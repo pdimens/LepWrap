@@ -14,7 +14,7 @@ lod_range = [i for i in range(lod_lim_l, lod_lim_h)]
 
 rule all:
     input:
-        expand("maps.splichrom/map.{LOD}", LOD = lod_range)
+        expand("maps.splitchrom/map.{LOD}", LOD = lod_range)
 
 rule parentcall:
     input:
@@ -41,7 +41,7 @@ rule separatechromosomes:
     input:
         "data_f.call.gz"
     output:
-        expand("maps.splichrom/map.{LOD}", LOD = lod_range)
+        expand("maps.splitchrom/map.{LOD}", LOD = lod_range)
     threads:
         8
     shell:
