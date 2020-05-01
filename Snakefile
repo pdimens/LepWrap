@@ -25,7 +25,7 @@ rule filtering:
     output:
         "data_f.call.gz"
     shell:
-        "echo -e -n "\nSpecify your data tolerance (0.0001 to 0.01):  " "
+        'echo -e -n "\nSpecify your data tolerance (0.0001 to 0.01):  " '
         "read -r "
         "zcat data.call.gz | java -cp ./LM3 Filtering2 data=- dataTolerance=$REPLY | gzip > data_f.call.gz"
 
