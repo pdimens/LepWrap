@@ -39,13 +39,13 @@ rule filtering:
 
 rule separatechromosomes:
     input:
-        datacall = "data_f.call.gz",
+        "data_f.call.gz"
     output:
         expand("maps.splichrom/map.{LOD}", LOD = lod_range)
     threads:
         8
     shell:
-        expand("zcat {input.datacall} | java -cp LM3 SeparateChromosomes2 data=- lodLimit={LOD} distortionLod=1 numThreads={threads} > maps.splitchrom/map.{LOD}", LOD = lod_range) 
+        expand("zcat {input} | java -cp LM3 SeparateChromosomes2 data=- lodLimit={LOD} distortionLod=1 numThreads={threads} > maps.splitchrom/map.{LOD}", LOD = lod_range) 
 
 
 
