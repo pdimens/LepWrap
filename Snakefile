@@ -7,9 +7,7 @@ import glob
 vcf_file = [os.path.basename(i) for i in glob.glob("./*.vcf")]
 
 # SeperateChromosomes2 params
-lod_lim_l = 20
-lod_lim_h = 30
-lod_range = [i for i in range(lod_lim_l, lod_lim_h)]
+lod_range = [i for i in range(20, 30)]
 #map_outs = ["maps.splichrom/map."+ str(i) for i in range(1,30)]
 
 rule all:
