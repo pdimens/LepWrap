@@ -1,0 +1,101 @@
+#! /usr/bin/env python
+
+# Originally written Adrienne E. Norrell, ported to python3, extended, and optimized for portability by Pavel Dimens
+
+import os
+import sys
+
+def usage():
+    print("\n", "Converts LepMap3 format linkage map(s) to ALLMAPS input format. Requires:")
+    print("1. A file that is the output of running `vcftools --012 --vcf yourvcf` ")
+    print("2. LepMap3 files must be named 'something.LGnumber.extension' (ex. chromosome.1.dist)", "\n")
+    
+    print(":: For separate male + female output ::")
+    print("[usage] lepmap2allmaps splitsex <outfile from vcftools --012> <lepmapfile extension>")
+    print("[example] lepmap2allmaps splitsex chrom_positions.pos .dist \n")
+    
+    print(":: For sex-averaged in/output ::")
+    print("[usage] lepmap2allmaps sexaverage <outfile from vcftools --012>")
+    print("[example] lepmap2allmaps sexaverage chrom_positions.pos .sexdist")
+
+if len(sys.argv) != 4:
+    usage()
+    exit()
+
+# define the sex-averaged function of this script
+def sexdist():
+    outfile = open("sexaverage_distances_ALLMAPS.csv", "w")
+    outfile.write("Scaffold ID,scaffold position,LG,genetic position" + "\n")
+
+    for lg in filelist:
+        infile = open(lg)
+        for line in infile.readlines():
+            if line.find("#") == 0:
+                continue
+            elif line.find("*") == 0:
+                continue
+            else:
+                data = line.strip("\n").split("\t")
+                marker_id = int(data[0]) - 1
+                cm = float(data[1])
+                scaf = pos[marker_id].split("\t")
+                scaf_id = str(scaf[0])
+                scaf_pos = str(scaf[1])
+                outfile.write(scaf_id + "," + scaf_pos + "," + lg.split(".")[1] + "," + str(cm) + "\n")
+    infile.close()
+    outfile.close()
+    pos_file.close()
+
+# define the slit-by-sex function of this script
+def mapdistance():
+    m_outfile = open("male_distances_ALLMAPS.csv", "w")
+    m_outfile.write("Scaffold ID,scaffold position,LG,genetic position" + "\n")
+    f_outfile = open("female_distances_ALLMAPS.csv", "w")
+    f_outfile.write("Scaffold ID,scaffold position,LG,genetic position" + "\n")
+
+    for lg in filelist:
+        infile = open(lg)
+        for line in infile.readlines():
+            if line.find("#") == 0:
+                continue
+            elif line.find("*") == 0:
+                continue
+            else:
+                data = line.strip("\n").split("\t")
+                marker_id = int(data[0]) - 1
+                cm_m = float(data[1])
+                cm_f = float(data[2])
+                scaf = pos[marker_id].split("\t")
+                scaf_id = str(scaf[0])
+                scaf_pos = str(scaf[1])
+                m_outfile.write(scaf_id + "," + scaf_pos + "," + lg.split(".")[1] + "," + str(cm_m) + "\n")
+                f_outfile.write(scaf_id + "," + scaf_pos + "," + lg.split(".")[1] + "," + str(cm_f) + "\n")
+                infile.close()
+    m_outfile.close()
+    f_outfile.close()
+    pos_file.close()
+
+# if wrong input format, then error and usage
+if (sys.argv[1] ) != "sexaverage" and (sys.argv[1] ) != "splitsex":
+    print("incorrect usage, please read below for proper use")
+    usage()
+    exit()
+
+# actually perform the script based on the first argument
+pos_file = open(sys.argv[2],"r")
+pos = []
+cwd = os.getcwd()
+filelist = []
+for root, dirs, files in os.walk(os.getcwd()):
+    for file in files:
+        if file.endswith(sys.argv[3]):
+            filelist.append(file)
+
+for line in pos_file.readlines():
+    pos.append(line.strip("\n"))
+
+if (sys.argv)[1] == "sexaverage":
+    sexdist()
+    mapdistance()
+else:
+    mapdistance()
