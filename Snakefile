@@ -39,10 +39,10 @@ rule separatechromosomes:
     input:
         "data_f.call.gz"
     output:
-        expand("maps.splitchrom/map.{LOD}", LOD = lod_range)
+        "maps.splitchrom/map.{lod_range}"
     threads: 8
     params:
-        lod_lim = expand("lodLimit={LOD}", LOD = lod_range},
+        lod_lim = "lodLimit={lod_range}",
         dist_lod = "distortionLod=1"
     shell:
         "zcat {input} | java -cp LM3 SeparateChromosomes2 data=- {params.lod_lim} {params.dist_lod} numThreads={threads} > maps.splitchrom/map.{lod_range}" 
