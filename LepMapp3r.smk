@@ -32,17 +32,17 @@ rule filtering:
 
 
 
-rule separatechromosomes:
-    input:
+#rule separatechromosomes:
+#    input:
 
-    output:
+#    output:
 
-    shell:
-
-
+#    shell:
 
 
 
+
+""""
 separatechromosomes(){
     printf "\nParentCall->"
     printf "\033[01;33m" 
@@ -68,3 +68,4 @@ separatechromosomes(){
         # prepend column names
         sed  -i "1i map.$i LG" maps.splitchrom/.map.$i.summary.txt
     done
+"""
