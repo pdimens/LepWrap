@@ -4,10 +4,10 @@
 
 for i in maps.splitchrom/map.*; do
     FNAME=$(basename $i)
-# summarizes the maps, removes leading whitespaces, and sorts by LG
-    sed '1,1d' $i | sort | uniq -c | sed 's/^[[:space:]]*//' | sort -k2n > .$i.summary.txt
+    # summarizes the maps, removes leading whitespaces, and sorts by LG
+    sed '1,1d' $i | sort | uniq -c | sed 's/^[[:space:]]*//' | sort -k2n > maps.splitchrom/.$FNAME.summary.txt
     # prepend column names
-    sed  -i "1i $FNAME LG" $i.summary.txt
+    sed  -i "1i $FNAME LG" maps.splitchrom/.$FNAME.summary.txt
 done
 
 # initialize max number of LG's in summary file
