@@ -3,7 +3,6 @@ import glob
 #FILENAMES = [os.path.basename(i) for i in glob.iglob("test/*.R1.fq.gz")]
 #FILEBASENAMES = [i.replace('.R1.fq.gz', '') for i in FILENAMES]
 
-vcf_file = os.path.basename(glob.glob("./*.vcf"))
 
 rule all:
     input:
@@ -12,7 +11,7 @@ rule all:
 
 rule parentcall:
     input:
-        vcf = expand("{vcf}", vcf = vcf_file)
+        vcf = "YFT70_maxmiss80.recode.vcf"
         pedigree = "pedigree.txt"
     output:
         "data.call.gz"
@@ -42,7 +41,7 @@ rule filtering:
 
 
 
-""""
+"""
 separatechromosomes(){
     printf "\nParentCall->"
     printf "\033[01;33m" 
