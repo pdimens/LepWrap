@@ -45,7 +45,7 @@ rule separatechromosomes:
     threads:
         8
     shell:
-        expand("zcat {{input}} | java -cp LM3 SeparateChromosomes2 data=- lodLimit={LOD} distortionLod=1 numThreads={{threads}} > maps.splitchrom/map.{LOD}", LOD = lod_range) 
+        "zcat {input} | java -cp LM3 SeparateChromosomes2 data=- lodLimit={wildcards.lod_range} distortionLod=1 numThreads={threads} > maps.splitchrom/map.{wildcards.lod_range}" 
 
 
 
