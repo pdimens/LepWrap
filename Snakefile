@@ -4,10 +4,11 @@ import glob
 #FILEBASENAMES = [i.replace('.R1.fq.gz', '') for i in FILENAMES]
 
 vcf_file = [os.path.basename(i) for i in glob.glob("./*.vcf")]
+#map_outs = ["maps.splichrom/map."+ str(i) for i in range(1,30)]
 
 rule all:
     input:
-        "data_f.call.gz"
+        expand("maps.splichrom/map.{LOD}", LOD = [i for i in range(1,30)])
 
 
 rule parentcall:
