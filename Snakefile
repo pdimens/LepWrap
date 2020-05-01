@@ -3,13 +3,18 @@ import glob
 #FILENAMES = [os.path.basename(i) for i in glob.iglob("test/*.R1.fq.gz")]
 #FILEBASENAMES = [i.replace('.R1.fq.gz', '') for i in FILENAMES]
 
+#initial VCF file
 vcf_file = [os.path.basename(i) for i in glob.glob("./*.vcf")]
+
+# SeperateChromosomes2 params
+lod_lim_l = 20
+lod_lim_h = 30
+lod_range = [i for i in range(lod_lim_l, lod_lim_h)]
 #map_outs = ["maps.splichrom/map."+ str(i) for i in range(1,30)]
 
 rule all:
     input:
-        expand("maps.splichrom/map.{LOD}", LOD = [i for i in range(1,30)])
-
+        expand("maps.splichrom/map.{LOD}", LOD = lod_range)
 
 rule parentcall:
     input:
@@ -36,11 +41,11 @@ rule separatechromosomes:
     input:
         datacall = "data_f.call.gz",
     output:
-        expand("maps.splichrom/map.{LOD}", LOD = [i for i in range(1,30)])
+        expand("maps.splichrom/map.{LOD}", LOD = lod_range)
     threads:
         8
     shell:
-        "zcat {input.datacall} | java -cp LM3 SeparateChromosomes2 data=- lodLimit={LOD} distortionLod=1 numThreads={threads} > maps.splitchrom/map.{LOD}"
+        expand("zcat {input.datacall} | java -cp LM3 SeparateChromosomes2 data=- lodLimit={LOD} distortionLod=1 numThreads={threads} > maps.splitchrom/map.{LOD}", LOD = lod_range) 
 
 
 
