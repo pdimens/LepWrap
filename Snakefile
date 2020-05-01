@@ -7,12 +7,15 @@ import glob
 vcf_file = [os.path.basename(i) for i in glob.glob("./*.vcf")]
 
 # SeperateChromosomes2 params
-lod_range = [i for i in range(20, 30)]
+lod_min = 20
+lod_max = 30
+lod_range = [i for i in range(lod_min, lod_max)]
 #map_outs = ["maps.splichrom/map."+ str(i) for i in range(1,30)]
 
 rule all:
     input:
-        expand("maps.splitchrom/map.{LOD}", LOD = lod_range)
+        "maps.splitchrom/maps.summary.txt"
+        #expand("maps.splitchrom/map.{LOD}", LOD = lod_range)
 
 rule parentcall:
     input:
@@ -39,7 +42,7 @@ rule separatechromosomes:
     input:
         "data_f.call.gz"
     output:
-        "maps.splitchrom/map.{lod_range}"
+        map = "maps.splitchrom/map.{lod_range}",
     threads: 8
     params:
         lod_lim = "lodLimit={lod_range}",
@@ -47,33 +50,12 @@ rule separatechromosomes:
     shell:
         "zcat {input} | java -cp LM3 SeparateChromosomes2 data=- {params.lod_lim} {params.dist_lod} numThreads={threads} > {output}" 
 
-
-
-
-"""
-separatechromosomes(){
-    printf "\nParentCall->"
-    printf "\033[01;33m" 
-    printf " SeparateChromosomes\n" 
-    printf "\033[0m"
-    echo -e "\nChromosome separation can be iterated over a range of LOD score limits to find the best map"
-    printf 'What LOD limit do you want to start with?  '
-    read -r LODSTART
-    printf 'What LOD limit do you want to end with?  '
-    read -r LODEND 
-    echo -e "\nThis may take a while depending on your data and the range of LOD scores you're exploring."
-    printf 'How many CPUs would you like to use per iteration (max=%s)?  ' "$(nproc)"
-    read -r NBPROCS
-    mkdir -p maps.splitchrom
-    for i in $(seq $LODSTART $LODEND)
-        do
-        printf "\033[01;33m" 
-        printf "Running SeparateChromosomes 2 with LOD limit=%s\n" "$i" 
-        printf "\033[0m"
-        zcat data_f.call.gz | java $LM3PATH SeparateChromosomes2 data=- lodLimit=$i distortionLod=1 numThreads=$NBPROCS > maps.splitchrom/map.$i
-        # this exhausted pipe summarizes the maps, removes leading whitespaces, and sorts by LG
-        sed '1,1d' maps.splitchrom/map.$i | sort | uniq -c | sed 's/^[[:space:]]*//' | sort -k2n > maps.splitchrom/.map.$i.summary.txt
-        # prepend column names
-        sed  -i "1i map.$i LG" maps.splitchrom/.map.$i.summary.txt
-    done
-"""
+rule mapsummary:
+    input:
+        "maps.splitchrom/map.{lod_range}"
+    output:
+        "maps.splitchrom/maps.summary.txt"
+    params:
+        LOD_max = "{lod_max}"
+    shell:
+        "./scripts/map_summary.sh {params.LOD_max}"
