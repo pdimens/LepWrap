@@ -52,7 +52,7 @@ rule separatechromosomes:
 
 rule mapsummary:
     input:
-        "maps.splitchrom/map.{lod_range}"
+        expand("maps.splitchrom/map.{LOD}", LOD = lod_range)
     output:
         "maps.splitchrom/maps.summary.txt"
     params:
