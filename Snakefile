@@ -17,7 +17,7 @@ rule parentcall:
     output:
         "data.call.gz"
     shell:
-        "java -cp ./LM3 ParentCall2 data={input.pedigree} vcfFile={input.vcf} removeNonInformative=1 | gzip > data.call.gz"
+        "java -cp LM3 ParentCall2 data={input.pedigree} vcfFile={input.vcf} removeNonInformative=1 | gzip > data.call.gz"
 
 rule filtering:
     input:
@@ -28,17 +28,18 @@ rule filtering:
         """
         echo -e -n '\nSpecify your data tolerance (0.0001 to 0.01):  '
         read -r
-        zcat data.call.gz | java -cp ./LM3 Filtering2 data=- dataTolerance=$REPLY | gzip > data_f.call.gz
+        zcat data.call.gz | java -cp LM3 Filtering2 data=- dataTolerance=$REPLY | gzip > data_f.call.gz
         """
 
-
-
-#rule separatechromosomes:
-#    input:
-
-#    output:
-
-#    shell:
+rule separatechromosomes:
+    input:
+        datacall = "data_f.call.gz",
+    output:
+        expand("maps.splichrom/map.{LOD}", LOD = [i for i in range(1,30)])
+    threads:
+        8
+    shell:
+        "zcat {input.datacall} | java -cp LM3 SeparateChromosomes2 data=- lodLimit={LOD} distortionLod=1 numThreads={threads} > maps.splitchrom/map.{LOD}"
 
 
 
