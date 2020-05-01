@@ -3,7 +3,7 @@ import glob
 #FILENAMES = [os.path.basename(i) for i in glob.iglob("test/*.R1.fq.gz")]
 #FILEBASENAMES = [i.replace('.R1.fq.gz', '') for i in FILENAMES]
 
-vcf_file = os.path.basename(glob.glob("./*.vcf"))
+vcf_file = os.path.basename(glob.glob("./*.vcf")[0])
 
 rule all:
     input:
