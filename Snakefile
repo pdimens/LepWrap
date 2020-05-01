@@ -55,7 +55,5 @@ rule mapsummary:
         expand("maps.splitchrom/map.{LOD}", LOD = lod_range)
     output:
         "maps.splitchrom/maps.summary.txt"
-    params:
-        LOD_max = "{lod_max}"
     shell:
-        "./scripts/map_summary.sh {params.LOD_max}"
+        "./scripts/map_summary.sh {lod_max}"
