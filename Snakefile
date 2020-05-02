@@ -35,7 +35,7 @@ rule filtering:
         """
         echo -e -n '\nSpecify your data tolerance (0.0001 to 0.01):  '
         read -r
-        zcat data.call.gz | java -cp LM3 Filtering2 data=- dataTolerance=$REPLY | gzip > data_f.call.gz
+        zcat {input} | java -cp LM3 Filtering2 data=- dataTolerance=$REPLY | gzip > data_f.call.gz
         """
 
 rule separatechromosomes:
@@ -60,7 +60,8 @@ rule mapsummary:
 
 rule joinsingles:
     input:
-        "maps.splitchrom/maps.summary.txt"
+        datacall = "data_f.call.gz",
+        map_summ = "maps.splitchrom/maps.summary.txt"
     output:
         "map.master"
     threads: 8
@@ -72,13 +73,14 @@ rule joinsingles:
         """
         echo -n -e '\nWhich map would you like to use (e.g. map.15)? map.'
         read -r
-        zcat data_f.call.gz | java -cp LM3 JoinSingles2All map=maps.splitchrom/map.$REPLY data=- {params.lod_limit} {params.lod_diff} {params.iterate} numThreads={threads} > map.master
+        zcat {input.datacall} | java -cp LM3 JoinSingles2All map=maps.splitchrom/map.$REPLY data=- {params.lod_limit} {params.lod_diff} {params.iterate} numThreads={threads} > map.master
         echo 'Your filtered map can be found in the working directory'
         """
 
 rule ordermarkers:
     input:
-        "map.master"
+        datacall = "data_f.call.gz",
+        filt_map = "map.master"
     output:
         logfile = "ordermarkers/logs/ordered.{params.chrom}.{params.iteration}.log",
         lgfile = "ordermarkers/ordered.{params.chrom}.{params.iteration}.txt"
@@ -89,6 +91,6 @@ rule ordermarkers:
     threads: 2
     shell:
         """
-        zcat data_f.call.gz | java -cp LM3 OrderMarkers2 map={input} data=- numThreads={threads} {params.dist_method} {params.chrom} &> {output.logfile}
+        zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.dist_method} {params.chrom} &> {output.logfile}
         grep -A 100000 \*\*\*\ LG\ \= {output.logfile} > {output.lgfile}
         """
