@@ -82,12 +82,11 @@ rule ordermarkers:
         datacall = "data_f.call.gz",
         filt_map = "map.master"
     output:
-        logfile = "ordermarkers/logs/ordered.{params.chrom}.{params.iteration}.log",
-        lgfile = "ordermarkers/ordered.{params.chrom}.{params.iteration}.txt"
+        logfile = expand("ordermarkers/logs/ordered.{params.chrom}.{ITER}.log", ITER = list(range(1,100+1))),
+        lgfile = expand("ordermarkers/ordered.{params.chrom}.{ITER}.txt", ITER = list(range(1,100+1)))
     params:
         dist_method = "useKosambi=1",
-        chrom = expand("chromosome={LG}", LG = lg_range),
-        iteration = expand("{ITER}", ITER = list(range(1,100+1)))
+        chrom = expand("chromosome={LG}", LG = lg_range)
     threads: 2
     shell:
         """
