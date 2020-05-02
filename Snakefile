@@ -87,7 +87,7 @@ rule ordermarkers:
     params:
         dist_method = "useKosambi=1",
         chrom = expand("chromosome={LG}", LG = lg_range)
-        iteration = expand("{ITER}", list(range(1,100+1)))
+        iteration = expand("{ITER}", ITER = list(range(1,100+1)))
     threads: 2
     shell:
         """
