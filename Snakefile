@@ -84,7 +84,7 @@ rule ordermarkers:
         lgfile = expand("ordermarkers/ordered.{LG}.{ITER}.txt", LG = lg_range, ITER = list(range(1,100+1)))
     params:
         dist_method = "useKosambi=1",
-        chrom = "chromosome={LG}"
+        chrom = expand("chromosome={LG}", LG = lg_range)
     threads: 2
     shell:
         """
