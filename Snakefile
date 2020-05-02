@@ -10,6 +10,8 @@ vcf_file = [os.path.basename(i) for i in glob.glob("./*.vcf")]
 lod_min = 20
 lod_max = 40
 lod_range = list(range(lod_min, lod_max+1))
+exp_lg = 24
+lg_range = list(range(1, exp_lg+1))
 
 rule all:
     input:
@@ -71,5 +73,21 @@ rule joinsingles:
         echo -n -e '\nWhich map would you like to use (e.g. map.15)? map.'
         read -r
         zcat data_f.call.gz | java -cp LM3 JoinSingles2All map=maps.splitchrom/map.$REPLY data=- {params.lod_limit} {params.lod_diff} {params.iterate} numThreads={threads} > map.$REPLY.master
-        echo 'Your filtered map can be found in ./map.${REPLY}.master'
+        echo 'Your filtered map can be found in the working directory'
+        """
+
+rule ordermarkers:
+    input:
+        "map.{LOD}.master"
+    output:
+        logfile = expand("ordermarkers/logs/ordered.{LG}.{ITER}.log", LG = lg_range, ITER = list(range(1,100+1))),
+        lgfile = expand("ordermarkers/ordered.{LG}.{ITER}.txt", LG = lg_range, ITER = list(range(1,100+1)))
+    params:
+        dist_method = "useKosambi=1",
+        chrom = "chromosome={LG}"
+    threads: 2
+    shell:
+        """
+        zcat data_f.call.gz | java -cp LM3 OrderMarkers2 map={input} data=- numThreads={threads} {params.dist_method} {params.chrom} &> {output.logfile}
+        grep -A 100000 \*\*\*\ LG\ \= {output.logfile} > {output.lgfile}
         """
