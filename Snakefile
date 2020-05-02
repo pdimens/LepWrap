@@ -82,8 +82,8 @@ rule ordermarkers:
         datacall = "data_f.call.gz",
         filt_map = "map.master"
     output:
-        logfile = expand("ordermarkers/logs/ordered.{params.chrom}.{ITER}.log", ITER = list(range(1,100+1))),
-        lgfile = expand("ordermarkers/ordered.{params.chrom}.{ITER}.txt", ITER = list(range(1,100+1)))
+        logfile = expand("ordermarkers/logs/ordered.{LG}.{ITER}.log", LG = lg_range, ITER = list(range(1,100+1))),
+        lgfile = expand("ordermarkers/ordered.{LG}.{ITER}.txt", LG = lg_range, ITER = list(range(1,100+1)))
     params:
         dist_method = "useKosambi=1",
         chrom = expand("chromosome={LG}", LG = lg_range)
