@@ -60,7 +60,7 @@ rule mapsummary:
 
 rule joinsingles:
     input:
-        map = "maps.splitchrom/map.{lod_range}"
+        "maps.splitchrom/maps.summary.txt"
     output:
         "map.master"
     threads: 8
