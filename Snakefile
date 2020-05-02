@@ -78,7 +78,7 @@ rule joinsingles:
 
 rule ordermarkers:
     input:
-        "map.{LOD}.master"
+        "map.{lod_range}.master"
     output:
         logfile = expand("ordermarkers/logs/ordered.{LG}.{ITER}.log", LG = lg_range, ITER = list(range(1,100+1))),
         lgfile = expand("ordermarkers/ordered.{LG}.{ITER}.txt", LG = lg_range, ITER = list(range(1,100+1)))
