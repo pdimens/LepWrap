@@ -12,6 +12,7 @@ lod_max = 40
 lod_range = list(range(lod_min, lod_max+1))
 exp_lg = 24
 lg_range = list(range(1, exp_lg+1))
+ITER = list(range(1,100+1))
 
 rule all:
     input:
@@ -82,11 +83,11 @@ rule ordermarkers:
         datacall = "data_f.call.gz",
         filt_map = "map.master"
     output:
-        logfile = expand("ordermarkers/logs/ordered.{LG}.{ITER}.log", LG = lg_range, ITER = list(range(1,100+1))),
-        lgfile = expand("ordermarkers/ordered.{LG}.{ITER}.txt", LG = lg_range, ITER = list(range(1,100+1)))
+        logfile = "ordermarkers/logs/ordered.{lg_range}.{ITER}.log",
+        lgfile = "ordermarkers/ordered.{lg_range}.{ITER}.txt"
     params:
         dist_method = "useKosambi=1",
-        chrom = expand("chromosome={LG}", LG = lg_range)
+        chrom = "chromosome={lg_range}"
     threads: 2
     shell:
         """
