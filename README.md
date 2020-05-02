@@ -1,6 +1,6 @@
 ![logo](logo.png)
 
-# LepMapp3r.smk
+# LepMak3r
 
 A Snakemake variant to LepMapp3r
 
