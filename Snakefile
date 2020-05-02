@@ -13,8 +13,7 @@ lod_range = list(range(lod_min, lod_max+1))
 
 rule all:
     input:
-        "maps.splitchrom/maps.summary.txt"
-        #expand("maps.splitchrom/map.{LOD}", LOD = lod_range)
+        "map.27.master"
 
 rule parentcall:
     input:
