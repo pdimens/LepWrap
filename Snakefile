@@ -41,7 +41,7 @@ rule separatechromosomes:
     input:
         "data_f.call.gz"
     output:
-        map = "maps.splitchrom/map.{lod_range}",
+        map = "maps.splitchrom/map.{lod_range}"
     threads: 8
     params:
         lod_lim = "lodLimit={lod_range}",
@@ -55,4 +55,24 @@ rule mapsummary:
     output:
         "maps.splitchrom/maps.summary.txt"
     shell:
-        "./scripts/map_summary.sh {lod_max}"
+        "./scripts/map_summary.sh {lod_max} "
+
+rule joinsingles:
+    input:
+        map = "maps.splitchrom/map.{lod_range}"
+    output:
+        "map.{lod_range}.master"
+    threads: 8
+    params:
+        lod_limit = "lodLimit=4",
+        lod_diff = "lodDifference=2",
+        iterate = "iterate=1",
+        threads = "numThreads={threads}"
+
+    shell:
+        """
+        echo -n -e '\nWhich map would you like to use (e.g. map.15)? map.'
+        read -r
+        zcat data_f.call.gz | java -cp LM3 JoinSingles2All map=maps.splitchrom/map.$REPLY data=- {params.lod_limit} {params.lod_diff} {params.iterate} {params.threads} > map.$REPLY.master
+        echo 'Your filtered map can be found in ./map.$REPLY.master'
+        """

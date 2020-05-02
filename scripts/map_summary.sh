@@ -20,3 +20,8 @@ for summfile in $(find ./maps.splitchrom -maxdepth 1 -name ".map.*.summary.txt" 
 done
 # replace all spaces with tabs
 sed -i 's/ /\t/g' maps.splitchrom/maps.summary.txt
+
+echo -e "\nExamine the maps produced ("maps.splitchrom/maps.summary.txt") and decide on the best map before proceeding"
+echo "if using a screen/tmux environment, detach this session and return to it with the appropriate command when ready"
+echo "When you have decided on a map, press Enter to proceed"
+read
