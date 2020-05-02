@@ -15,7 +15,7 @@ lg_range = list(range(1, exp_lg+1))
 
 rule all:
     input:
-        expand("ordermarkers/ordered.{LG}.{ITER}.txt", LG = lg_range, ITER = list(range(1,100+1)))
+        expand("ordermarkers/logs/ordered.{LG}.{ITER}.log", LG = lg_range, ITER = list(range(1,100+1)))
 
 rule parentcall:
     input:
