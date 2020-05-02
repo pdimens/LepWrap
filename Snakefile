@@ -63,7 +63,7 @@ rule joinsingles:
         "map.{lod_range}.master"
     threads: 8
     params:
-        lod_limit = "lodLimit=4",
+        lod_limit = "lodLimit=10",
         lod_diff = "lodDifference=2",
         iterate = "iterate=1",
     shell:
@@ -71,5 +71,5 @@ rule joinsingles:
         echo -n -e '\nWhich map would you like to use (e.g. map.15)? map.'
         read -r
         zcat data_f.call.gz | java -cp LM3 JoinSingles2All map=maps.splitchrom/map.$REPLY data=- {params.lod_limit} {params.lod_diff} {params.iterate} numThreads={threads} > map.$REPLY.master
-        echo 'Your filtered map can be found in ./map.$REPLY.master'
+        echo 'Your filtered map can be found in ./map.${REPLY}.master'
         """
