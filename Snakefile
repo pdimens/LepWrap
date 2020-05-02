@@ -67,7 +67,6 @@ rule joinsingles:
         lod_diff = "lodDifference=2",
         iterate = "iterate=1",
         threads = "numThreads={threads}"
-
     shell:
         """
         echo -n -e '\nWhich map would you like to use (e.g. map.15)? map.'
