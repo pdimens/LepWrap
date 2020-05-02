@@ -62,7 +62,7 @@ rule joinsingles:
     input:
         map = "maps.splitchrom/map.{lod_range}"
     output:
-        "map.{lod_range}.master"
+        "map.master"
     threads: 8
     params:
         lod_limit = "lodLimit=10",
@@ -72,13 +72,13 @@ rule joinsingles:
         """
         echo -n -e '\nWhich map would you like to use (e.g. map.15)? map.'
         read -r
-        zcat data_f.call.gz | java -cp LM3 JoinSingles2All map=maps.splitchrom/map.$REPLY data=- {params.lod_limit} {params.lod_diff} {params.iterate} numThreads={threads} > map.$REPLY.master
+        zcat data_f.call.gz | java -cp LM3 JoinSingles2All map=maps.splitchrom/map.$REPLY data=- {params.lod_limit} {params.lod_diff} {params.iterate} numThreads={threads} > map.master
         echo 'Your filtered map can be found in the working directory'
         """
 
 rule ordermarkers:
     input:
-        expand("map.{LOD}.master", LOD = lod_range)
+        "map.master"
     output:
         logfile = expand("ordermarkers/logs/ordered.{LG}.{ITER}.log", LG = lg_range, ITER = list(range(1,100+1))),
         lgfile = expand("ordermarkers/ordered.{LG}.{ITER}.txt", LG = lg_range, ITER = list(range(1,100+1)))
