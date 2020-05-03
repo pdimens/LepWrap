@@ -16,7 +16,7 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        "ordermarkers/likelihoods.txt"
+        "ordermarkers/likelihoods.sorted.txt"
         #expand("ordermarkers/logs/ordered.{LG}.{ITER}.log", LG = lg_range, ITER = list(range(1,100+1)))
 
 rule parentcall:
