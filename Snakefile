@@ -16,7 +16,8 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        expand("ordermarkers/logs/ordered.{LG}.{ITER}.log", LG = lg_range, ITER = list(range(1,100+1)))
+        "ordermarkers/likelihoods.txt"
+        #expand("ordermarkers/logs/ordered.{LG}.{ITER}.log", LG = lg_range, ITER = list(range(1,100+1)))
 
 rule parentcall:
     input:
@@ -83,21 +84,30 @@ rule ordermarkers:
         datacall = "data_f.call.gz",
         filt_map = "map.master"
     output:
-        order = "ordermarkers/ordered.{lg_range}.{ITER}.txt",
-        orderlog = "ordermarkers/logs/ordered.{lg_range}.{ITER}.log",
-        likelihoods = "ordermarkers/likelihoods.txt"
+        "ordermarkers/ordered.{lg_range}.{ITER}.txt"
+    log:
+        "ordermarkers/logs/ordered.{lg_range}.{ITER}.log"
     params:
         dist_method = "useKosambi=1",
         chrom = "chromosome={lg_range}"
     threads: 2
     shell:
         """
-        zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.dist_method} {params.chrom} &> {output.orderlog}
-        grep -A 100000 \*\*\*\ LG\ \= {output.orderlog} > {output.order}
-        LG=$(echo {output.order} | cut -d "." -f1,2)
-        ITERUN=$(echo {output.order} | cut -d "." -f3)
-        LIKELIHOOD=$(head -1 {output.order} | tail -1 | cut -c 27-)
-        echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.likelihoods}
+        zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.dist_method} {params.chrom} &> {log}
+        grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
+        """
+
+rule likelihoodsummary:
+    input:
+        "ordermarkers/ordered.{lg_range}.{ITER}.txt"
+    output:
+        "ordermarkers/likelihoods.txt"
+    shell:
+        """
+        LG=$(echo {input} | cut -d "." -f1,2)
+        ITERUN=$(echo {input} | cut -d "." -f3)
+        LIKELIHOOD=$(head -1 {input} | tail -1 | cut -c 27-)
+        echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output}
         """
 
 rule bestlikelihoods:
