@@ -57,7 +57,7 @@ rule mapsummary:
     output:
         "maps.splitchrom/maps.summary.txt"
     shell:
-        "./scripts/map_summary.sh {lod_max} "
+        "scripts/map_summary.sh {lod_max} "
 
 rule joinsingles:
     input:
@@ -98,7 +98,24 @@ rule ordermarkers:
 
 rule bestlikelihoods:
     input:
-        "ordermarkers/ordered.{lg_range}.{ITER}.txt"
+        "ordermarkers/ordered.{lg}.{iter}.txt"
     output:
-        
+        "ordermarkers/likelihoods.txt"
+        "ordermarkers/likelihoods.sorted.txt",
+        "ordermarkers/bestlikelihoods/ordered.{lg}.{iter}.txt"
     shell:
+        "scripts/bestlikelihood.sh"
+
+rule trimming:
+    input:
+        "ordermarkers/bestlikelihoods/ordered.{lg}.{iter}"
+    output:
+        "ordermarkers/best.trimmed/ordered.{lg}.{iter}"
+    log:
+        "Trimming.log",
+        "bad_markers.txt",
+        "ordermarkers/best.trimmed/trimming.plots.pdf"
+    params:
+        trim_threshold = "10"
+    shell:
+        "Rscript scripts/LepMapp3rQA.r $(pwd)/ordermarkers/bestlikelihoods ordered {params.trim_threshold} > Trimming.log"
