@@ -83,22 +83,22 @@ rule ordermarkers:
         datacall = "data_f.call.gz",
         filt_map = "map.master"
     output:
-        orderfile = "ordermarkers/ordered.{lg_range}.{ITER}.txt",
-        likelihoods = "ordermarkers/likelihoods.txt"
+        "ordermarkers/ordered.{lg_range}.{ITER}.txt"
     log:
-        "ordermarkers/logs/ordered.{lg_range}.{ITER}.log",
+        orderlog = "ordermarkers/logs/ordered.{lg_range}.{ITER}.log",
+        likelihoods = "ordermarkers/likelihoods.txt"
     params:
         dist_method = "useKosambi=1",
         chrom = "chromosome={lg_range}"
     threads: 2
     shell:
         """
-        zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.dist_method} {params.chrom} &> {log}
-        grep -A 100000 \*\*\*\ LG\ \= {log} > {output.orderfile}
-        LG=$(echo {output.orderfile} | cut -d "." -f1,2)
-        ITERUN=$(echo {output.orderfile} | cut -d "." -f3)
-        LIKELIHOOD=$(head -1 {output.orderfile} | tail -1 | cut -c 27-)
-        echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.likelihoods}
+        zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.dist_method} {params.chrom} &> {log.orderlog}
+        grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
+        LG=$(echo {output} | cut -d "." -f1,2)
+        ITERUN=$(echo {output} | cut -d "." -f3)
+        LIKELIHOOD=$(head -1 {output} | tail -1 | cut -c 27-)
+        echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {log.likelihoods}
         """
 
 rule bestlikelihoods:
