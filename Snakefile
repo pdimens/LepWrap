@@ -132,10 +132,6 @@ rule trimming:
         "ordermarkers/bestlikelihoods/ordered.{lg}.{iter}"
     output:
         "ordermarkers/best.trimmed/ordered.{lg}.{iter}"
-    #log:
-    #    "Trimming.log",
-    #    "bad_markers.txt",
-    #    "ordermarkers/best.trimmed/trimming.plots.pdf"
     params:
         trim_threshold = "10"
     shell:
