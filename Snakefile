@@ -108,7 +108,6 @@ rule bestlikelihoods:
     output:
         "ordermarkers/bestlikelihoods/ordered.{lg}.{iter}.txt"
     log:
-        "ordermarkers/likelihoods.txt",
         "ordermarkers/likelihoods.sorted.txt"
     shell:
         "scripts/bestlikelihood.sh"
