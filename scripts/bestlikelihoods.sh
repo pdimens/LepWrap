@@ -1,18 +1,10 @@
 #! /usr/bin/env bash
 
-LG=$(find ordermarkers -maxdepth 1 -name "ordered.*.*.txt" | cut -d "." -f3 | sort -V | uniq)
-NUMITER=$(find ordermarkers -maxdepth 1 -name "ordered.*.*.txt" | cut -d "." -f4 | sort -V | uniq)
-TOTALMAPS=$(find ordermarkers -maxdepth 1 -name "ordered.*.*.txt" | wc -l) 
-
-for i in $LG ; do
-    for j in $(seq 1 $NUMITER) ; do
-        LG="ordered.$i"
-        ITERUN="$j"
-        LIKELIHOOD=$(head -1 ordermarkers/ordered.$i.$j.txt | tail -1 | cut -c 27-) 
-        echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> ordermarkers/likelihoods.txt
-    done
-done
 sort ordermarkers/likelihoods.txt -k1,1V -k3,3nr > ordermarkers/likelihoods.sorted.txt
+
+LG=$(find ordermarkers -maxdepth 1 -name "ordered.*.*.txt" | cut -d "." -f2 | sort -V | uniq)
+NUMITER=$(find ordermarkers -maxdepth 1 -name "ordered.*.*.txt" | cut -d "." -f3 | sort -V | uniq)
+TOTALMAPS=$(find ordermarkers -maxdepth 1 -name "ordered.*.*.txt" | wc -l) 
 
 # pull out best maps for each linkage group
 echo "Best ordered maps:"
