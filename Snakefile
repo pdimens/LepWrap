@@ -110,14 +110,20 @@ rule likelihoodsummary:
         echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output}
         """
 
+rule sortlikelihoods:
+    input:
+        "ordermarkers/likelihoods.txt"
+    output:
+        "ordermarkers/likelihoods.sorted.txt"
+    shell:
+        "sort {input} -k1,1V -k3,3nr > {output}"
+
 rule bestlikelihoods:
     input:
         "ordermarkers/likelihoods.txt",
         "ordermarkers/ordered.{lg}.{iter}.txt"
     output:
         "ordermarkers/bestlikelihoods/ordered.{lg}.{iter}.txt"
-    log:
-        "ordermarkers/likelihoods.sorted.txt"
     shell:
         "scripts/bestlikelihood.sh"
 
@@ -126,10 +132,10 @@ rule trimming:
         "ordermarkers/bestlikelihoods/ordered.{lg}.{iter}"
     output:
         "ordermarkers/best.trimmed/ordered.{lg}.{iter}"
-    log:
-        "Trimming.log",
-        "bad_markers.txt",
-        "ordermarkers/best.trimmed/trimming.plots.pdf"
+    #log:
+    #    "Trimming.log",
+    #    "bad_markers.txt",
+    #    "ordermarkers/best.trimmed/trimming.plots.pdf"
     params:
         trim_threshold = "10"
     shell:

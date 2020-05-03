@@ -1,7 +1,5 @@
 #! /usr/bin/env bash
 
-sort ordermarkers/likelihoods.txt -k1,1V -k3,3nr > ordermarkers/likelihoods.sorted.txt
-
 LG=$(find ordermarkers -maxdepth 1 -name "ordered.*.*.txt" | cut -d "." -f2 | sort -V | uniq)
 NUMITER=$(find ordermarkers -maxdepth 1 -name "ordered.*.*.txt" | cut -d "." -f3 | sort -V | uniq)
 TOTALMAPS=$(find ordermarkers -maxdepth 1 -name "ordered.*.*.txt" | wc -l) 
