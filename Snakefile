@@ -99,7 +99,7 @@ rule ordermarkers:
 
 rule likelihoodsummary:
     input:
-        "ordermarkers/ordered.{lg_range}.{ITER}.txt"
+        "ordermarkers/ordered.{lg}.{iter}.txt"
     output:
         "ordermarkers/likelihoods.txt"
     shell:
