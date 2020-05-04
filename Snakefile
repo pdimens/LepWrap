@@ -170,4 +170,4 @@ rule trimming:
     params:
         trim_threshold = "10"
     shell:
-        "Rscript scripts/LepMapp3rQA.r $(pwd)/ordermarkers {input} {params.trim_threshold} > Trimming.log"
+        "Rscript scripts/LepMapp3rQA.r $(pwd)/ordermarkers bestlikelihoods.txt {params.trim_threshold} > Trimming.log"
