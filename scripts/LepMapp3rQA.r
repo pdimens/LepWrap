@@ -6,8 +6,8 @@ suppressMessages(if (!require("dplyr")) install.packages("dplyr"))
 suppressMessages(library("dplyr"))
 path = args[1]
 setwd(args[1])
-file.names <- dir(path, pattern = args[2])
-file.names <- file.names[order(nchar(file.names), file.names)] #sort by LG
+file.names <- scan(args[2], character(), quote = "")
+#file.names <- file.names[order(nchar(file.names), file.names)] #sort by LG
 PDFPath <- paste(path, "/best.trimmed/trimming.plots.pdf", sep = "/")
 pdf(file=PDFPath, height = 11, width = 8.5) 
 par(mfrow=(c(4,2))) # create 4x2 plots
@@ -15,7 +15,7 @@ par(mfrow=(c(4,2))) # create 4x2 plots
 ##### Pruning the ends #####
 for(i in file.names){  
   lgfile <- read.delim(
-    paste(path,i, sep = "/"), 
+    i, 
     header = FALSE, 
     sep = "\t", 
     comment.char="#"

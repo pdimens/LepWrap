@@ -16,8 +16,8 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        "ordermarkers/bestlikelihoods.txt"
-        #expand("ordermarkers/logs/ordered.{LG}.{ITER}.log", LG = lg_range, ITER = list(range(1,100+1)))
+        expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = open("ordermarkers/bestlikelihoods.txt").read().splitlines())
+        #"ordermarkers/bestlikelihoods.txt"
 
 rule parentcall:
     input:
@@ -164,10 +164,10 @@ rule find_bestlikelihoods:
 
 rule trimming:
     input:
-        "ordermarkers/bestlikelihoods/ordered.{lg}.{iter}"
+        "ordermarkers/bestlikelihoods.txt"
     output:
-        "ordermarkers/best.trimmed/ordered.{lg}.{iter}"
+        expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = open("{{input}}").read().splitlines())
     params:
         trim_threshold = "10"
     shell:
-        "Rscript scripts/LepMapp3rQA.r $(pwd)/ordermarkers/bestlikelihoods ordered {params.trim_threshold} > Trimming.log"
+        "Rscript scripts/LepMapp3rQA.r $(pwd)/ordermarkers {input} {params.trim_threshold} > Trimming.log"
