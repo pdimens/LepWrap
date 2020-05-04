@@ -16,7 +16,7 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()])
+        expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()])
         #"ordermarkers/bestlikelihoods.txt"
 
 rule parentcall:
@@ -166,7 +166,7 @@ rule trimming:
     input:
         "ordermarkers/bestlikelihoods.txt"
     output:
-        expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()])
+        expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()])
     params:
         trim_threshold = "10"
     shell:
