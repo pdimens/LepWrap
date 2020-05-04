@@ -142,7 +142,7 @@ rule find_bestlikelihoods:
 
         for i in $(seq 1 $NUMITER $TOTALMAPS); do
             LIKELYMAP=$(sed -n ${{i}}p ordermarkers/likelihoods.sorted.txt | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
-            echo "ordermarkers/$LIKELYMAP.txt" > ordermarkers/bestlikelihoods.txt
+            echo "ordermarkers/$LIKELYMAP.txt" >> ordermarkers/bestlikelihoods.txt
         done
         """
 
