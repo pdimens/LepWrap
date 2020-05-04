@@ -25,6 +25,10 @@ rule parentcall:
         pedigree = "pedigree.txt"
     output:
         "data.call.gz"
+    message:
+        """
+        Creating Lep-Map3 data file from VCF and pedigree files
+        """
     shell:
         "java -cp LM3 ParentCall2 data={input.pedigree} vcfFile={input.vcf} removeNonInformative=1 | gzip > data.call.gz"
 
@@ -33,6 +37,10 @@ rule filtering:
         "data.call.gz"
     output:
         "data_f.call.gz"
+    message:
+        """
+        Filtering the data
+        """
     shell:
         """
         echo -e -n '\nSpecify your data tolerance (0.0001 to 0.01):  '
@@ -45,6 +53,10 @@ rule separatechromosomes:
         "data_f.call.gz"
     output:
         map = "maps.splitchrom/map.{lod_range}"
+    message:
+        """
+        Creating maps for specified LOD range >> maps.splitchrom/map.LG
+        """
     threads: 8
     params:
         lod_lim = "lodLimit={lod_range}",
@@ -134,6 +146,10 @@ rule find_bestlikelihoods:
         "ordermarkers/likelihoods.sorted.txt",
     output:
         "ordermarkers/bestlikelihoods.txt"
+    message:
+        """
+        Identifying ordered maps with best likelihoods for each LG >> ordermarkers/bestlikelihoods.txt
+        """
     shell:
         """
         LG=$(find ordermarkers -maxdepth 1 -name "ordered.*.*.txt" | cut -d "." -f2 | sort -V | uniq)
