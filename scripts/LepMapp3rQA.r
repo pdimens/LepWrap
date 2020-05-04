@@ -78,7 +78,9 @@ for(i in file.names){
   removed_markers <- (lgfile %>% filter(Mpass == FALSE | Fpass == FALSE))$V1 
   
   # outputting filtered files
-  filename<- paste("trimmed",i, sep=".")
+  # should output ordermarkers/best.trimmed/trimmed.ordered.I.J.txt
+  filename<- paste(path, "best.trimmed", paste("trimmed",i, sep="."), sep = "/")
+
   print(paste("Removing",length(removed_markers),"markers from",i , "and writing new file", filename, sep = " "))
   writeLines(readLines(i, n=3),con = filename)
   write.table(cleaned_markers[,1:5], 
