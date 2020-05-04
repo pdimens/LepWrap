@@ -57,6 +57,10 @@ rule mapsummary:
         expand("maps.splitchrom/map.{LOD}", LOD = lod_range)
     output:
         "maps.splitchrom/maps.summary.txt"
+    message:
+        """
+        Combining map summaries >> maps.splitchrom/maps.summary.txt
+        """
     shell:
         "scripts/map_summary.sh {lod_max} "
 
@@ -87,6 +91,11 @@ rule ordermarkers:
         "ordermarkers/ordered.{lg_range}.{ITER}.txt"
     log:
         "ordermarkers/logs/ordered.{lg_range}.{ITER}.log"
+    message:
+        """
+        Ordering the markers on linkage groups 1:N
+        This may take a while depending on the number of provided threads and requested iterations
+        """
     params:
         dist_method = "useKosambi=1",
         chrom = "chromosome={lg_range}"
@@ -103,6 +112,11 @@ rule likelihoodsummary:
     output:
         likelihoods = "ordermarkers/likelihoods.txt",
         sorted_likelihoods = "ordermarkers/likelihoods.sorted.txt"
+    message:
+        """
+        Summarizing likelihoods from each iteration >> ordermarkers/likelihoods.txt
+        Sorting iterations by likelihoods >> ordermarkers/likelihoods.sorted.txt
+        """
     shell:
         """
         for LIKE in {input}; do 
@@ -127,7 +141,7 @@ rule find_bestlikelihoods:
         TOTALMAPS=$(find ordermarkers -maxdepth 1 -name "ordered.*.*.txt" | wc -l) 
 
         for i in $(seq 1 $NUMITER $TOTALMAPS); do
-            LIKELYMAP=$(sed -n ${i}p ordermarkers/likelihoods.sorted.txt | cut -f1,2 | awk '{print $0, $1 "." $NF}' | cut -d ' ' -f2)
+            LIKELYMAP=$(sed -n ${{i}}p ordermarkers/likelihoods.sorted.txt | cut -f1,2 | awk '{print $0, $1 "." $NF}' | cut -d ' ' -f2)
             echo "ordermarkers/$LIKELYMAP.txt" > ordermarkers/bestlikelihoods.txt
         done
         """
