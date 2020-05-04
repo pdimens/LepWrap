@@ -6,7 +6,8 @@ suppressMessages(if (!require("dplyr")) install.packages("dplyr"))
 suppressMessages(library("dplyr"))
 path = args[1]
 setwd(args[1])
-file.names <- scan(args[2], character(), quote = "")
+file.names <- read.csv(args[2], header=FALSE, sep="/")[,2]
+
 #file.names <- file.names[order(nchar(file.names), file.names)] #sort by LG
 PDFPath <- paste(path, "/best.trimmed/trimming.plots.pdf", sep = "/")
 pdf(file=PDFPath, height = 11, width = 8.5) 
