@@ -7,7 +7,7 @@ suppressMessages(library("dplyr"))
 path = args[1]
 setwd(args[1])
 file.names <- read.csv(args[2], header=FALSE, sep="/")[,2]
-
+no_rm <- c()
 #file.names <- file.names[order(nchar(file.names), file.names)] #sort by LG
 PDFPath <- paste(path, "/best.trimmed/trimming_plots.pdf", sep = "/")
 pdf(file=PDFPath, height = 11, width = 8.5) 
@@ -82,22 +82,35 @@ for(i in file.names){
   filename<- paste(path, "best.trimmed", paste("trimmed",i, sep="."), sep = "/")
 
   print(paste("Removing", length(removed_markers), "markers from", i, sep = " "))
+  no_rm <- c(no_rm, length(removed_markers))
   writeLines(readLines(i, n=3),con = filename)
-  write.table(cleaned_markers[,1:5], 
-              file = filename, 
-              sep = "\t",
-              quote = FALSE, 
-              row.names = FALSE,
-              col.names = FALSE,
-              append=TRUE
+  write.table(
+    cleaned_markers[,1:5], 
+    file = filename, 
+    sep = "\t",
+    quote = FALSE, 
+    row.names = FALSE,
+    col.names = FALSE,
+    append=TRUE
   )
-  write.table(removed_markers,
-              file=paste(path, "best.trimmed/bad_markers.txt", sep = "/"),
-              append=TRUE, 
-              sep = "\t", 
-              quote = FALSE, 
-              row.names = FALSE, 
-              col.names = FALSE
+  write.table(
+    removed_markers,
+    file=paste(path, "best.trimmed/bad_markers.txt", sep = "/"),
+    append=TRUE, 
+    sep = "\t", 
+    quote = FALSE, 
+    row.names = FALSE, 
+    col.names = FALSE
   )
 }
+trimlog <- as.data.frame(file = file.names, no_removed = no_rm)
+write.table(
+  removed_markers,
+  file=paste(path, "best.trimmed/trimming.log", sep = "/"),
+  append=FALSE, 
+  sep = "\t", 
+  quote = FALSE, 
+  row.names = FALSE, 
+  col.names = TRUE
+)
 suppressMessages(dev.off())
