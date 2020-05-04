@@ -81,7 +81,7 @@ for(i in file.names){
   # should output ordermarkers/best.trimmed/trimmed.ordered.I.J.txt
   filename<- paste(path, "best.trimmed", paste("trimmed",i, sep="."), sep = "/")
 
-  print(paste("Removing",length(removed_markers),"markers from",i , "and writing new file", filename, sep = " "))
+  print(paste("Removing", length(removed_markers), "markers from", i, sep = " "))
   writeLines(readLines(i, n=3),con = filename)
   write.table(cleaned_markers[,1:5], 
               file = filename, 
@@ -92,7 +92,7 @@ for(i in file.names){
               append=TRUE
   )
   write.table(removed_markers,
-              file="bad.markers.txt",
+              file=paste(path, "best.trimmed/bad.markers.txt", sep = "/"),
               append=TRUE, 
               sep = "\t", 
               quote = FALSE, 

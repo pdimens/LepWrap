@@ -169,5 +169,13 @@ rule trimming:
         expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()])
     params:
         trim_threshold = "10"
+    log:
+        "ordermarkers/best.trimmed/trimming.log",
+        "ordermarkers/best.trimmed/bad_markers.txt",
+        "ordermarkers/best.trimmed/trimming.plots.pdf"
+    message:
+        """
+        Scanning the first and last 15% of markers in each LG and removing clusters >{params.trim_threshold}cM apart from the other markers. 
+        """
     shell:
-        "Rscript scripts/LepMapp3rQA.r $(pwd)/ordermarkers bestlikelihoods.txt {params.trim_threshold} > Trimming.log"
+        "Rscript scripts/LepMapp3rQA.r $(pwd)/ordermarkers bestlikelihoods.txt {params.trim_threshold} > ordermarkers/best.trimmed/trimming.log"
