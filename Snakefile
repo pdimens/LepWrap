@@ -166,7 +166,7 @@ rule trimming:
     input:
         "ordermarkers/bestlikelihoods.txt"
     output:
-        expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = open("{{input}}").read().splitlines())
+        expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = open("{input}").read().splitlines())
     params:
         trim_threshold = "10"
     shell:
