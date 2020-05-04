@@ -103,7 +103,7 @@ for(i in file.names){
     col.names = FALSE
   )
 }
-trimlog <- as.data.frame(file = file.names, no_removed = no_rm)
+trimlog <- data.frame(file = file.names, no_removed = no_rm)
 write.table(
   trimlog,
   file=paste(path, "best.trimmed/trimming.log", sep = "/"),
