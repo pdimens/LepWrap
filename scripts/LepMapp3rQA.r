@@ -81,7 +81,7 @@ for(i in file.names){
   # should output ordermarkers/best.trimmed/trimmed.ordered.I.J.txt
   filename<- paste(path, "best.trimmed", paste("trimmed",i, sep="."), sep = "/")
 
-  print(paste("Removing", length(removed_markers), "markers from", i, sep = " "))
+#  print(paste("Removing", length(removed_markers), "markers from", i, sep = " "))
   no_rm <- c(no_rm, length(removed_markers))
   writeLines(readLines(i, n=3),con = filename)
   write.table(
@@ -105,7 +105,7 @@ for(i in file.names){
 }
 trimlog <- as.data.frame(file = file.names, no_removed = no_rm)
 write.table(
-  removed_markers,
+  trimlog,
   file=paste(path, "best.trimmed/trimming.log", sep = "/"),
   append=FALSE, 
   sep = "\t", 
