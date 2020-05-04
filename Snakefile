@@ -172,7 +172,7 @@ rule trimming:
     log:
         "ordermarkers/best.trimmed/trimming.log",
         "ordermarkers/best.trimmed/bad_markers.txt",
-        "ordermarkers/best.trimmed/trimming.plots.pdf"
+        "ordermarkers/best.trimmed/trimming_plots.pdf"
     message:
         """
         Scanning the first and last 15% of markers in each LG and removing clusters >{params.trim_threshold}cM apart from the other markers. 

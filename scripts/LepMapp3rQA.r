@@ -9,7 +9,7 @@ setwd(args[1])
 file.names <- read.csv(args[2], header=FALSE, sep="/")[,2]
 
 #file.names <- file.names[order(nchar(file.names), file.names)] #sort by LG
-PDFPath <- paste(path, "/best.trimmed/trimming.plots.pdf", sep = "/")
+PDFPath <- paste(path, "/best.trimmed/trimming_plots.pdf", sep = "/")
 pdf(file=PDFPath, height = 11, width = 8.5) 
 par(mfrow=(c(4,2))) # create 4x2 plots
 
@@ -92,7 +92,7 @@ for(i in file.names){
               append=TRUE
   )
   write.table(removed_markers,
-              file=paste(path, "best.trimmed/bad.markers.txt", sep = "/"),
+              file=paste(path, "best.trimmed/bad_markers.txt", sep = "/"),
               append=TRUE, 
               sep = "\t", 
               quote = FALSE, 
