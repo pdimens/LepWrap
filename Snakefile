@@ -104,10 +104,12 @@ rule likelihoodsummary:
         "ordermarkers/likelihoods.txt"
     shell:
         """
-        LG=$(echo {input} | cut -d "." -f1,2)
-        ITERUN=$(echo {input} | cut -d "." -f3)
-        LIKELIHOOD=$(head -1 {input} | tail -1 | cut -c 27-)
-        echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output}
+        for LIKE in {input}; do 
+            LG=$(echo $LIKE | cut -d "." -f1,2)
+            ITERUN=$(echo $LIKE | cut -d "." -f3)
+            LIKELIHOOD=$(head -1 $LIKE | tail -1 | cut -c 27-)
+            echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output}
+        done
         """
 
 rule sortlikelihoods:
