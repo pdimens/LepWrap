@@ -105,9 +105,9 @@ rule likelihoodsummary:
     shell:
         """
         for LIKE in {input}; do 
-            LG=$(echo $LIKE | cut -d "." -f1,2)
+            LG=$(echo $(basename $LIKE) | cut -d "." -f1,2)
             ITERUN=$(echo $LIKE | cut -d "." -f3)
-            LIKELIHOOD=$(head -1 $LIKE | tail -1 | cut -c 27-)
+            LIKELIHOOD=$(cat $LIKE | grep "likelihood = " | cut -d " " -f7)
             echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output}
         done
         """
