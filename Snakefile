@@ -16,7 +16,7 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        directory("reordermarkers/)"
+        directory("reordermarkers/")
         #expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()])
         #"ordermarkers/bestlikelihoods.txt"
 
