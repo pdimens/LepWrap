@@ -188,7 +188,7 @@ rule reorder:
     output:
         "reordermarkers/{trimfile}.{ITER}.txt"
     log:
-        "reordermarkers/{trimfile}.{ITER}.log"
+        "reordermarkers/logs/{trimfile}.{ITER}.log"
     message:
         """
         Reordering the markers for each linkage group using the trimmed orders with the best likelihoods from initial ordering.
