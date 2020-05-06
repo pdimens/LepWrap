@@ -16,7 +16,7 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        "reordermarkers/likelihoods.sorted.txt"
+        directory("reordermarkers/)"
         #expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()])
         #"ordermarkers/bestlikelihoods.txt"
 
@@ -184,11 +184,11 @@ rule reorder:
     input:
         datacall = "data_f.call.gz",
         filt_map = "map.master",
-        lg_map = "ordermarkers/best.trimmed/trimmed.ordered.{LG}.{itr}txt"
+        lg_map = directory("ordermarkers/best.trimmed/")
     output:
-        "reordermarkers/reordered.{LG}.{ITER}.txt"
+        "reordermarkers/reordered.{lg_range}.{ITER}.txt"
     log:
-        "reordermarkers/logs/reordered.{LG}.{ITER}.log"
+        "reordermarkers/logs/reordered.{lg_range}.{ITER}.log"
     message:
         """
         Reordering the markers for each linkage group using the trimmed orders with the best likelihoods from initial ordering.
@@ -196,14 +196,14 @@ rule reorder:
         """
     params:
         dist_method = "useKosambi=1",
-        eval_order="evaluateOrder={input.lg_map}"
+        eval_order="evaluateOrder={input.lg_map}trimmed.ordered.{lg_range}.*.txt"
     threads: 2
     shell:
         """
         zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.eval_order} {params.dist_method} &> {log}
         grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
         """
-
+"""
 rule summarize_likelihoods2:
     input:
         "reordermarkers/reordered.{LG}.{prior_iter}.{new_iter}.txt"
@@ -225,3 +225,4 @@ rule summarize_likelihoods2:
         done
         sort {output.likelihoods} -k1,1V -k3,3nr > {output.sorted_likelihoods}
         """
+"""
