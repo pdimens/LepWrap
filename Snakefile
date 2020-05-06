@@ -203,26 +203,25 @@ rule reorder:
         zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.eval_order} {params.dist_method} &> {log}
         grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
         """
-"""
-rule summarize_likelihoods2:
-    input:
-        "reordermarkers/reordered.{LG}.{prior_iter}.{new_iter}.txt"
-    output:
-        likelihoods = "reordermarkers/likelihoods.txt",
-        sorted_likelihoods = "reordermarkers/likelihoods.sorted.txt"
-    message:
-        """
-        Summarizing likelihoods from each iteration >> reordermarkers/likelihoods.txt
-        Sorting iterations by likelihoods >> reordermarkers/likelihoods.sorted.txt
-        """
-    shell:
-        """
-        for LIKE in {input}; do 
-            LG=$(echo $(basename $LIKE) | cut -d "." -f1,2)
-            ITERUN=$(echo $LIKE | cut -d "." -f3)
-            LIKELIHOOD=$(cat $LIKE | grep "likelihood = " | cut -d " " -f7)
-            echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output}
-        done
-        sort {output.likelihoods} -k1,1V -k3,3nr > {output.sorted_likelihoods}
-        """
-"""
+
+#rule summarize_likelihoods2:
+#    input:
+#        "reordermarkers/reordered.{LG}.{prior_iter}.{new_iter}.txt"
+#    output:
+#       likelihoods = "reordermarkers/likelihoods.txt",
+#       sorted_likelihoods = "reordermarkers/likelihoods.sorted.txt"
+#   message:
+#       """
+#       Summarizing likelihoods from each iteration >> reordermarkers/likelihoods.txt
+#       Sorting iterations by likelihoods >> reordermarkers/likelihoods.sorted.txt
+#       """
+#   shell:
+#       """
+#       for LIKE in {input}; do 
+#           LG=$(echo $(basename $LIKE) | cut -d "." -f1,2)
+#           ITERUN=$(echo $LIKE | cut -d "." -f3)
+#           LIKELIHOOD=$(cat $LIKE | grep "likelihood = " | cut -d " " -f7)
+#           echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output}
+#       done
+#       sort {output.likelihoods} -k1,1V -k3,3nr > {output.sorted_likelihoods}
+#       """
