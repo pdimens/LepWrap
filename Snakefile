@@ -184,11 +184,11 @@ rule reorder:
     input:
         datacall = "data_f.call.gz",
         filt_map = "map.master",
-        lg_map = directory("ordermarkers/best.trimmed/")
+        lg_map = "ordermarkers/best.trimmed/trimmed.{lg}.txt"
     output:
-        "reordermarkers/reordered.{lg_range}.{ITER}.txt"
+        expand("reordermarkers/{{lg}}.{ITER}.txt", ITER = ITER)
     log:
-        "reordermarkers/logs/reordered.{lg_range}.{ITER}.log"
+        expand("reordermarkers/{{lg}}.{ITER}.log", ITER = ITER)
     message:
         """
         Reordering the markers for each linkage group using the trimmed orders with the best likelihoods from initial ordering.
@@ -196,7 +196,7 @@ rule reorder:
         """
     params:
         dist_method = "useKosambi=1",
-        eval_order="evaluateOrder={input.lg_map}trimmed.ordered.{lg_range}.*.txt"
+        eval_order="evaluateOrder={input.lg_map}"
     threads: 2
     shell:
         """
