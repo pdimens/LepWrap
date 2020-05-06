@@ -16,7 +16,7 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        expand("reordermarkers/{trimfile}", trimfile = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()])
+        expand("reordermarkers/re{trimfile}", trimfile = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()])
         #expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()])
         #"ordermarkers/bestlikelihoods.txt"
 
@@ -184,11 +184,11 @@ rule reorder:
     input:
         datacall = "data_f.call.gz",
         filt_map = "map.master",
-        lg_map = "ordermarkers/best.trimmed/trimmed.{lg}.txt"
+        trim_dir = directory("ordermarkers/best.trimmed")
     output:
-        expand("reordermarkers/{{lg}}.{ITER}.txt", ITER = ITER)
+        "reordermarkers/reordered.{lg_range}.{ITER}.txt"
     log:
-        expand("reordermarkers/{{lg}}.{ITER}.log", ITER = ITER)
+        "reordermarkers/logs/reordered.{lg_range}.{ITER}.log"
     message:
         """
         Reordering the markers for each linkage group using the trimmed orders with the best likelihoods from initial ordering.
@@ -196,32 +196,10 @@ rule reorder:
         """
     params:
         dist_method = "useKosambi=1",
-        eval_order="evaluateOrder={input.lg_map}"
+        eval_order="evaluateOrder={input.trim_dir}/trimmed.ordered.{lg_range}.{first_iter}.txt"
     threads: 2
     shell:
         """
         zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.eval_order} {params.dist_method} &> {log}
         grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
         """
-
-#rule summarize_likelihoods2:
-#    input:
-#        "reordermarkers/reordered.{LG}.{prior_iter}.{new_iter}.txt"
-#    output:
-#       likelihoods = "reordermarkers/likelihoods.txt",
-#       sorted_likelihoods = "reordermarkers/likelihoods.sorted.txt"
-#   message:
-#       """
-#       Summarizing likelihoods from each iteration >> reordermarkers/likelihoods.txt
-#       Sorting iterations by likelihoods >> reordermarkers/likelihoods.sorted.txt
-#       """
-#   shell:
-#       """
-#       for LIKE in {input}; do 
-#           LG=$(echo $(basename $LIKE) | cut -d "." -f1,2)
-#           ITERUN=$(echo $LIKE | cut -d "." -f3)
-#           LIKELIHOOD=$(cat $LIKE | grep "likelihood = " | cut -d " " -f7)
-#           echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output}
-#       done
-#       sort {output.likelihoods} -k1,1V -k3,3nr > {output.sorted_likelihoods}
-#       """
