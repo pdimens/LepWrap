@@ -16,7 +16,8 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()])
+        "reordermarkers/likelihoods.sorted.txt"
+        #expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()])
         #"ordermarkers/bestlikelihoods.txt"
 
 rule parentcall:
@@ -118,7 +119,7 @@ rule ordermarkers:
         grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
         """
 
-rule likelihoodsummary:
+rule summarize_likelihoods:
     input:
         expand("ordermarkers/ordered.{LG}.{ITER}.txt", LG = lg_range, ITER = ITER)
     output:
@@ -201,4 +202,27 @@ rule reorder:
         """
         zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.dist_method} {params.chrom} &> {log}
         grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
+        """
+
+
+rule summarize_likelihoods2:
+    input:
+        expand("reordermarkers/reordered.{LG}.{ITER}.txt", LG = lg_range, ITER = ITER)
+    output:
+        likelihoods = "reordermarkers/likelihoods.txt",
+        sorted_likelihoods = "reordermarkers/likelihoods.sorted.txt"
+    message:
+        """
+        Summarizing likelihoods from each iteration >> reordermarkers/likelihoods.txt
+        Sorting iterations by likelihoods >> reordermarkers/likelihoods.sorted.txt
+        """
+    shell:
+        """
+        for LIKE in {input}; do 
+            LG=$(echo $(basename $LIKE) | cut -d "." -f1,2)
+            ITERUN=$(echo $LIKE | cut -d "." -f3)
+            LIKELIHOOD=$(cat $LIKE | grep "likelihood = " | cut -d " " -f7)
+            echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output}
+        done
+        sort {output.likelihoods} -k1,1V -k3,3nr > {output.sorted_likelihoods}
         """
