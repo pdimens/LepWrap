@@ -138,7 +138,6 @@ rule likelihoodsummary:
             echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output}
         done
         sort {output.likelihoods} -k1,1V -k3,3nr > {output.sorted_likelihoods}
-
         """
 
 rule find_bestlikelihoods:
@@ -179,3 +178,27 @@ rule trimming:
         """
     shell:
         "Rscript scripts/LepMapp3rQA.r $(pwd)/ordermarkers bestlikelihoods.txt {params.trim_threshold}"
+
+rule reorder:
+    input:
+        datacall = "data_f.call.gz"
+        filt_map = "map.master"
+        lg_map = "ordermarkers/best.trimmed/trimmed.ordered.{LG}.{best_iter}.txt"
+    output:
+        "reordermarkers/reordered.{LG}.{ITER}.txt"
+    log:
+        "reordermarkers/logs/reordered.{LG}.{ITER}.log"
+    message:
+        """
+        Reordering the markers for each linkage group using the trimmed orders with the best likelihoods from initial ordering.
+        This may take a while depending on the number of provided threads and requested iterations
+        """
+    params:
+        dist_method = "useKosambi=1",
+        chrom = "chromosome={LG}"
+    threads: 2
+    shell:
+        """
+        zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.dist_method} {params.chrom} &> {log}
+        grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
+        """
