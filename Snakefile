@@ -196,18 +196,17 @@ rule reorder:
         """
     params:
         dist_method = "useKosambi=1",
-        chrom = "chromosome={LG}"
+        eval_order="evaluateOrder={input.lg_map}"
     threads: 2
     shell:
         """
-        zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.dist_method} {params.chrom} &> {log}
+        zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.eval_order} {params.dist_method} &> {log}
         grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
         """
 
-
 rule summarize_likelihoods2:
     input:
-        expand("reordermarkers/reordered.{LG}.{ITER}.txt", LG = lg_range, ITER = ITER)
+        expand("reordermarkers/reordered.{{LG}}.{ITER}.txt", LG = lg_range, ITER = ITER)
     output:
         likelihoods = "reordermarkers/likelihoods.txt",
         sorted_likelihoods = "reordermarkers/likelihoods.sorted.txt"
