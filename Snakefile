@@ -196,7 +196,7 @@ rule reorder:
         """
     params:
         dist_method = "useKosambi=1",
-        eval_order="evaluateOrder={{input.lg_order}}"
+        eval_order="evaluateOrder=ordermarkers/best.trimmed/trimmed.{trimfile}"
     threads: 2
     shell:
         """
