@@ -16,7 +16,7 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        expand("reordermarkers/re{trimfile}", trimfile = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()])
+        expand("reordermarkers/{trimfile}.{ITER}.txt", trimfile = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()], ITER=ITER)
         #expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()])
         #"ordermarkers/bestlikelihoods.txt"
 
@@ -184,11 +184,11 @@ rule reorder:
     input:
         datacall = "data_f.call.gz",
         filt_map = "map.master",
-        trim_dir = directory("ordermarkers/best.trimmed")
+        lg_order = "ordermarkers/best.trimmed/trimmed.{trimfile}"
     output:
-        "reordermarkers/reordered.{lg_range}.{ITER}.txt"
+        "reordermarkers/{trimfile}.{ITER}.txt"
     log:
-        "reordermarkers/logs/reordered.{lg_range}.{ITER}.log"
+        "reordermarkers/{trimfile}.{ITER}.log"
     message:
         """
         Reordering the markers for each linkage group using the trimmed orders with the best likelihoods from initial ordering.
@@ -196,7 +196,7 @@ rule reorder:
         """
     params:
         dist_method = "useKosambi=1",
-        eval_order="evaluateOrder={input.trim_dir}/trimmed.ordered.{lg_range}.{first_iter}.txt"
+        eval_order="evaluateOrder={input.lg_order}"
     threads: 2
     shell:
         """
