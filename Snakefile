@@ -184,7 +184,7 @@ rule reorder:
     input:
         datacall = "data_f.call.gz",
         filt_map = "map.master",
-        lg_map = "ordermarkers/best.trimmed/trimmed.ordered.{LG}.txt"
+        lg_map = "ordermarkers/best.trimmed/trimmed.ordered.{LG}.{itr}txt"
     output:
         "reordermarkers/reordered.{LG}.{ITER}.txt"
     log:
