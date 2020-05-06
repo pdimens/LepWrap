@@ -14,9 +14,9 @@ exp_lg = 24
 lg_range = list(range(1, exp_lg+1))
 ITER = list(range(1,100+1))
 
-rule all:
-    input:
-        directory("reordermarkers/")
+#rule all:
+#    input:
+#        expand("reordermarkers/{lg}.{ITER}.txt", ITER = ITER)
         #expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()])
         #"ordermarkers/bestlikelihoods.txt"
 
@@ -180,7 +180,7 @@ rule trimming:
     shell:
         "Rscript scripts/LepMapp3rQA.r $(pwd)/ordermarkers bestlikelihoods.txt {params.trim_threshold}"
 
-rule reorder:
+rule all:
     input:
         datacall = "data_f.call.gz",
         filt_map = "map.master",
