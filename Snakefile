@@ -287,9 +287,9 @@ rule find_bestlikelihoods2:
 #        zcat {input.datacall} | java -cp LM3 OrderMarkers2 data=- {params.eval} numThreads={threads} {params.dist_method} improveOrder=0 sexAveraged=1 > {output.dist_SA}
 #        """
 
-best_reorder = [i.split("/")[1].split(".txt")[0] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()]
 
 rule intervals:
+    best_reorder = [i.split("/")[1].split(".txt")[0] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()]
     input:
         best_lg = "reordermarkers/{best_reorder}.txt",
         datacall = "data_f.call.gz"
