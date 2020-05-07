@@ -204,7 +204,7 @@ rule reorder:
         """
 
 
-rule summarize_likelihoods:
+rule summarize_likelihoods2:
     input:
         "reordermarkers/ordered.{LG}.{ITER1}.{ITER2}.txt"
         #expand("ordermarkers/ordered.{LG}.{ITER}.txt", LG = lg_range, ITER = ITER)
@@ -224,7 +224,7 @@ rule summarize_likelihoods:
         echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.likelihoods}
         """
 
-rule find_bestlikelihoods:
+rule find_bestlikelihoods2:
     input:
         "ordermarkers/likelihoods.txt"
     output:
