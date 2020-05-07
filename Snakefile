@@ -259,7 +259,7 @@ rule distances:
     threads: 2
     params:
         dist_method = "useKosambi=1",
-        eval: expand("evaluateOrder={lg_file}", lg_file = [i for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
+        eval = expand("evaluateOrder={lg_file}", lg_file = [i for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
     shell:
         """
         zcat {input.datacall} | java -cp LM3 OrderMarkers2 data=- {params.eval} numThreads={threads} {params.dist_method} improveOrder=0 > {output.dist}
@@ -274,7 +274,7 @@ rule distances_sexaverage:
     threads: 2
     params:
         dist_method = "useKosambi=1",
-        eval: expand("evaluateOrder={lg_file}", lg_file = [i for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
+        eval = expand("evaluateOrder={lg_file}", lg_file = [i for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
     shell:
         """
         zcat {input.datacall} | java -cp LM3 OrderMarkers2 data=- {params.eval} numThreads={threads} {params.dist_method} improveOrder=0 sexAveraged=1 > {output.dist_SA}
@@ -289,7 +289,7 @@ rule intervals:
     threads: 2
     params:
         dist_method = "useKosambi=1",
-        eval: expand("evaluateOrder={lg_file}", lg_file = [i for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
+        eval = expand("evaluateOrder={lg_file}", lg_file = [i for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
     shell:
         """
         zcat {input.datacall} | java -cp LM3 OrderMarkers2 data=- {params.eval} numThreads={threads} {params.dist_method} calculateIntervals={intervals}
