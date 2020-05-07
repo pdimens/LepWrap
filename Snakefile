@@ -16,10 +16,8 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        "intervals/int.done"
-        #"reordermarkers/bestlikelihoods.txt"
-        #expand("intervals/{trimfile}.intervals", trimfile = [i.split("/")[1].split(".txt")[0] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
-        
+        "reordermarkers/likelihoods.txt"
+
 rule parentcall:
     input:
         vcf = expand("{vcffile}", vcffile = vcf_file),
@@ -206,10 +204,9 @@ rule reorder:
 
 rule summarize_likelihoods2:
     input:
-        expand("reordermarkers/{reorder_file}", reorder_file = [os.path.basename(i) for i in glob.glob("reordermarkers/ordered.*.txt")])
-        #expand("ordermarkers/ordered.{LG}.{ITER}.txt", LG = lg_range, ITER = ITER)
+        "reordermarkers/ordered.{LG}.txt" #, LG = lg_range, ITER = ITER)
     output:
-        likelihoods = "reordermarkers/likelihoods.txt",
+        likelihoods = "reordermarkers/likelihoods.txt"
         #sorted_likelihoods = "reordermarkers/likelihoods.sorted.txt"
     message:
         """
@@ -226,58 +223,58 @@ rule summarize_likelihoods2:
         done
         """
 
-rule find_bestlikelihoods2:
-    input:
-        "reordermarkers/likelihoods.txt"
-    output:
-        sorted = "reordermarkers/likelihoods.sorted.txt",
-        best = "reordermarkers/bestlikelihoods.txt"
-    message:
-        """
-        Identifying ordered maps with best likelihoods for each LG >> reordermarkers/bestlikelihoods.txt
-        """
-    shell:
-        """
-        sort {input} -k1,1V -k3,3nr > {output.sorted}
-        LG=$(find reordermarkers -maxdepth 1 -name "ordered.*.*.*.txt" | cut -d "." -f2 | sort -V | uniq)
-        NUMITER=$(find reordermarkers -maxdepth 1 -name "ordered.*.*.*.txt" | cut -d "." -f4 | sort -V | uniq | tail -1)
-        TOTALMAPS=$(find reordermarkers -maxdepth 1 -name "ordered.*.*.*.txt" | wc -l) 
+#rule find_bestlikelihoods2:
+#    input:
+#        "reordermarkers/likelihoods.txt"
+#    output:
+#        sorted = "reordermarkers/likelihoods.sorted.txt",
+#        best = "reordermarkers/bestlikelihoods.txt"
+#    message:
+#        """
+#        Identifying ordered maps with best likelihoods for each LG >> reordermarkers/bestlikelihoods.txt
+#        """
+#    shell:
+#        """
+#        sort {input} -k1,1V -k3,3nr > {output.sorted}
+#        LG=$(find reordermarkers -maxdepth 1 -name "ordered.*.*.*.txt" | cut -d "." -f2 | sort -V | uniq)
+#        NUMITER=$(find reordermarkers -maxdepth 1 -name "ordered.*.*.*.txt" | cut -d "." -f4 | sort -V | uniq | tail -1)
+#        TOTALMAPS=$(find reordermarkers -maxdepth 1 -name "ordered.*.*.*.txt" | wc -l) #
 
-        for i in $(seq 1 $NUMITER $TOTALMAPS); do
-            LIKELYMAP=$(sed -n ${{i}}p {output.sorted} | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
-            echo "reordermarkers/$LIKELYMAP.txt" >> {output.best}
-        done
-        """
-rule link_best:
-    input:
-        "reordermarkers/bestlikelihoods.txt"
-    output:
-        dynamic("reordermarkers/best/ordered.{lg_iter}.txt")
-    shell:
-        """
-        while read best; do
-            ln -s $best reordermarkers/best/$(echo $best | basename)
-        done < {input}
-        """
+#        for i in $(seq 1 $NUMITER $TOTALMAPS); do
+#            LIKELYMAP=$(sed -n ${{i}}p {output.sorted} | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
+#            echo "reordermarkers/$LIKELYMAP.txt" >> {output.best}
+#        done
+#        """
+#rule link_best:
+#    input:
+#        "reordermarkers/bestlikelihoods.txt"
+#    output:
+#        dynamic("reordermarkers/best/ordered.{lg_iter}.txt")
+#    shell:
+#        """
+#        while read best; do
+#            ln -s $best reordermarkers/best/$(echo $best | basename)
+#        done < {input}
+#        """#
 
-#expand("reordermarkers/best/{lg}.txt", lg = [i.split("/")[1].split(".txt")[0] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
+##expand("reordermarkers/best/{lg}.txt", lg = [i.split("/")[1].split(".txt")[0] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])#
 
-rule intervals:
-    input:
-        best_lg = "reordermarkers/best/{best_reorder}.txt",
-        datacall = "data_f.call.gz"
-    output:
-        intervals = "intervals/{best_reorder}.intervals",
-        done = "intervals/int.done"
-    message:
-        """
-        Calculating intervals for best reordered maps
-        """
-    threads: 2
-    params:
-        dist_method = "useKosambi=1"
-    shell:
-        """
-        zcat {input.datacall} | java -cp LM3 OrderMarkers2 data=- evaluateOrder={input.best_lg} numThreads={threads} {params.dist_method} calculateIntervals={output.intervals}
-        touch {output.done}
-        """
+#rule intervals:
+#    input:
+#        best_lg = "reordermarkers/best/{best_reorder}.txt",
+#        datacall = "data_f.call.gz"
+#    output:
+#        intervals = "intervals/{best_reorder}.intervals",
+#        done = "intervals/int.done"
+#    message:
+#        """
+#        Calculating intervals for best reordered maps
+#        """
+#    threads: 2
+#    params:
+#        dist_method = "useKosambi=1"
+#    shell:
+#        """
+#        zcat {input.datacall} | java -cp LM3 OrderMarkers2 data=- evaluateOrder={input.best_lg} numThreads={threads} {params.dist_method} calculateIntervals={output.intervals}
+#        touch {output.done}
+#        """
