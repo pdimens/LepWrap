@@ -16,7 +16,10 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        ".lepmak3r.done"
+        expand("distances/{trimfile}", trimfile = [i.split("/")[1] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()]),
+        expand("distances_sexAveraged/{trimfile}", trimfile = [i.split("/")[1] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()]),
+        expand("intervals/{trimfile}", trimfile = [i.split("/")[1] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
+
         #"reordermarkers/bestlikelihoods.txt"
         #expand("reordermarkers/{trimfile}.{ITER}.txt", trimfile = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()], ITER=ITER)
         
@@ -295,14 +298,14 @@ rule intervals:
         zcat {input.datacall} | java -cp LM3 OrderMarkers2 data=- {params.eval} numThreads={threads} {params.dist_method} calculateIntervals={intervals}
         """
 
-rule finalcheck:
-    input:
-        directory("distances"),
-        directory("distances_sexAveraged"),
-        directory("intervals")
-    output:
-        ".lepmak3r.done"
-    shell:
-        """
-        touch .lepmak3r.done
-        """
+#rule finalcheck:
+#    input:
+#        directory("distances"),
+#        directory("distances_sexAveraged"),
+#        directory("intervals")
+#    output:
+#        ".lepmak3r.done"
+#    shell:
+#        """
+#        touch .lepmak3r.done
+#        """
