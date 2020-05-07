@@ -265,7 +265,7 @@ rule intervals:
         best_lg = "reordermarkers/best/{best_reorder}.txt",
         datacall = "data_f.call.gz"
     output:
-        intervals = "intervals/{best_reorder}.intervals"),
+        intervals = "intervals/{best_reorder}.intervals",
         done = "intervals/int.done"
     message:
         """
