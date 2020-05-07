@@ -16,7 +16,8 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        "reordermarkers/bestlikelihoods.txt"
+        ".lepmak3r.done"
+        #"reordermarkers/bestlikelihoods.txt"
         #expand("reordermarkers/{trimfile}.{ITER}.txt", trimfile = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()], ITER=ITER)
         
 rule parentcall:
@@ -245,6 +246,63 @@ rule find_bestlikelihoods2:
 
         for i in $(seq 1 $NUMITER $TOTALMAPS); do
             LIKELYMAP=$(sed -n ${{i}}p {output.sorted} | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
-            echo "ordermarkers/$LIKELYMAP.txt" >> {output.best}
+            echo "reordermarkers/$LIKELYMAP.txt" >> {output.best}
         done
+        """
+
+rule distances:
+    input:
+        likelihoods = "reordermarkers/bestlikelihoods.txt",
+        datacall = "data_f.call.gz"
+    output:
+        dist = expand("distances/{trimfile}", trimfile = [i.split("/")[1] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()]),
+    threads: 2
+    params:
+        dist_method = "useKosambi=1",
+        eval: expand("evaluateOrder={lg_file}", lg_file = [i for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
+    shell:
+        """
+        zcat {input.datacall} | java -cp LM3 OrderMarkers2 data=- {params.eval} numThreads={threads} {params.dist_method} improveOrder=0 > {output.dist}
+        """
+
+rule distances_sexaverage:
+    input:
+        likelihoods = "reordermarkers/bestlikelihoods.txt",
+        datacall = "data_f.call.gz"
+    output:
+        dist_SA = expand("distances_sexAveraged/{trimfile}", trimfile = [i.split("/")[1] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()]),
+    threads: 2
+    params:
+        dist_method = "useKosambi=1",
+        eval: expand("evaluateOrder={lg_file}", lg_file = [i for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
+    shell:
+        """
+        zcat {input.datacall} | java -cp LM3 OrderMarkers2 data=- {params.eval} numThreads={threads} {params.dist_method} improveOrder=0 sexAveraged=1 > {output.dist_SA}
+        """
+
+rule intervals:
+    input:
+        likelihoods = "reordermarkers/bestlikelihoods.txt",
+        datacall = "data_f.call.gz"
+    output:
+        intervals = expand("intervals/{trimfile}", trimfile = [i.split("/")[1] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
+    threads: 2
+    params:
+        dist_method = "useKosambi=1",
+        eval: expand("evaluateOrder={lg_file}", lg_file = [i for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
+    shell:
+        """
+        zcat {input.datacall} | java -cp LM3 OrderMarkers2 data=- {params.eval} numThreads={threads} {params.dist_method} calculateIntervals={intervals}
+        """
+
+rule finalcheck:
+    input:
+        directory("distances"),
+        directory("distances_sexAveraged"),
+        directory("intervals")
+    output:
+        ".lepmak3r.done"
+    shell:
+        """
+        touch .lepmak3r.done
         """
