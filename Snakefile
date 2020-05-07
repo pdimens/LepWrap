@@ -16,7 +16,8 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        "reordermarkers/likelihoods.txt"
+        "best.done"
+        #"reordermarkers/likelihoods.txt"
 
 rule parentcall:
     input:
@@ -246,6 +247,13 @@ rule find_bestlikelihoods2:
         done
         """
 
+rule checkbest:
+    input:
+        directory("reordermarkers/best/")
+    output:
+        "best.done"
+    shell:
+        "touch {output}"
 
 #rule link_best:
 #    input:
