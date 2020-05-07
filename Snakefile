@@ -206,7 +206,7 @@ rule reorder:
 
 rule summarize_likelihoods2:
     input:
-        "reordermarkers/ordered.{lg}.{iter, \d+}.txt"
+        expand("reordermarkers/{reorder_file}", reorder_file = [os.path.basename(i) for i in glob.glob("reordermarkers/ordered.*.txt")])
         #expand("ordermarkers/ordered.{LG}.{ITER}.txt", LG = lg_range, ITER = ITER)
     output:
         likelihoods = "reordermarkers/likelihoods.txt",
@@ -218,10 +218,12 @@ rule summarize_likelihoods2:
         """
     shell:
         """
-        LG=$(echo $(basename {input}) | cut -d "." -f1,2,3)
-        ITERUN=$(echo {input} | cut -d "." -f4)
-        LIKELIHOOD=$(cat {input} | grep "likelihood = " | cut -d " " -f7)
-        echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.likelihoods}
+        for LIKE in {input}; do
+            LG=$(echo $(basename $LIKE) | cut -d "." -f1,2,3)
+            ITERUN=$(echo $LIKE | cut -d "." -f4)
+            LIKELIHOOD=$(cat $LIKE | grep "likelihood = " | cut -d " " -f7)
+            echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.likelihoods}
+        done
         """
 
 rule find_bestlikelihoods2:
