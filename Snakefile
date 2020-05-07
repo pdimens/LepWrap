@@ -249,13 +249,14 @@ rule find_bestlikelihoods2:
         done
         """
 rule link_best:
-    input: 
-        expand("reordermarkers/{lg}.txt", lg = [i.split("/")[1].split(".txt")[0] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
+    input:
+        bestfile = "reordermarkers/bestlikelihoods.txt",
+        best_lg = expand("reordermarkers/{lg}.txt", lg = [i.split("/")[1].split(".txt")[0] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
     output:
         expand("reordermarkers/best/{lg}.txt", lg = [i.split("/")[1].split(".txt")[0] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
     shell:
         """
-        for i in {input}; do
+        for i in {input.best_lg}; do
             ln -s $i reordermarkers/best/$(echo $i | basename)
         done
         """
