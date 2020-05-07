@@ -226,7 +226,7 @@ rule summarize_likelihoods2:
 
 rule find_bestlikelihoods2:
     input:
-        "ordermarkers/likelihoods.txt"
+        "reordermarkers/likelihoods.txt"
     output:
         sorted = "reordermarkers/likelihoods.sorted.txt",
         best = "reordermarkers/bestlikelihoods.txt"
