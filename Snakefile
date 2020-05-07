@@ -16,7 +16,8 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        expand("intervals/{trimfile}.intervals", trimfile = [i.split("/")[1].split(".txt")[0] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
+        "reordermarkers/bestlikelihoods.txt"
+        #expand("intervals/{trimfile}.intervals", trimfile = [i.split("/")[1].split(".txt")[0] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
         
 rule parentcall:
     input:
