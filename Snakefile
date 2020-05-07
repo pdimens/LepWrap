@@ -250,15 +250,14 @@ rule find_bestlikelihoods2:
         """
 rule link_best:
     input:
-        bestfile = "reordermarkers/bestlikelihoods.txt",
-        best_lg = expand("reordermarkers/{lg}.txt", lg = [i.split("/")[1].split(".txt")[0] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
+        "reordermarkers/bestlikelihoods.txt"
     output:
-        expand("reordermarkers/best/{lg}.txt", lg = [i.split("/")[1].split(".txt")[0] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
+        expand("reordermarkers/best/{lg}.txt", lg = [i.split("/")[1].split(".txt")[0] for i in open({input}).read().splitlines()])
     shell:
         """
-        for i in {input.best_lg}; do
-            ln -s $i reordermarkers/best/$(echo $i | basename)
-        done
+        while read best; do
+            ln -s $best reordermarkers/best/$(echo $best | basename)
+        done < {input}
         """
 
 rule intervals:
