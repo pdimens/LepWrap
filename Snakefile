@@ -228,8 +228,9 @@ rule find_bestlikelihoods2:
     input:
        sorted_likelihoods = "reordermarkers/likelihoods.sorted.txt"
     output:
-        best = "reordermarkers/bestlikelihoods.txt",
         best_link = dynamic("reordermarkers/best/order.{lg_iter}.txt")
+    log:
+        best = "reordermarkers/bestlikelihoods.txt"
     message:
         """
         Identifying ordered maps with best likelihoods for each LG >> reordermarkers/bestlikelihoods.txt
@@ -242,7 +243,7 @@ rule find_bestlikelihoods2:
 
         for i in $(seq 1 $NUMITER $TOTALMAPS); do
             LIKELYMAP=$(sed -n ${{i}}p {output.sorted} | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
-            echo "reordermarkers/$LIKELYMAP.txt" >> {output.best}
+            echo "reordermarkers/$LIKELYMAP.txt" >> {log.best}
             ln -s reordermarkers/$LIKELYMAP.txt reordermarkers/best/$LIKELYMAP.txt
         done
         """
