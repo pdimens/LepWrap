@@ -206,8 +206,8 @@ rule summarize_likelihoods2:
     input:
         directory("reordermarkers/")
     output:
-        likelihoods = "reordermarkers/likelihoods.txt"
-        #sorted_likelihoods = "reordermarkers/likelihoods.sorted.txt"
+        likelihoods = "reordermarkers/likelihoods.txt",
+        sorted_likelihoods = "reordermarkers/likelihoods.sorted.txt"
     message:
         """
         Summarizing likelihoods from each iteration >> reordermarkers/likelihoods.txt
@@ -221,30 +221,33 @@ rule summarize_likelihoods2:
             LIKELIHOOD=$(cat $LIKE | grep "likelihood = " | cut -d " " -f7)
             echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.likelihoods}
         done
+        sort {output.likelihoods} -k1,1V -k3,3nr > {output.sorted_likelihoods}
         """
 
-#rule find_bestlikelihoods2:
-#    input:
-#        "reordermarkers/likelihoods.txt"
-#    output:
-#        sorted = "reordermarkers/likelihoods.sorted.txt",
-#        best = "reordermarkers/bestlikelihoods.txt"
-#    message:
-#        """
-#        Identifying ordered maps with best likelihoods for each LG >> reordermarkers/bestlikelihoods.txt
-#        """
-#    shell:
-#        """
-#        sort {input} -k1,1V -k3,3nr > {output.sorted}
-#        LG=$(find reordermarkers -maxdepth 1 -name "ordered.*.*.*.txt" | cut -d "." -f2 | sort -V | uniq)
-#        NUMITER=$(find reordermarkers -maxdepth 1 -name "ordered.*.*.*.txt" | cut -d "." -f4 | sort -V | uniq | tail -1)
-#        TOTALMAPS=$(find reordermarkers -maxdepth 1 -name "ordered.*.*.*.txt" | wc -l) #
+rule find_bestlikelihoods2:
+    input:
+       sorted_likelihoods = "reordermarkers/likelihoods.sorted.txt"
+    output:
+        best = "reordermarkers/bestlikelihoods.txt",
+        best_link = dynamic("reordermarkers/best/order.{lg_iter}.txt")
+    message:
+        """
+        Identifying ordered maps with best likelihoods for each LG >> reordermarkers/bestlikelihoods.txt
+        """
+    shell:
+        """
+        LG=$(find reordermarkers -maxdepth 1 -name "ordered.*.*.*.txt" | cut -d "." -f2 | sort -V | uniq)
+        NUMITER=$(find reordermarkers -maxdepth 1 -name "ordered.*.*.*.txt" | cut -d "." -f4 | sort -V | uniq | tail -1)
+        TOTALMAPS=$(find reordermarkers -maxdepth 1 -name "ordered.*.*.*.txt" | wc -l) #
 
-#        for i in $(seq 1 $NUMITER $TOTALMAPS); do
-#            LIKELYMAP=$(sed -n ${{i}}p {output.sorted} | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
-#            echo "reordermarkers/$LIKELYMAP.txt" >> {output.best}
-#        done
-#        """
+        for i in $(seq 1 $NUMITER $TOTALMAPS); do
+            LIKELYMAP=$(sed -n ${{i}}p {output.sorted} | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
+            echo "reordermarkers/$LIKELYMAP.txt" >> {output.best}
+            ln -s reordermarkers/$LIKELYMAP.txt reordermarkers/best/$LIKELYMAP.txt
+        done
+        """
+
+
 #rule link_best:
 #    input:
 #        "reordermarkers/bestlikelihoods.txt"
