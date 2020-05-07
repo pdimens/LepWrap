@@ -16,12 +16,7 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        #expand("distances/{trimfile}", trimfile = [i.split("/")[1] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()]),
-        #expand("distances_sexAveraged/{trimfile}", trimfile = [i.split("/")[1] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()]),
-        expand("intervals/{trimfile}", trimfile = [i.split("/")[1] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
-
-        #"reordermarkers/bestlikelihoods.txt"
-        #expand("reordermarkers/{trimfile}.{ITER}.txt", trimfile = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()], ITER=ITER)
+        expand("intervals/{trimfile}.intervals", trimfile = [i.split("/")[1].split(".txt")[0] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
         
 rule parentcall:
     input:
@@ -291,27 +286,24 @@ rule find_bestlikelihoods2:
 #        zcat {input.datacall} | java -cp LM3 OrderMarkers2 data=- {params.eval} numThreads={threads} {params.dist_method} improveOrder=0 sexAveraged=1 > {output.dist_SA}
 #        """
 
-best_reorder = [i.split("/")[1] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()]
+best_reorder = [i.split("/")[1].split(".txt")[0] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()]
 
 rule intervals:
     input:
-        best_lg = "reordermarkers/{best_reorder}",
+        best_lg = "reordermarkers/{best_reorder}.txt",
         datacall = "data_f.call.gz"
     output:
-        intervals = "intervals/{best_reorder}"
-        #intervals = expand("intervals/{trimfile}", trimfile = [i.split("/")[1] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
+        intervals = "intervals/{best_reorder}.intervals"
     message:
         """
         Calculating intervals for best reordered maps
         """
     threads: 2
     params:
-        dist_method = "useKosambi=1",
-        eval = "evaluateOrder={input.best_lg}"
-        #eval = expand("evaluateOrder={lg_file}", lg_file = [i for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
+        dist_method = "useKosambi=1"
     shell:
         """
-        zcat {input.datacall} | java -cp LM3 OrderMarkers2 data=- {params.eval} numThreads={threads} {params.dist_method} calculateIntervals={output.intervals}
+        zcat {input.datacall} | java -cp LM3 OrderMarkers2 data=- evaluateOrder={input.best_lg} numThreads={threads} {params.dist_method} calculateIntervals={output.intervals}
         """
 
 #rule finalcheck:
