@@ -260,9 +260,9 @@ rule distances:
     output:
         dist = expand("distances/{trimfile}", trimfile = [i.split("/")[1] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()]),
     message:
-    """
-    Calculating map distances for best reordered maps
-    """
+        """
+        Calculating map distances for best reordered maps
+        """
     threads: 2
     params:
         dist_method = "useKosambi=1",
@@ -279,9 +279,9 @@ rule distances_sexaverage:
     output:
         dist_SA = expand("distances_sexAveraged/{trimfile}", trimfile = [i.split("/")[1] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()]),
     message:
-    """
-    Calculating sex-averaged map distances for best reordered maps
-    """
+        """
+        Calculating sex-averaged map distances for best reordered maps
+        """
     threads: 2
     params:
         dist_method = "useKosambi=1",
