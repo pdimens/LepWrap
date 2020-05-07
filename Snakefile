@@ -204,7 +204,7 @@ rule reorder:
 
 rule summarize_likelihoods2:
     input:
-        "reordermarkers/ordered.{LG, \d+}.{iter1, \d+}.{iter2, \d+}.txt" #, LG = lg_range, ITER = ITER)
+        directory("reordermarkers/")
     output:
         likelihoods = "reordermarkers/likelihoods.txt"
         #sorted_likelihoods = "reordermarkers/likelihoods.sorted.txt"
@@ -215,7 +215,7 @@ rule summarize_likelihoods2:
         """
     shell:
         """
-        for LIKE in {input}; do
+        for LIKE in $(find {input} -maxdepth 1 -name "order*.txt"); do
             LG=$(echo $(basename $LIKE) | cut -d "." -f1,2,3)
             ITERUN=$(echo $LIKE | cut -d "." -f4)
             LIKELIHOOD=$(cat $LIKE | grep "likelihood = " | cut -d " " -f7)
