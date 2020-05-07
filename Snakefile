@@ -252,7 +252,7 @@ rule link_best:
     input:
         "reordermarkers/bestlikelihoods.txt"
     output:
-        dynamic(reordermarkers/best/ordered.{lg_iter}.txt)
+        dynamic("reordermarkers/best/ordered.{lg_iter}.txt")
     shell:
         """
         while read best; do
