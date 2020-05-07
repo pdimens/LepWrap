@@ -202,6 +202,7 @@ rule reorder:
         grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
         """
 
+#TODO fix this input rule
 rule summarize_likelihoods2:
     input:
         "reordermarkers/ordered.{lg, \d+}.{iter1, \d+}.{ITER, \d+}.txt"
