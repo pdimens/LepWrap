@@ -252,7 +252,7 @@ rule link_best:
     input:
         "reordermarkers/bestlikelihoods.txt"
     output:
-        expand("reordermarkers/best/{lg}.txt", lg = [i.split("/")[1].split(".txt")[0] for i in open({input}).read().splitlines()])
+        expand("reordermarkers/best/{lg}.txt", lg = [i.split("/")[1].split(".txt")[0] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
     shell:
         """
         while read best; do
