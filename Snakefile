@@ -252,13 +252,15 @@ rule link_best:
     input:
         "reordermarkers/bestlikelihoods.txt"
     output:
-        expand("reordermarkers/best/{lg}.txt", lg = [i.split("/")[1].split(".txt")[0] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
+        dynamic(reordermarkers/best/ordered.{lg_iter}.txt)
     shell:
         """
         while read best; do
             ln -s $best reordermarkers/best/$(echo $best | basename)
         done < {input}
         """
+
+#expand("reordermarkers/best/{lg}.txt", lg = [i.split("/")[1].split(".txt")[0] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
 
 rule intervals:
     input:
