@@ -204,7 +204,7 @@ rule reorder:
 
 rule summarize_likelihoods2:
     input:
-        directory("reordermarkers/")
+        "reordermarkers/{trimfile}.{ITER}.txt"
     output:
         likelihoods = "reordermarkers/likelihoods.txt",
         sorted_likelihoods = "reordermarkers/likelihoods.sorted.txt"
@@ -215,14 +215,20 @@ rule summarize_likelihoods2:
         """
     shell:
         """
-        for LIKE in $(find {input} -maxdepth 1 -name "order*.txt"); do
-            LG=$(echo $(basename $LIKE) | cut -d "." -f1,2,3)
-            ITERUN=$(echo $LIKE | cut -d "." -f4)
-            LIKELIHOOD=$(cat $LIKE | grep "likelihood = " | cut -d " " -f7)
-            echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.likelihoods}
-        done
+        LG=$(echo $(basename {input}) | cut -d "." -f1,2,3)
+        ITERUN=$(echo {input} | cut -d "." -f4)
+        LIKELIHOOD=$(cat {input} | grep "likelihood = " | cut -d " " -f7)
+        echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.likelihoods}
         sort {output.likelihoods} -k1,1V -k3,3nr > {output.sorted_likelihoods}
         """
+#    for LIKE in $(find {input} -maxdepth 1 -name "order*.txt"); do
+#        LG=$(echo $(basename $LIKE) | cut -d "." -f1,2,3)
+#        ITERUN=$(echo $LIKE | cut -d "." -f4)
+#        LIKELIHOOD=$(cat $LIKE | grep "likelihood = " | cut -d " " -f7)
+#        echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.likelihoods}
+#    done
+#    sort {output.likelihoods} -k1,1V -k3,3nr > {output.sorted_likelihoods}
+#
 
 #rule find_bestlikelihoods2:
 #    input:
