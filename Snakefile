@@ -203,7 +203,6 @@ rule reorder:
         grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
         """
 
-
 rule summarize_likelihoods2:
     input:
         expand("reordermarkers/{reorder_file}", reorder_file = [os.path.basename(i) for i in glob.glob("reordermarkers/ordered.*.txt")])
@@ -231,7 +230,8 @@ rule find_bestlikelihoods2:
         "reordermarkers/likelihoods.txt"
     output:
         sorted = "reordermarkers/likelihoods.sorted.txt",
-        best = "reordermarkers/bestlikelihoods.txt"
+        best = "reordermarkers/bestlikelihoods.txt",
+        best_ln = dynamic("reordermarkers/best/{lg}.txt")
     message:
         """
         Identifying ordered maps with best likelihoods for each LG >> reordermarkers/bestlikelihoods.txt
@@ -246,75 +246,31 @@ rule find_bestlikelihoods2:
         for i in $(seq 1 $NUMITER $TOTALMAPS); do
             LIKELYMAP=$(sed -n ${{i}}p {output.sorted} | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
             echo "reordermarkers/$LIKELYMAP.txt" >> {output.best}
+            ln -s reordermarkers/$LIKELYMAP.txt reordermarkers/best/$LIKELYMAP.txt
         done
         """
 
-#rule distances:
+#def best_like(infile):
+#    [i.split("/")[1].split(".txt")[0] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()]
+
+
+#rule intervals:
 #    input:
-#        likelihoods = "reordermarkers/bestlikelihoods.txt",
+#        best_lg = "reordermarkers/{best_reorder}.txt",
 #        datacall = "data_f.call.gz"
 #    output:
-#        dist = expand("distances/{trimfile}", trimfile = [i.split("/")[1] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()]),
+#        directory("./intervals"),
+#        "intervals/int.done"
+#
+#        #intervals = "intervals/{best_reorder}.intervals"
 #    message:
 #        """
-#        Calculating map distances for best reordered maps
+#        Calculating intervals for best reordered maps
 #        """
 #    threads: 2
 #    params:
-#        dist_method = "useKosambi=1",
-#        eval = expand("evaluateOrder={lg_file}", lg_file = [i for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
+#        dist_method = "useKosambi=1"
 #    shell:
 #        """
-#        zcat {input.datacall} | java -cp LM3 OrderMarkers2 data=- {params.eval} numThreads={threads} {params.dist_method} improveOrder=0 > {output.dist}
-#        """
-
-#rule distances_sexaverage:
-#    input:
-#        likelihoods = "reordermarkers/bestlikelihoods.txt",
-#        datacall = "data_f.call.gz"
-#    output:
-#        dist_SA = expand("distances_sexAveraged/{trimfile}", trimfile = [i.split("/")[1] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()]),
-#    message:
-#        """
-#        Calculating sex-averaged map distances for best reordered maps
-#        """
-#    threads: 2
-#    params:
-#        dist_method = "useKosambi=1",
-#        eval = expand("evaluateOrder={lg_file}", lg_file = [i for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
-#    shell:
-#        """
-#        zcat {input.datacall} | java -cp LM3 OrderMarkers2 data=- {params.eval} numThreads={threads} {params.dist_method} improveOrder=0 sexAveraged=1 > {output.dist_SA}
-#        """
-
-
-rule intervals:
-    best_reorder = [i.split("/")[1].split(".txt")[0] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()]
-    input:
-        best_lg = "reordermarkers/{best_reorder}.txt",
-        datacall = "data_f.call.gz"
-    output:
-        intervals = "intervals/{best_reorder}.intervals"
-    message:
-        """
-        Calculating intervals for best reordered maps
-        """
-    threads: 2
-    params:
-        dist_method = "useKosambi=1"
-    shell:
-        """
-        zcat {input.datacall} | java -cp LM3 OrderMarkers2 data=- evaluateOrder={input.best_lg} numThreads={threads} {params.dist_method} calculateIntervals={output.intervals}
-        """
-
-#rule finalcheck:
-#    input:
-#        directory("distances"),
-#        directory("distances_sexAveraged"),
-#        directory("intervals")
-#    output:
-#        ".lepmak3r.done"
-#    shell:
-#        """
-#        touch .lepmak3r.done
+#        zcat {input.datacall} | java -cp LM3 OrderMarkers2 data=- evaluateOrder={input.best_lg} numThreads={threads} {params.dist_method} calculateIntervals=intervals/${{echo {input.best_lg}.intervals | basename | cut -d "." -f1,2,3,4,6 }}
 #        """
