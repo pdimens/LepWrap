@@ -296,7 +296,8 @@ rule intervals:
         likelihoods = "reordermarkers/bestlikelihoods.txt",
         datacall = "data_f.call.gz"
     output:
-        intervals = expand("intervals/{trimfile}", trimfile = [i.split("/")[1] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
+        intervals = ["intervals/"+i.split("/")[1] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()]
+        #intervals = expand("intervals/{trimfile}", trimfile = [i.split("/")[1] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
     message:
         """
         Calculating intervals for best reordered maps
@@ -304,7 +305,8 @@ rule intervals:
     threads: 2
     params:
         dist_method = "useKosambi=1",
-        eval = expand("evaluateOrder={lg_file}", lg_file = [i for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
+        eval = ["evaluateOrder="+i for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()]
+        #eval = expand("evaluateOrder={lg_file}", lg_file = [i for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])
     shell:
         """
         zcat {input.datacall} | java -cp LM3 OrderMarkers2 data=- {params.eval} numThreads={threads} {params.dist_method} calculateIntervals={output.intervals}
