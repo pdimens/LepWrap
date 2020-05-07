@@ -16,10 +16,9 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        expand("reordermarkers/{trimfile}.{ITER}.txt", trimfile = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()], ITER=ITER)
-        #expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()])
-        #"ordermarkers/bestlikelihoods.txt"
-
+        "reordermarkers/bestlikelihoods.txt"
+        #expand("reordermarkers/{trimfile}.{ITER}.txt", trimfile = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()], ITER=ITER)
+        
 rule parentcall:
     input:
         vcf = expand("{vcffile}", vcffile = vcf_file),
@@ -75,7 +74,7 @@ rule mapsummary:
         Combining map summaries >> maps.splitchrom/maps.summary.txt
         """
     shell:
-        "scripts/map_summary.sh {lod_max} "
+        "scripts/map_summary.sh {lod_max}"
 
 rule joinsingles:
     input:
@@ -136,14 +135,14 @@ rule summarize_likelihoods:
             LG=$(echo $(basename $LIKE) | cut -d "." -f1,2)
             ITERUN=$(echo $LIKE | cut -d "." -f3)
             LIKELIHOOD=$(cat $LIKE | grep "likelihood = " | cut -d " " -f7)
-            echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output}
+            echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.likelihoods}
         done
         sort {output.likelihoods} -k1,1V -k3,3nr > {output.sorted_likelihoods}
         """
 
 rule find_bestlikelihoods:
     input:
-        "ordermarkers/likelihoods.sorted.txt",
+        "ordermarkers/likelihoods.sorted.txt"
     output:
         "ordermarkers/bestlikelihoods.txt"
     message:
@@ -184,7 +183,7 @@ rule reorder:
     input:
         datacall = "data_f.call.gz",
         filt_map = "map.master",
-        lg_order = "ordermarkers/best.trimmed/trimmed.{trimfile}"
+        lg_order = "ordermarkers/best.trimmed/trimmed.{trimfile}.txt"
     output:
         "reordermarkers/{trimfile}.{ITER}.txt"
     log:
@@ -196,10 +195,54 @@ rule reorder:
         """
     params:
         dist_method = "useKosambi=1",
-        eval_order="evaluateOrder=ordermarkers/best.trimmed/trimmed.{trimfile}"
+        eval_order="evaluateOrder=ordermarkers/best.trimmed/trimmed.{trimfile}.txt"
     threads: 2
     shell:
         """
         zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.eval_order} {params.dist_method} &> {log}
         grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
+        """
+
+
+rule summarize_likelihoods:
+    input:
+        "reordermarkers/ordered.{LG}.{ITER1}.{ITER2}.txt"
+        #expand("ordermarkers/ordered.{LG}.{ITER}.txt", LG = lg_range, ITER = ITER)
+    output:
+        likelihoods = "reordermarkers/likelihoods.txt",
+        #sorted_likelihoods = "reordermarkers/likelihoods.sorted.txt"
+    message:
+        """
+        Summarizing likelihoods from each iteration >> reordermarkers/likelihoods.txt
+        Sorting iterations by likelihoods >> reordermarkers/likelihoods.sorted.txt
+        """
+    shell:
+        """
+        LG=$(echo $(basename {input}) | cut -d "." -f1,2,3)
+        ITERUN=$(echo {input} | cut -d "." -f4)
+        LIKELIHOOD=$(cat {input} | grep "likelihood = " | cut -d " " -f7)
+        echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.likelihoods}
+        """
+
+rule find_bestlikelihoods:
+    input:
+        "ordermarkers/likelihoods.txt"
+    output:
+        sorted = "reordermarkers/likelihoods.sorted.txt",
+        best = "reordermarkers/bestlikelihoods.txt"
+    message:
+        """
+        Identifying ordered maps with best likelihoods for each LG >> reordermarkers/bestlikelihoods.txt
+        """
+    shell:
+        """
+        sort {input} -k1,1V -k3,3nr > {output.sorted}
+        LG=$(find reordermarkers -maxdepth 1 -name "ordered.*.*.*.txt" | cut -d "." -f2 | sort -V | uniq)
+        NUMITER=$(find reordermarkers -maxdepth 1 -name "ordered.*.*.*.txt" | cut -d "." -f4 | sort -V | uniq | tail -1)
+        TOTALMAPS=$(find reordermarkers -maxdepth 1 -name "ordered.*.*.*.txt" | wc -l) 
+
+        for i in $(seq 1 $NUMITER $TOTALMAPS); do
+            LIKELYMAP=$(sed -n ${{i}}p {output.sorted} | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
+            echo "ordermarkers/$LIKELYMAP.txt" >> {output.best}
+        done
         """
