@@ -204,7 +204,7 @@ rule reorder:
 
 rule summarize_likelihoods2:
     input:
-        "reordermarkers/ordered.{LG}.txt" #, LG = lg_range, ITER = ITER)
+        "reordermarkers/ordered.{LG, \d+}.{iter1, \d+}.{iter2, \d+}.txt" #, LG = lg_range, ITER = ITER)
     output:
         likelihoods = "reordermarkers/likelihoods.txt"
         #sorted_likelihoods = "reordermarkers/likelihoods.sorted.txt"
