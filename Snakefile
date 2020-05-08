@@ -16,7 +16,7 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        sorted_likelihoods = "reordermarkers/likelihoods.sorted.txt"
+        "reordermarkers/best.likelihoods"
 
 rule parentcall:
     input:
@@ -202,17 +202,16 @@ rule reorder:
         grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
         """
 
-#TODO fix this input rule
 rule summarize_likelihoods2:
     input:
-        "reordermarkers/ordered.{lg, \d+}.{iter1, \d+}.{ITER, \d+}.txt"
+        "reordermarkers/{trimfile}.{ITER}.txt"
     output:
-        likelihoods = "reordermarkers/likelihoods.txt",
-        sorted_likelihoods = "reordermarkers/likelihoods.sorted.txt"
+        likelihoods = "reordermarkers/{trimfile}.likelihoods",
+        sorted_likelihoods = "reordermarkers/{trimfile}.likelihoods.sorted"
     message:
         """
-        Summarizing likelihoods from each iteration >> reordermarkers/likelihoods.txt
-        Sorting iterations by likelihoods >> reordermarkers/likelihoods.sorted.txt
+        Summarizing likelihoods from each iteration
+        Sorting iterations by likelihoods
         """
     shell:
         """
@@ -222,26 +221,24 @@ rule summarize_likelihoods2:
         echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.likelihoods}
         sort {output.likelihoods} -k1,1V -k3,3nr > {output.sorted_likelihoods}
         """
-#    for LIKE in $(find {input} -maxdepth 1 -name "order*.txt"); do
-#        LG=$(echo $(basename $LIKE) | cut -d "." -f1,2,3)
-#        ITERUN=$(echo $LIKE | cut -d "." -f4)
-#        LIKELIHOOD=$(cat $LIKE | grep "likelihood = " | cut -d " " -f7)
-#        echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.likelihoods}
-#    done
-#    sort {output.likelihoods} -k1,1V -k3,3nr > {output.sorted_likelihoods}
-#
 
-#rule find_bestlikelihoods2:
-#    input:
-#       sorted_likelihoods = "reordermarkers/likelihoods.sorted.txt"
-#    output:
-#        best_link = dynamic("reordermarkers/best/order.{lg_iter}.txt")
-#    message:
-#        """
-#        Identifying ordered maps with best likelihoods for each LG >> reordermarkers/bestlikelihoods.txt
-#        """
-#    shell:
-#        """
+
+rule find_bestlikelihoods2:
+    input:
+       sorted_likelihoods = "reordermarkers/{trimfile}.likelihoods.sorted"
+    output:
+        best = "reordermarkers/best.likelihoods"
+        #best_link = dynamic("reordermarkers/best/order.{lg_iter}.txt")
+    message:
+        """
+        Identifying ordered maps with best likelihoods for each LG 
+        """
+    shell:
+        """
+        LIKELYMAP=$(head -1 {input.sorted_likelihoods} | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
+        echo "reordermarkers/$LIKELYMAP.txt" >>  {output.best}
+        """
+
 #        LG=$(find reordermarkers -maxdepth 1 -name "ordered.*.*.*.txt" | cut -d "." -f2 | sort -V | uniq)
 #        NUMITER=$(find reordermarkers -maxdepth 1 -name "ordered.*.*.*.txt" | cut -d "." -f4 | sort -V | uniq | tail -1)
 #        TOTALMAPS=$(find reordermarkers -maxdepth 1 -name "ordered.*.*.*.txt" | wc -l) #
@@ -251,7 +248,7 @@ rule summarize_likelihoods2:
 #            echo "reordermarkers/$LIKELYMAP.txt" >>  reordermarkers/bestlikelihoods.txt
 #            ln -s reordermarkers/$LIKELYMAP.txt reordermarkers/best/$LIKELYMAP.txt
 #        done
-#        """
+        
 #
 #rule checkbest:
 #    input:
