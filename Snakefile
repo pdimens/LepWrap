@@ -121,7 +121,7 @@ rule ordermarkers:
 rule summarize_likelihoods:
     input:
         #expand("ordermarkers/ordered.{LG}.{ITER}", LG = lg_range, ITER = ITER)
-        "ordermarkers/ordered.{lg}.{iter}""
+        "ordermarkers/ordered.{lg}.{iter}"
     output:
         likelihoods = "ordermarkers/likelihoods.txt",
         sorted_likelihoods = "ordermarkers/likelihoods.sorted.txt"
