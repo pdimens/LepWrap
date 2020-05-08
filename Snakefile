@@ -99,7 +99,7 @@ rule ordermarkers:
         datacall = "data_f.call.gz",
         filt_map = "map.master"
     output:
-        "ordermarkers/ordered.{lg_range}.{ITER}.txt"
+        "ordermarkers/ordered.{lg_range}.{ITER}"
     log:
         "ordermarkers/logs/ordered.{lg_range}.{ITER}.log"
     message:
@@ -119,7 +119,8 @@ rule ordermarkers:
 
 rule summarize_likelihoods:
     input:
-        expand("ordermarkers/ordered.{LG}.{ITER}.txt", LG = lg_range, ITER = ITER)
+        #expand("ordermarkers/ordered.{LG}.{ITER}", LG = lg_range, ITER = ITER)
+        "ordermarkers/ordered.{lg}.{iter}""
     output:
         likelihoods = "ordermarkers/likelihoods.txt",
         sorted_likelihoods = "ordermarkers/likelihoods.sorted.txt"
@@ -130,14 +131,24 @@ rule summarize_likelihoods:
         """
     shell:
         """
-        for LIKE in {input}; do 
-            LG=$(echo $(basename $LIKE) | cut -d "." -f1,2)
-            ITERUN=$(echo $LIKE | cut -d "." -f3)
-            LIKELIHOOD=$(cat $LIKE | grep "likelihood = " | cut -d " " -f7)
-            echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.likelihoods}
-        done
+        LG=$(echo $(basename {input}) | cut -d "." -f1,2)
+        ITERUN=$(echo {input} | cut -d "." -f3)
+        LIKELIHOOD=$(cat {input} | grep "likelihood = " | cut -d " " -f7)
+        echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.likelihoods}
         sort {output.likelihoods} -k1,1V -k3,3nr > {output.sorted_likelihoods}
         """
+
+
+#    shell:
+#        """
+#        for LIKE in {input}; do 
+#            LG=$(echo $(basename $LIKE) | cut -d "." -f1,2)
+#            ITERUN=$(echo $LIKE | cut -d "." -f3)
+#            LIKELIHOOD=$(cat $LIKE | grep "likelihood = " | cut -d " " -f7)
+#            echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.likelihoods}
+#        done
+#        sort {output.likelihoods} -k1,1V -k3,3nr > {output.sorted_likelihoods}
+#        """
 
 rule find_bestlikelihoods:
     input:
@@ -201,96 +212,3 @@ rule reorder:
         zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.eval_order} {params.dist_method} &> {log}
         grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
         """
-
-rule summarize_likelihoods2:
-    input:
-        expand("reordermarkers/ordered.{lg_range}.{{iter}}.{ITER}.txt", lg_range=lg_range, ITER=ITER)
-    output:
-        likelihoods = "reordermarkers/likelihoods.txt",
-        sorted_likelihoods = "reordermarkers/likelihoods.sorted"
-    message:
-        """
-        Summarizing likelihoods from each iteration
-        Sorting iterations by likelihoods
-        """
-    shell:
-        """
-        #FILES=$(find {input} -maxdepth 1 -name "ordered.*.txt")
-        for FILE in {input}; do
-            LG=$(echo $(basename $FILE) | cut -d "." -f1,2,3)
-            ITERUN=$(echo $FILE | cut -d "." -f4)
-            LIKELIHOOD=$(cat $FILE | grep "likelihood = " | cut -d " " -f7)
-            echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.likelihoods}
-        done
-        sort {output.likelihoods} -k1,1V -k3,3nr > {output.sorted_likelihoods}
-        """
-
-
-rule find_bestlikelihoods2:
-    input:
-       sorted_likelihoods = "reordermarkers/{trimfile}.likelihoods.sorted"
-    output:
-        best = "reordermarkers/best.likelihoods"
-        #best_link = dynamic("reordermarkers/best/order.{lg_iter}.txt")
-    message:
-        """
-        Identifying ordered maps with best likelihoods for each LG 
-        """
-    shell:
-        """
-        LIKELYMAP=$(head -1 {input.sorted_likelihoods} | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
-        echo "reordermarkers/$LIKELYMAP.txt" >>  {output.best}
-        """
-
-#        LG=$(find reordermarkers -maxdepth 1 -name "ordered.*.*.*.txt" | cut -d "." -f2 | sort -V | uniq)
-#        NUMITER=$(find reordermarkers -maxdepth 1 -name "ordered.*.*.*.txt" | cut -d "." -f4 | sort -V | uniq | tail -1)
-#        TOTALMAPS=$(find reordermarkers -maxdepth 1 -name "ordered.*.*.*.txt" | wc -l) #
-#
-#        for i in $(seq 1 $NUMITER $TOTALMAPS); do
-#            LIKELYMAP=$(sed -n ${{i}}p {output.sorted} | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
-#            echo "reordermarkers/$LIKELYMAP.txt" >>  reordermarkers/bestlikelihoods.txt
-#            ln -s reordermarkers/$LIKELYMAP.txt reordermarkers/best/$LIKELYMAP.txt
-#        done
-        
-#
-#rule checkbest:
-#    input:
-#        directory("reordermarkers/best/")
-#    output:
-#        "best.done"
-#    shell:
-#        "touch {output}"
-#
-#rule link_best:
-#    input:
-#        "reordermarkers/bestlikelihoods.txt"
-#    output:
-#        dynamic("reordermarkers/best/ordered.{lg_iter}.txt")
-#    shell:
-#        """
-#        while read best; do
-#            ln -s $best reordermarkers/best/$(echo $best | basename)
-#        done < {input}
-#        """#
-
-##expand("reordermarkers/best/{lg}.txt", lg = [i.split("/")[1].split(".txt")[0] for i in open("reordermarkers/bestlikelihoods.txt").read().splitlines()])#
-
-#rule intervals:
-#    input:
-#        best_lg = "reordermarkers/best/{best_reorder}.txt",
-#        datacall = "data_f.call.gz"
-#    output:
-#        intervals = "intervals/{best_reorder}.intervals",
-#        done = "intervals/int.done"
-#    message:
-#        """
-#        Calculating intervals for best reordered maps
-#        """
-#    threads: 2
-#    params:
-#        dist_method = "useKosambi=1"
-#    shell:
-#        """
-#        zcat {input.datacall} | java -cp LM3 OrderMarkers2 data=- evaluateOrder={input.best_lg} numThreads={threads} {params.dist_method} calculateIntervals={output.intervals}
-#        touch {output.done}
-#        """
