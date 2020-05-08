@@ -204,10 +204,10 @@ rule reorder:
 
 rule summarize_likelihoods2:
     input:
-        directory("reordermarkers")
+        expand("reordermarkers/ordered.{lg_range}.{{iter}}.{ITER}", lg_range=lg_range, ITER=ITER)
     output:
-        likelihoods = "{input}/likelihoods.txt",
-        sorted_likelihoods = "{input}/likelihoods.sorted"
+        likelihoods = "reordermarkers/likelihoods.txt",
+        sorted_likelihoods = "reordermarkers/likelihoods.sorted"
     message:
         """
         Summarizing likelihoods from each iteration
@@ -215,8 +215,8 @@ rule summarize_likelihoods2:
         """
     shell:
         """
-        FILES=$(find {input} -maxdepth 1 -name "ordered.*.txt")
-        for FILE in $FILES; do
+        #FILES=$(find {input} -maxdepth 1 -name "ordered.*.txt")
+        for FILE in {input}; do
             LG=$(echo $(basename $FILE) | cut -d "." -f1,2,3)
             ITERUN=$(echo $FILE | cut -d "." -f4)
             LIKELIHOOD=$(cat $FILE | grep "likelihood = " | cut -d " " -f7)
