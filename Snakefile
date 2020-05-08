@@ -16,7 +16,7 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        "reordermarkers/best.likelihoods"
+        "reordermarkers/likelihoods.sorted"
 
 rule parentcall:
     input:
@@ -204,10 +204,10 @@ rule reorder:
 
 rule summarize_likelihoods2:
     input:
-        "reordermarkers/{trimfile}.{{ITER}}.txt"
+        directory("reordermarkers")
     output:
-        likelihoods = "reordermarkers/{trimfile}.likelihoods",
-        sorted_likelihoods = "reordermarkers/{trimfile}.likelihoods.sorted"
+        likelihoods = "{input}/likelihoods.txt",
+        sorted_likelihoods = "{input}/likelihoods.sorted"
     message:
         """
         Summarizing likelihoods from each iteration
@@ -215,10 +215,13 @@ rule summarize_likelihoods2:
         """
     shell:
         """
-        LG=$(echo $(basename {input}) | cut -d "." -f1,2,3)
-        ITERUN=$(echo {input} | cut -d "." -f4)
-        LIKELIHOOD=$(cat {input} | grep "likelihood = " | cut -d " " -f7)
-        echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.likelihoods}
+        FILES=$(find {input} -maxdepth 1 -name "ordered.*.txt")
+        for FILE in $FILES; do
+            LG=$(echo $(basename $FILE) | cut -d "." -f1,2,3)
+            ITERUN=$(echo $FILE | cut -d "." -f4)
+            LIKELIHOOD=$(cat $FILE | grep "likelihood = " | cut -d " " -f7)
+            echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.likelihoods}
+        done
         sort {output.likelihoods} -k1,1V -k3,3nr > {output.sorted_likelihoods}
         """
 
