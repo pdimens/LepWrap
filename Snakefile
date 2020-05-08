@@ -204,7 +204,7 @@ rule reorder:
 
 rule summarize_likelihoods2:
     input:
-        "reordermarkers/{trimfile}.{ITER, \d+}.txt"
+        "reordermarkers/{trimfile}.{{ITER}}.txt"
     output:
         likelihoods = "reordermarkers/{trimfile}.likelihoods",
         sorted_likelihoods = "reordermarkers/{trimfile}.likelihoods.sorted"
