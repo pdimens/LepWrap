@@ -16,7 +16,8 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        "reordermarkers/likelihoods.sorted"
+        "ordermarkers/bestlikelihoods.txt"
+
 
 rule parentcall:
     input:
@@ -170,45 +171,45 @@ rule find_bestlikelihoods:
             echo "ordermarkers/$LIKELYMAP.txt" >> ordermarkers/bestlikelihoods.txt
         done
         """
-
-rule trimming:
-    input:
-        "ordermarkers/bestlikelihoods.txt"
-    output:
-        expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()])
-    params:
-        trim_threshold = "10"
-    log:
-        "ordermarkers/best.trimmed/trimming.log",
-        "ordermarkers/best.trimmed/bad_markers.txt",
-        "ordermarkers/best.trimmed/trimming_plots.pdf"
-    message:
-        """
-        Scanning the first and last 15% of markers in each LG and removing clusters >{params.trim_threshold}cM apart from the other markers. 
-        """
-    shell:
-        "Rscript scripts/LepMapp3rQA.r $(pwd)/ordermarkers bestlikelihoods.txt {params.trim_threshold}"
-
-rule reorder:
-    input:
-        datacall = "data_f.call.gz",
-        filt_map = "map.master",
-        lg_order = "ordermarkers/best.trimmed/trimmed.{trimfile}.txt"
-    output:
-        "reordermarkers/{trimfile}.{ITER}.txt"
-    log:
-        "reordermarkers/logs/{trimfile}.{ITER}.log"
-    message:
-        """
-        Reordering the markers for each linkage group using the trimmed orders with the best likelihoods from initial ordering.
-        This may take a while depending on the number of provided threads and requested iterations
-        """
-    params:
-        dist_method = "useKosambi=1",
-        eval_order="evaluateOrder=ordermarkers/best.trimmed/trimmed.{trimfile}.txt"
-    threads: 2
-    shell:
-        """
-        zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.eval_order} {params.dist_method} &> {log}
-        grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
-        """
+#
+#rule trimming:
+#    input:
+#        "ordermarkers/bestlikelihoods.txt"
+#    output:
+#        expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()])
+#    params:
+#        trim_threshold = "10"
+#    log:
+#        "ordermarkers/best.trimmed/trimming.log",
+#        "ordermarkers/best.trimmed/bad_markers.txt",
+#        "ordermarkers/best.trimmed/trimming_plots.pdf"
+#    message:
+#        """
+#        Scanning the first and last 15% of markers in each LG and removing clusters >{params.trim_threshold}cM apart from the other markers. 
+#        """
+#    shell:
+#        "Rscript scripts/LepMapp3rQA.r $(pwd)/ordermarkers bestlikelihoods.txt {params.trim_threshold}"
+#
+#rule reorder:
+#    input:
+#        datacall = "data_f.call.gz",
+#        filt_map = "map.master",
+#        lg_order = "ordermarkers/best.trimmed/trimmed.{trimfile}.txt"
+#    output:
+#        "reordermarkers/{trimfile}.{ITER}.txt"
+#    log:
+#        "reordermarkers/logs/{trimfile}.{ITER}.log"
+#    message:
+#        """
+#        Reordering the markers for each linkage group using the trimmed orders with the best likelihoods from initial ordering.
+#        This may take a while depending on the number of provided threads and requested iterations
+#        """
+#    params:
+#        dist_method = "useKosambi=1",
+#        eval_order="evaluateOrder=ordermarkers/best.trimmed/trimmed.{trimfile}.txt"
+#    threads: 2
+#    shell:
+#        """
+#        zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.eval_order} {params.dist_method} &> {log}
+#        grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
+#        """
