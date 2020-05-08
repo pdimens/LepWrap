@@ -120,8 +120,7 @@ rule ordermarkers:
 
 rule summarize_likelihoods:
     input:
-        #expand("ordermarkers/ordered.{LG}.{ITER}", LG = lg_range, ITER = ITER)
-        "ordermarkers/ordered.{lg}.{iter}"
+        expand("ordermarkers/ordered.{LG}.{ITER}", LG = lg_range, ITER = ITER)
     output:
         likelihoods = "ordermarkers/likelihoods.txt",
         sorted_likelihoods = "ordermarkers/likelihoods.sorted.txt"
@@ -132,24 +131,14 @@ rule summarize_likelihoods:
         """
     shell:
         """
-        LG=$(echo $(basename {input}) | cut -d "." -f1,2)
-        ITERUN=$(echo {input} | cut -d "." -f3)
-        LIKELIHOOD=$(cat {input} | grep "likelihood = " | cut -d " " -f7)
-        echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.likelihoods}
+        for LIKE in {input}; do 
+            LG=$(echo $(basename $LIKE) | cut -d "." -f1,2)
+            ITERUN=$(echo $LIKE | cut -d "." -f3)
+            LIKELIHOOD=$(cat $LIKE | grep "likelihood = " | cut -d " " -f7)
+            echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.likelihoods}
+        done
         sort {output.likelihoods} -k1,1V -k3,3nr > {output.sorted_likelihoods}
         """
-
-
-#    shell:
-#        """
-#        for LIKE in {input}; do 
-#            LG=$(echo $(basename $LIKE) | cut -d "." -f1,2)
-#            ITERUN=$(echo $LIKE | cut -d "." -f3)
-#            LIKELIHOOD=$(cat $LIKE | grep "likelihood = " | cut -d " " -f7)
-#            echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.likelihoods}
-#        done
-#        sort {output.likelihoods} -k1,1V -k3,3nr > {output.sorted_likelihoods}
-#        """
 
 rule find_bestlikelihoods:
     input:
