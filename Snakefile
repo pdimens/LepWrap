@@ -164,7 +164,6 @@ rule find_bestlikelihoods:
 
 def best_orders(wildcards):
     files = expand("{files}", files = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()])
-    #[i.split("/")[1] for i in open(infile).read().splitlines()]
     return files
 
 rule trimming:
