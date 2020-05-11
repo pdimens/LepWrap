@@ -16,7 +16,7 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        "trim.done"
+        "trim.check"
         #expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = best_orders)
         #"ordermarkers/likelihoods.txt"
 
@@ -161,16 +161,15 @@ rule find_bestlikelihoods:
        done
        """
 
-def best_orders():
-    files = expand("{files}", files = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()])
+def best_orders(infile):
+    files = [i.split("/")[1] for i in open(infile).read().splitlines()])
     return files
 
 rule trimming:
     input:
         "ordermarkers/bestlikelihoods.txt"
     output:
-        trimmed_files = expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = best_orders()),
-        done = "trim.done"
+        done = "ordermarkers/best.trim/trim.done"
     params:
         trim_threshold = "10"
     log:
@@ -183,9 +182,19 @@ rule trimming:
         """
     shell:
         """
-        echo {output.trimmed_files}
         Rscript scripts/LepMapp3rQA.r $(pwd)/ordermarkers bestlikelihoods.txt {params.trim_threshold}
         touch {output.done}
+        """
+
+rule checktrim:
+    input:
+        done = "ordermarkers/best.trim/trim.done",
+        trimfiles = "ordermarkers/best.trim/trimmed.ordered.{lg_iter}"
+    output:
+        done = "trim.check"
+    shell:
+        """
+        echo {input.trimfiles}
         """
 #rule reorder:
 #    input:
