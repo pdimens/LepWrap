@@ -194,7 +194,7 @@ rule checktrim:
         done = "trim.check"
     shell:
         """
-        echo {input.trimfiles}
+        echo "{input.trimfiles}"
         """
 
 #rule reorder:
