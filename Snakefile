@@ -16,7 +16,8 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = best_orders)
+        "trim.done"
+        #expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = best_orders)
         #"ordermarkers/likelihoods.txt"
 
 
@@ -170,7 +171,8 @@ rule trimming:
     input:
         "ordermarkers/bestlikelihoods.txt"
     output:
-        expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = best_orders)
+        expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = best_orders),
+        "trim.done"
     params:
         trim_threshold = "10"
     log:
@@ -182,8 +184,10 @@ rule trimming:
         Scanning the first and last 15% of markers in each LG and removing clusters >{params.trim_threshold}cM apart from the other markers. 
         """
     shell:
-        "Rscript scripts/LepMapp3rQA.r $(pwd)/ordermarkers bestlikelihoods.txt {params.trim_threshold}"
-
+        """
+        Rscript scripts/LepMapp3rQA.r $(pwd)/ordermarkers bestlikelihoods.txt {params.trim_threshold}
+        touch trim.done
+        """
 #rule reorder:
 #    input:
 #        datacall = "data_f.call.gz",
