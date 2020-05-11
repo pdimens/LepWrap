@@ -16,7 +16,7 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        "trim.check"
+        "trim.done"
         #expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = best_orders)
         #"ordermarkers/likelihoods.txt"
 
@@ -169,7 +169,8 @@ rule trimming:
     input:
         "ordermarkers/bestlikelihoods.txt"
     output:
-        done = "ordermarkers/best.trim/trim.done"
+        done = "ordermarkers/best.trim/trim.done",
+        "ordermarkers/best.trim/trimmed.ordered.{lg_iter}
     params:
         trim_threshold = "10"
     log:
@@ -186,16 +187,6 @@ rule trimming:
         touch {output.done}
         """
 
-rule checktrim:
-    input:
-        done = "ordermarkers/best.trim/trim.done",
-        trimfiles = "ordermarkers/best.trim/trimmed.ordered.{lg_iter}"
-    output:
-        done = "trim.check"
-    shell:
-        """
-        echo "{input.trimfiles}"
-        """
 
 #rule reorder:
 #    input:
