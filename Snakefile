@@ -169,7 +169,7 @@ rule trimming:
     input:
         "ordermarkers/bestlikelihoods.txt"
     output:
-        expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = best_orders({input}))
+        expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = best_orders({{input}}))
     params:
         trim_threshold = "10"
     log:
