@@ -169,7 +169,6 @@ rule trimming:
     input:
         "ordermarkers/bestlikelihoods.txt"
     output:
-        done = "ordermarkers/best.trim/trim.done",
         trimfile = "ordermarkers/best.trim/trimmed.ordered.{lg_iter}"
     params:
         trim_threshold = "10"
@@ -187,6 +186,13 @@ rule trimming:
         touch {output.done}
         """
 
+rule trimcheck:
+    input:
+        "ordermarkers/best.trim/trimmed.ordered.{lg_iter}"
+    output:
+        "trim.done"
+    shell:
+        "touch {output}"
 
 #rule reorder:
 #    input:
