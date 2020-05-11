@@ -170,7 +170,7 @@ rule trimming:
         "ordermarkers/bestlikelihoods.txt"
     output:
         done = "ordermarkers/best.trim/trim.done",
-        "ordermarkers/best.trim/trimmed.ordered.{lg_iter}"
+        trimfile = "ordermarkers/best.trim/trimmed.ordered.{lg_iter}"
     params:
         trim_threshold = "10"
     log:
