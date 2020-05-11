@@ -120,9 +120,9 @@ rule ordermarkers:
 
 rule summarize_likelihoods:
     input:
-        rules.ordermarkers.output
+        "ordermarkers/ordered.{lg}.{iter}"
     output:
-        "ordermarkers/likelihoods.{lg_range}.txt"
+        dynamic("ordermarkers/likelihoods.{lg}.txt")
     message:
         """
         Summarizing and sorting likelihoods from each LG >> ordermarkers/likelihoods.{lg}.txt
