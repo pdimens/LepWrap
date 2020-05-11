@@ -16,7 +16,7 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        "ordermarkers/bestlikelihoods.txt"
+        expand("ordermarkers/likelihoods.{LG}.txt", LG = lg_range)
 
 
 rule parentcall:
@@ -138,30 +138,30 @@ rule summarize_likelihoods:
         sort {output.likelihoods}.tmp -k1,1V -k3,3nr > {output.likelihoods} && rm {output.likelihoods}.tmp
         """
 
-rule find_bestlikelihoods:
-    input:
-        "ordermarkers/likelihoods.sorted.txt"
-    output:
-        "ordermarkers/bestlikelihoods.txt"
-    message:
-        """
-        Identifying ordered maps with best likelihoods for each LG >> ordermarkers/bestlikelihoods.txt
-        """
-    shell:
-        """
-        LG=$(find ordermarkers -maxdepth 1 -name "ordered.*.*" | cut -d "." -f2 | sort -V | uniq)
-        NUMITER=$(find ordermarkers -maxdepth 1 -name "ordered.*.*" | cut -d "." -f3 | sort -V | uniq | tail -1)
-        TOTALMAPS=$(find ordermarkers -maxdepth 1 -name "ordered.*.*" | wc -l) 
-
-        for i in $(seq 1 $NUMITER $TOTALMAPS); do
-            LIKELYMAP=$(sed -n ${{i}}p ordermarkers/likelihoods.sorted.txt | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
-            echo "ordermarkers/$LIKELYMAP" >> ordermarkers/bestlikelihoods.txt
-        done
-        """
-#
-#rule trimming:
+#rule find_bestlikelihoods:
 #    input:
+#        "ordermarkers/likelihoods.{lg}.txt"
+#    output:
 #        "ordermarkers/bestlikelihoods.txt"
+#    message:
+#        """
+#        Identifying ordered maps with best likelihoods for each LG >> ordermarkers/bestlikelihoods.txt
+#        """
+#    shell:
+#        """
+#        LG=$(find ordermarkers -maxdepth 1 -name "ordered.*.*" | cut -d "." -f2 | sort -V | uniq)
+#        NUMITER=$(find ordermarkers -maxdepth 1 -name "ordered.*.*" | cut -d "." -f3 | sort -V | uniq | tail -1)
+#        TOTALMAPS=$(find ordermarkers -maxdepth 1 -name "ordered.*.*" | wc -l) 
+#
+#        for i in $(seq 1 $NUMITER $TOTALMAPS); do
+#            LIKELYMAP=$(sed -n ${{i}}p ordermarkers/likelihoods.sorted.txt | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
+#            echo "ordermarkers/$LIKELYMAP" >> ordermarkers/bestlikelihoods.txt
+#        done
+#        """
+##
+##rule trimming:
+##    input:
+##        "ordermarkers/bestlikelihoods.txt"
 #    output:
 #        expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()])
 #    params:
