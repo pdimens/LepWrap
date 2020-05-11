@@ -119,15 +119,11 @@ rule ordermarkers:
         grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
         """
 
-def pull_likelihoods(wildcards):
-    lg, iter = glob_wildcards("ordermarkers/ordered.{lg}.{iter}")
-    return lg, iter
-
-rule summarize_likelihoods:
+ rule summarize_likelihoods:
     input:
-        expand("ordermarkers/ordered.{lg}.{iter}", lg, iter = pull_likelihoods)
+        "ordermarkers/ordered.{lg_range}.{ITER}"
     output:
-        "ordermarkers/likelihoods.txt"
+        dynamic("ordermarkers/likelihoods.{lg_range}.txt")
     message:
         """
         Summarizing and sorting likelihoods from each LG >> ordermarkers/likelihoods.{lg}.txt
