@@ -127,8 +127,7 @@ rule summarize_likelihoods:
         "ordermarkers/likelihoods.txt"
     message:
         """
-        Summarizing likelihoods from each iteration >> ordermarkers/likelihoods.txt
-        Sorting iterations by likelihoods >> ordermarkers/likelihoods.sorted.txt
+        Summarizing + sorting likelihoods from each iteration >> ordermarkers/likelihoods.txt
         """
     shell:
         """
@@ -184,6 +183,7 @@ rule trimming:
         """
     shell:
         """
+        echo {output.trimmed_files}
         Rscript scripts/LepMapp3rQA.r $(pwd)/ordermarkers bestlikelihoods.txt {params.trim_threshold}
         touch {output.done}
         """
