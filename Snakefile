@@ -121,12 +121,13 @@ rule ordermarkers:
         
 rule summarize_likelihoods:
     input:
-        expand("ordermarkers/ordered.{lg}.{iter}", lg = lg_range, iter = ITER)
+        expand("ordermarkers/ordered.{LG}.{ITER}", LG = lg_range, ITER = ITER)
     output:
-        expand("ordermarkers/likelihoods.{lg}.txt", lg = lg_range)
+        "ordermarkers/likelihoods.txt"
     message:
         """
-        Summarizing and sorting likelihoods from each LG >> ordermarkers/likelihoods.{lg}.txt
+        Summarizing likelihoods from each iteration >> ordermarkers/likelihoods.txt
+        Sorting iterations by likelihoods >> ordermarkers/likelihoods.sorted.txt
         """
     shell:
         """
@@ -139,45 +140,49 @@ rule summarize_likelihoods:
         sort {output}.tmp -k1,1V -k3,3nr > {output} && rm {output}.tmp
         """
 
-#rule find_bestlikelihoods:
-#    input:
-#        "ordermarkers/likelihoods.{lg}.txt"
-#    output:
-#        "ordermarkers/bestlikelihoods.txt"
-#    message:
-#        """
-#        Identifying ordered maps with best likelihoods for each LG >> ordermarkers/bestlikelihoods.txt
-#        """
-#    shell:
-#        """
-#        LG=$(find ordermarkers -maxdepth 1 -name "ordered.*.*" | cut -d "." -f2 | sort -V | uniq)
-#        NUMITER=$(find ordermarkers -maxdepth 1 -name "ordered.*.*" | cut -d "." -f3 | sort -V | uniq | tail -1)
-#        TOTALMAPS=$(find ordermarkers -maxdepth 1 -name "ordered.*.*" | wc -l) 
-#
-#        for i in $(seq 1 $NUMITER $TOTALMAPS); do
-#            LIKELYMAP=$(sed -n ${{i}}p ordermarkers/likelihoods.sorted.txt | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
-#            echo "ordermarkers/$LIKELYMAP" >> ordermarkers/bestlikelihoods.txt
-#        done
-#        """
-##
-##rule trimming:
-##    input:
-##        "ordermarkers/bestlikelihoods.txt"
-#    output:
-#        expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()])
-#    params:
-#        trim_threshold = "10"
-#    log:
-#        "ordermarkers/best.trimmed/trimming.log",
-#        "ordermarkers/best.trimmed/bad_markers.txt",
-#        "ordermarkers/best.trimmed/trimming_plots.pdf"
-#    message:
-#        """
-#        Scanning the first and last 15% of markers in each LG and removing clusters >{params.trim_threshold}cM apart from the other markers. 
-#        """
-#    shell:
-#        "Rscript scripts/LepMapp3rQA.r $(pwd)/ordermarkers bestlikelihoods.txt {params.trim_threshold}"
-#
+
+rule find_bestlikelihoods:
+   input:
+       "ordermarkers/likelihoods.txt"
+   output:
+       "ordermarkers/bestlikelihoods.txt"
+   message:
+       """
+       Identifying ordered maps with best likelihoods for each LG >> ordermarkers/bestlikelihoods.txt
+       """
+   shell:
+       """
+       LG=$(find ordermarkers -maxdepth 1 -name "ordered.*.*" | cut -d "." -f2 | sort -V | uniq)
+       NUMITER=$(find ordermarkers -maxdepth 1 -name "ordered.*.*" | cut -d "." -f3 | sort -V | uniq | tail -1)
+       TOTALMAPS=$(find ordermarkers -maxdepth 1 -name "ordered.*.*" | wc -l) 
+       for i in $(seq 1 $NUMITER $TOTALMAPS); do
+           LIKELYMAP=$(sed -n ${{i}}p ordermarkers/likelihoods.sorted.txt | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
+           echo "ordermarkers/$LIKELYMAP" >> ordermarkers/bestlikelihoods.txt
+       done
+       """
+
+def best_orders(infile):
+    files = [i.split("/")[1] for i in open(infile).read().splitlines()]
+    return files
+
+rule trimming:
+    input:
+        "ordermarkers/bestlikelihoods.txt"
+    output:
+        expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = best_orders({input}))
+    params:
+        trim_threshold = "10"
+    log:
+        "ordermarkers/best.trimmed/trimming.log",
+        "ordermarkers/best.trimmed/bad_markers.txt",
+        "ordermarkers/best.trimmed/trimming_plots.pdf"
+    message:
+        """
+        Scanning the first and last 15% of markers in each LG and removing clusters >{params.trim_threshold}cM apart from the other markers. 
+        """
+    shell:
+        "Rscript scripts/LepMapp3rQA.r $(pwd)/ordermarkers bestlikelihoods.txt {params.trim_threshold}"
+
 #rule reorder:
 #    input:
 #        datacall = "data_f.call.gz",
