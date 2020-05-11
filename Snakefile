@@ -183,7 +183,7 @@ rule trimming:
     shell:
         """
         Rscript scripts/LepMapp3rQA.r $(pwd)/ordermarkers bestlikelihoods.txt {params.trim_threshold}
-        touch {output.done}
+        #touch {output.done}
         """
 
 rule trimcheck:
