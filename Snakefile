@@ -118,8 +118,8 @@ rule ordermarkers:
         zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.dist_method} {params.chrom} &> {log}
         grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
         """
-
- rule summarize_likelihoods:
+        
+rule summarize_likelihoods:
     input:
         "ordermarkers/ordered.{lg_range}.{ITER}"
     output:
