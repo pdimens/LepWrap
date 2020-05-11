@@ -16,7 +16,8 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        expand("ordermarkers/likelihoods.{LG}.txt", LG = lg_range)
+        "ordermarkers/likelihoods.txt"
+        #expand("ordermarkers/likelihoods.{LG}.txt", LG = lg_range)
 
 
 rule parentcall:
@@ -118,11 +119,15 @@ rule ordermarkers:
         grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
         """
 
+def pull_likelihoods(wildcards):
+    lg, iter = glob_wildcards("ordermarkers/ordered.{lg}.{iter}")
+    return lg, iter
+
 rule summarize_likelihoods:
     input:
-        "ordermarkers/ordered.{lg}.{iter}"
+        expand("ordermarkers/ordered.{lg}.{iter}", lg, iter = pull_likelihoods)
     output:
-        dynamic("ordermarkers/likelihoods.{lg}.txt")
+        "ordermarkers/likelihoods.txt"
     message:
         """
         Summarizing and sorting likelihoods from each LG >> ordermarkers/likelihoods.{lg}.txt
