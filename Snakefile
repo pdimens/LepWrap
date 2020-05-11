@@ -120,7 +120,7 @@ rule ordermarkers:
 
 rule summarize_likelihoods:
     input:
-        "ordermarkers/ordered.{lg}.{iter}"
+        "ordermarkers/ordered.{lg}.{ITER}"
     output:
         "ordermarkers/likelihoods.{lg}.txt"
     message:
