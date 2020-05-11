@@ -120,12 +120,12 @@ rule ordermarkers:
 
 rule summarize_likelihoods:
     input:
-        expand("ordermarkers/ordered.{LG}.{ITER}", LG = lg_range, ITER = ITER)
+        "ordermarkers/ordered.{lg}.{iter}"
     output:
-        likelihoods = "ordermarkers/likelihoods.{LG}.txt"
+        "ordermarkers/likelihoods.{lg}.txt"
     message:
         """
-        Summarizing and sorting likelihoods from each LG >> ordermarkers/likelihoods.txt
+        Summarizing and sorting likelihoods from each LG >> ordermarkers/likelihoods.{lg}.txt
         """
     shell:
         """
@@ -133,9 +133,9 @@ rule summarize_likelihoods:
             LG=$(echo $(basename $LIKE) | cut -d "." -f1,2)
             ITERUN=$(echo $LIKE | cut -d "." -f3)
             LIKELIHOOD=$(cat $LIKE | grep "likelihood = " | cut -d " " -f7)
-            echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.likelihoods}.tmp
+            echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output}.tmp
         done
-        sort {output.likelihoods}.tmp -k1,1V -k3,3nr > {output.likelihoods} && rm {output.likelihoods}.tmp
+        sort {output}.tmp -k1,1V -k3,3nr > {output} && rm {output}.tmp
         """
 
 #rule find_bestlikelihoods:
