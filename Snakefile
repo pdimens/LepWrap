@@ -120,9 +120,9 @@ rule ordermarkers:
 
 rule summarize_likelihoods:
     input:
-        expand("ordermarkers/ordered.{{lg, \d+}}.{ITER}", ITER=ITER)
+        rules.ordermarkers.output
     output:
-        "ordermarkers/likelihoods.{lg}.txt"
+        "ordermarkers/likelihoods.{lg_range}.txt"
     message:
         """
         Summarizing and sorting likelihoods from each LG >> ordermarkers/likelihoods.{lg}.txt
