@@ -188,7 +188,7 @@ rule trimming:
 
 rule trimcheck:
     input:
-        expand("ordermarkers/best.trim/trimmed.ordered.{lg}.{iter}", lg = lg_range, iter = ITER, allowmissing = true)
+        expand("ordermarkers/best.trim/trimmed.ordered.{lg}.{iter}", lg = lg_range, iter = ITER, allow_missing = True)
     output:
         "trim.done"
     shell:
