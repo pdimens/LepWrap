@@ -162,15 +162,15 @@ rule find_bestlikelihoods:
        done
        """
 
-def best_orders(infile):
-    files = expand("{files}", files = [i.split("/")[1] for i in open(infile).read().splitlines()])
+def best_orders(wildcards):
+    files = expand("{files}", files = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()])
     return files
 
 rule trimming:
     input:
         "ordermarkers/bestlikelihoods.txt"
     output:
-        trimmed_files = expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = best_orders(rule.trimming.input)),
+        trimmed_files = expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = best_orders),
         done = "trim.done"
     params:
         trim_threshold = "10"
