@@ -16,8 +16,8 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
+        expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = best_orders)
         #"ordermarkers/likelihoods.txt"
-        expand("ordermarkers/likelihoods.{LG}.txt", LG = lg_range)
 
 
 rule parentcall:
