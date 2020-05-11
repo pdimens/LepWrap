@@ -122,12 +122,10 @@ rule summarize_likelihoods:
     input:
         expand("ordermarkers/ordered.{LG}.{ITER}", LG = lg_range, ITER = ITER)
     output:
-        likelihoods = "ordermarkers/likelihoods.txt",
-        sorted_likelihoods = "ordermarkers/likelihoods.sorted.txt"
+        likelihoods = "ordermarkers/likelihoods.{LG}.txt"
     message:
         """
-        Summarizing likelihoods from each iteration >> ordermarkers/likelihoods.txt
-        Sorting iterations by likelihoods >> ordermarkers/likelihoods.sorted.txt
+        Summarizing and sorting likelihoods from each LG >> ordermarkers/likelihoods.txt
         """
     shell:
         """
@@ -135,9 +133,9 @@ rule summarize_likelihoods:
             LG=$(echo $(basename $LIKE) | cut -d "." -f1,2)
             ITERUN=$(echo $LIKE | cut -d "." -f3)
             LIKELIHOOD=$(cat $LIKE | grep "likelihood = " | cut -d " " -f7)
-            echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.likelihoods}
+            echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.likelihoods}.tmp
         done
-        sort {output.likelihoods} -k1,1V -k3,3nr > {output.sorted_likelihoods}
+        sort {output.likelihoods}.tmp -k1,1V -k3,3nr > {output.likelihoods} && rm {output.likelihoods}.tmp
         """
 
 rule find_bestlikelihoods:
@@ -151,13 +149,13 @@ rule find_bestlikelihoods:
         """
     shell:
         """
-        LG=$(find ordermarkers -maxdepth 1 -name "ordered.*.*.txt" | cut -d "." -f2 | sort -V | uniq)
-        NUMITER=$(find ordermarkers -maxdepth 1 -name "ordered.*.*.txt" | cut -d "." -f3 | sort -V | uniq | tail -1)
-        TOTALMAPS=$(find ordermarkers -maxdepth 1 -name "ordered.*.*.txt" | wc -l) 
+        LG=$(find ordermarkers -maxdepth 1 -name "ordered.*.*" | cut -d "." -f2 | sort -V | uniq)
+        NUMITER=$(find ordermarkers -maxdepth 1 -name "ordered.*.*" | cut -d "." -f3 | sort -V | uniq | tail -1)
+        TOTALMAPS=$(find ordermarkers -maxdepth 1 -name "ordered.*.*" | wc -l) 
 
         for i in $(seq 1 $NUMITER $TOTALMAPS); do
             LIKELYMAP=$(sed -n ${{i}}p ordermarkers/likelihoods.sorted.txt | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
-            echo "ordermarkers/$LIKELYMAP.txt" >> ordermarkers/bestlikelihoods.txt
+            echo "ordermarkers/$LIKELYMAP" >> ordermarkers/bestlikelihoods.txt
         done
         """
 #
