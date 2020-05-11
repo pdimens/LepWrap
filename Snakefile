@@ -111,11 +111,11 @@ rule ordermarkers:
         """
     params:
         dist_method = "useKosambi=1",
-        chrom = "chromosome={lg_range}"
+        chrom = "{lg_range}"
     threads: 2
     shell:
         """
-        zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.dist_method} {params.chrom} &> {log}
+        zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.dist_method} chromosome={params.chrom} &> {log}
         grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
         """
         
