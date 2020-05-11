@@ -121,9 +121,9 @@ rule ordermarkers:
         
 rule summarize_likelihoods:
     input:
-        "ordermarkers/ordered.{lg_range}.{ITER}"
+        expand("ordermarkers/ordered.{lg}.{iter}", lg = lg_range, iter = ITER)
     output:
-        dynamic("ordermarkers/likelihoods.{lg_range}.txt")
+        expand("ordermarkers/likelihoods.{lg}.txt", lg = lg_range)
     message:
         """
         Summarizing and sorting likelihoods from each LG >> ordermarkers/likelihoods.{lg}.txt
