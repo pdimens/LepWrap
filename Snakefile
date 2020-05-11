@@ -163,7 +163,7 @@ rule find_bestlikelihoods:
        """
 
 def best_orders(wildcards):
-    files = expand("{files}", files = [i.split("/")[1] for i in open( "ordermarkers/bestlikelihoods.txt").read().splitlines()])
+    files = expand("{files}", files = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()])
     #[i.split("/")[1] for i in open(infile).read().splitlines()]
     return files
 
@@ -171,8 +171,8 @@ rule trimming:
     input:
         "ordermarkers/bestlikelihoods.txt"
     output:
-        expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = best_orders),
-        "trim.done"
+        trimmed_files = expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = best_orders),
+        done = "trim.done"
     params:
         trim_threshold = "10"
     log:
@@ -186,7 +186,7 @@ rule trimming:
     shell:
         """
         Rscript scripts/LepMapp3rQA.r $(pwd)/ordermarkers bestlikelihoods.txt {params.trim_threshold}
-        touch trim.done
+        touch {output.done}
         """
 #rule reorder:
 #    input:
