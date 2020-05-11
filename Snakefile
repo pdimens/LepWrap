@@ -173,10 +173,10 @@ rule trimming:
         trimfile = "ordermarkers/best.trim/trimmed.ordered.{lg_iter}"
     params:
         trim_threshold = "10"
-    log:
-        "ordermarkers/best.trimmed/trimming.log",
-        "ordermarkers/best.trimmed/bad_markers.txt",
-        "ordermarkers/best.trimmed/trimming_plots.pdf"
+    #log:
+    #    "ordermarkers/best.trimmed/trimming.log",
+    #    "ordermarkers/best.trimmed/bad_markers.txt",
+    #    "ordermarkers/best.trimmed/trimming_plots.pdf"
     message:
         """
         Scanning the first and last 15% of markers in each LG and removing clusters >{params.trim_threshold}cM apart from the other markers. 
