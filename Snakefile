@@ -161,16 +161,16 @@ rule find_bestlikelihoods:
        done
        """
 
-def best_orders(infile):
-    files = [i.split("/")[1] for i in open(infile).read().splitlines()])
-    return files
+#def best_orders(infile):
+#    files = [i.split("/")[1] for i in open(infile).read().splitlines()])
+#    return files
 
 rule trimming:
     input:
         "ordermarkers/bestlikelihoods.txt"
     output:
         done = "ordermarkers/best.trim/trim.done",
-        "ordermarkers/best.trim/trimmed.ordered.{lg_iter}
+        "ordermarkers/best.trim/trimmed.ordered.{lg_iter}"
     params:
         trim_threshold = "10"
     log:
