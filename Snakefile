@@ -179,7 +179,7 @@ rule trimming:
         dynamic("ordermarkers/best.trim/{orderfile}.trim.pdf")
     params:
         trim_threshold = "10",
-        likefile = best_orders("ordermarkers/bestlikelihoods.txt")
+        likefile = best_orders(rule.find_bestlikelihoods.output)
     message:
         """
         Scanning the first and last 15% of markers in each LG and removing clusters >{params.trim_threshold}cM apart from the other markers. 
