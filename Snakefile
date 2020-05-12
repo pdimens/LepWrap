@@ -183,7 +183,7 @@ rule isolate_best:
     shell:
         """
         BEST=$(grep -F {params.grep_lg} {input})
-        ln -s $BEST {output}
+        ln $BEST {output}
         """
 
 rule trimming:
