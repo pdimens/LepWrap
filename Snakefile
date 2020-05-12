@@ -149,7 +149,7 @@ rule find_bestlikelihoods:
        dynamic("ordermarkers/best/{orderfile}")
    message:
        """
-       Identifying ordered maps with best likelihoods for {output} each LG >> ordermarkers/bestlikelihoods.txt
+       Identifying ordered maps with best likelihoods for each LG >> ordermarkers/bestlikelihoods.txt
        """
    shell:
        """
@@ -169,7 +169,8 @@ rule find_bestlikelihoods:
 
 rule trimming:
     input:
-        likes = "ordermarkers/best/{orderfile}"
+        #TODO possibly remove dynamic())
+        dynamic("ordermarkers/best/{orderfile}")
     output:
         "ordermarkers/best.trim/{orderfile}.trimmed"
         #trimfile = ["ordermarkers/best.trim/trimmed"+i.split("/")[1] for i in open("{input}").read().splitlines()]
