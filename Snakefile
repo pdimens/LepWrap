@@ -172,11 +172,11 @@ rule trimming:
         #TODO possibly remove dynamic())
         dynamic("ordermarkers/best/{orderfile}")
     output:
-        "ordermarkers/best.trim/{orderfile}.trimmed"
+        dynamic("ordermarkers/best.trim/{orderfile}.trimmed")
         #trimfile = ["ordermarkers/best.trim/trimmed"+i.split("/")[1] for i in open("{input}").read().splitlines()]
     log:
-        "ordermarkers/best.trim/{orderfile}.removed",
-        "ordermarkers/best.trim/{orderfile}.trim.pdf"
+        dynamic("ordermarkers/best.trim/{orderfile}.removed"),
+        dynamic("ordermarkers/best.trim/{orderfile}.trim.pdf")
     params:
         trim_threshold = "10",
     message:
