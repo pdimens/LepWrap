@@ -169,16 +169,15 @@ rule trimming:
     input:
         "ordermarkers/bestlikelihoods.txt"
     output:
-        dynamic("ordermarkers/best.trim/{orderfile}.trimmed"),
-        dynamic("ordermarkers/best.trim/{orderfile}.removed"),
-        dynamic("ordermarkers/best.trim/{orderfile}.trim.pdf")
+        dynamic("ordermarkers/best.trim/{orderfile}.trimmed")
+
         #trimfile = ["ordermarkers/best.trim/trimmed"+i.split("/")[1] for i in open("{input}").read().splitlines()]
     params:
-        trim_threshold = "10"
-    #log:
-    #    "ordermarkers/best.trimmed/trimming.log",
-    #    "ordermarkers/best.trimmed/bad_markers.txt",
-    #    "ordermarkers/best.trimmed/trimming_plots.pdf"
+        trim_threshold = "10",
+        infile = expand("ordermarkers/{orderfile}", orderfile = [i.split("/")[1] for i in open({{input}}).read().splitlines()]
+    log:
+        dynamic("ordermarkers/best.trim/{orderfile}.removed"),
+        dynamic("ordermarkers/best.trim/{orderfile}.trim.pdf")
     message:
         """
         Scanning the first and last 15% of markers in each LG and removing clusters >{params.trim_threshold}cM apart from the other markers. 
