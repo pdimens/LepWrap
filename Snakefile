@@ -232,26 +232,26 @@ rule trimcheck:
     shell:
         "touch {output}"
 
-#rule reorder:
-#    input:
-#        datacall = "data_f.call.gz",
-#        filt_map = "map.master",
-#        lg_order = "ordermarkers/best.trimmed/trimmed.{trimfile}.txt"
-#    output:
-#        "reordermarkers/{trimfile}.{ITER}.txt"
-#    log:
-#        "reordermarkers/logs/{trimfile}.{ITER}.log"
-#    message:
-#        """
-#        Reordering the markers for each linkage group using the trimmed orders with the best likelihoods from initial ordering.
-#        This may take a while depending on the number of provided threads and requested iterations
-#        """
-#    params:
-#        dist_method = "useKosambi=1",
-#        eval_order="evaluateOrder=ordermarkers/best.trimmed/trimmed.{trimfile}.txt"
-#    threads: 2
-#    shell:
-#        """
-#        zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.eval_order} {params.dist_method} &> {log}
-#        grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
-#        """
+rule reorder:
+    input:
+        datacall = "data_f.call.gz",
+        filt_map = "map.master",
+        lg_order = "ordermarkers/best.trim/{trimfile}.trimmed"
+    output:
+        "reordermarkers/{trimfile}.{ITER}.txt"
+    log:
+        "reordermarkers/logs/{trimfile}.{ITER}.log"
+    message:
+        """
+        Reordering the markers for each linkage group using the trimmed orders with the best likelihoods from initial ordering.
+        This may take a while depending on the number of provided threads and requested iterations
+        """
+    params:
+        dist_method = "useKosambi=1",
+        eval_order="evaluateOrder=ordermarkers/best.trim/{trimfile}.trimmed"
+    threads: 2
+    shell:
+        """
+        zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.eval_order} {params.dist_method} &> {log}
+        grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
+        """
