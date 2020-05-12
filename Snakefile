@@ -169,7 +169,9 @@ rule trimming:
     input:
         "ordermarkers/bestlikelihoods.txt"
     output:
-        dynamic("ordermarkers/best.trim/{orderfile}.trimmed")
+        dynamic("ordermarkers/best.trim/{orderfile}.trimmed"),
+        dynamic("ordermarkers/best.trim/{orderfile}.removed"),
+        dynamic("ordermarkers/best.trim/{orderfile}.trim.pdf")
         #trimfile = ["ordermarkers/best.trim/trimmed"+i.split("/")[1] for i in open("{input}").read().splitlines()]
     params:
         trim_threshold = "10"
