@@ -191,7 +191,6 @@ rule trimming:
         "ordermarkers/best/{orderfile}"
     output:
         "ordermarkers/best.trim/{orderfile}.trimmed"
-        #trimfile = ["ordermarkers/best.trim/trimmed"+i.split("/")[1] for i in open("{input}").read().splitlines()]
     log:
         "ordermarkers/best.trim/{orderfile}.removed",
         "ordermarkers/best.trim/{orderfile}.trim.pdf"
@@ -199,12 +198,11 @@ rule trimming:
         trim_threshold = "10",
     message:
         """
-        Scanning the first and last 15% of markers in each LG and removing clusters >{params.trim_threshold}cM apart from the other markers. 
+        Scanning the first and last 15% of markers in {input} and removing clusters >{params.trim_threshold}cM apart from the other markers. 
         """
     shell:
         """
-        touch {output}
-        #Rscript scripts/LepMapp3rQA_single.r $(pwd)/ordermarkers {params.trim_threshold}
+        Rscript scripts/LepMapp3rQA_single.r $(pwd)/ordermarkers {input} {params.trim_threshold}
         """
 
 rule trimcheck:
