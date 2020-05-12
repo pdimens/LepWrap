@@ -215,7 +215,7 @@ rule trim_summary:
     shell:
         """
         echo -e "LG\trm_marker" >> {output}
-        for each in {input}; do
+        for each in ordermarkers/best.trim/ordered.*.removed ; do
             BASE=$(basename $each | cut -d "." -f1,2)
             sed -e "s/^/$BASE /" $each >> {output} 
         done
