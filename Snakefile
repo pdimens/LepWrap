@@ -141,10 +141,6 @@ rule summarize_likelihoods:
         sort {output}.tmp -k1,1V -k3,3nr > {output} && rm {output}.tmp
         """
 
-# TODO: rewrite R code to take best likelihood of a particular LG. trim it,
-# and write the new files in best.trim
-# make a param the LG so it can iterate over that.
-
 rule find_bestlikelihoods:
     input:
         "ordermarkers/likelihoods.txt"
@@ -164,10 +160,6 @@ rule find_bestlikelihoods:
             echo "ordermarkers/$LIKELYMAP" >> ordermarkers/bestlikelihoods.txt
         done
         """
-
-#def best_orders(infile):
-#    files = [i.split("/")[1] for i in open(infile).read().splitlines()])
-#    return files
 
 rule isolate_best:
     input:
@@ -240,7 +232,7 @@ rule reorder:
         trimlog = "ordermarkers/best.trim/trim.log",
         lg_order = "ordermarkers/best.trim/{trimfile}.trimmed"
     output:
-        "reordermarkers/{trimfile}.{ITER}.txt"
+        "reordermarkers/{trimfile}.{ITER}"
     log:
         "reordermarkers/logs/{trimfile}.{ITER}.log"
     message:
@@ -260,7 +252,7 @@ rule reorder:
 
 rule reordercheck:
     input:
-        expand("reordermarkers/ordered.{lg}.{iter}.txt", lg = lg_range, iter = ITER)
+        expand("reordermarkers/ordered.{lg}.{iter}", lg = lg_range, iter = ITER)
     output:
         "reorder.done"
     shell:
