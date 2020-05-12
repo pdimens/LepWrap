@@ -176,7 +176,7 @@ rule trimming:
         dynamic("ordermarkers/best.trim/{orderfile}.trim.pdf")
     params:
         trim_threshold = "10",
-        infile = expand("ordermarkers/{orderfile}", orderfile = [i.split("/")[1] for i in open({{input}}).read().splitlines()])
+        infile = expand("ordermarkers/{orderfile}", orderfile = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()])
     message:
         """
         Scanning the first and last 15% of markers in each LG and removing clusters >{params.trim_threshold}cM apart from the other markers. 
