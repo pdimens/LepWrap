@@ -16,7 +16,8 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        "trim.done"
+        "reorder.done"
+        #"trim.done"
         #expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = best_orders)
         #"ordermarkers/likelihoods.txt"
 
@@ -255,3 +256,11 @@ rule reorder:
         zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.eval_order} {params.dist_method} &> {log}
         grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
         """
+
+rule trimcheck:
+    input:
+        expand("reordermarkers/ordered.{lg}.{iter}.txt", lg = lg_range, iter = ITER)
+    output:
+        "reorder.done"
+    shell:
+        "touch {output}"
