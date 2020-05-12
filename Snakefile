@@ -208,7 +208,7 @@ rule trimming:
 rule trim_summary:
     input:
         expand("ordermarkers/best.trim/ordered.{lg}.trimmed", lg = lg_range)
-    log:
+    output:
         "ordermarkers/best.trim/trim.log"
     message:
         "Summarizing trim logs into single trim.log file"
@@ -216,12 +216,13 @@ rule trim_summary:
         """
         for each in $(sort -V {input}); do
             BASE=$(echo $each | cut -d "." -f1,2)
-            sed -e "s/^/$BASE /" $each >> {log}
+            sed -e "s/^/$BASE /" $each >> {output}
         done
         """
 
 rule trimcheck:
     input:
+        "ordermarkers/best.trim/trim.log",
         expand("ordermarkers/best.trim/ordered.{lg}.trimmed", lg = lg_range)
         #expand("ordermarkers/best.trim/ordered.{lg}.{iter}.trimmed", lg = lg_range, iter = ITER, allow_missing = True)
     output:
