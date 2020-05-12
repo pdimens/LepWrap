@@ -102,7 +102,7 @@ write.table(
   append=TRUE
 )
 
-supressMessages(
+suppressMessages(
     write.table(
       removed_markers,
       file=paste(outfile_base, "removed", sep = "."),
