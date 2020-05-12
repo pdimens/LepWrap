@@ -202,7 +202,7 @@ rule trimming:
         """
     shell:
         """
-        Rscript scripts/LepMapp3rQA_single.r $(pwd)/ordermarkers {input} {params.trim_threshold}
+        Rscript scripts/LepMapp3rQA_single.r $(pwd) {input} {params.trim_threshold}
         """
 
 rule trimcheck:

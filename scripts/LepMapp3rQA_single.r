@@ -5,19 +5,22 @@ args = commandArgs(trailingOnly = TRUE)
 suppressMessages(if (!require("dplyr")) install.packages("dplyr"))
 suppressMessages(library("dplyr"))
 path = args[1]
+# path = project directory
 setwd(args[1])
-#file.names <- read.csv(args[2], header=FALSE, sep="/")[,2]
 
 lgfile <- read.delim(
-            Sys.readlink(args[2]), 
+            args[2], 
             header = FALSE, 
             sep = "\t", 
             comment.char="#"
           )
+
+filename <- unlist(strsplit(args[2], "/"))[3]
+
 # instantiate QC columns
 lgfile$Mpass <- c(TRUE)
 lgfile$Fpass <- c(TRUE)
-outfile_base <- paste(path, "best.trimmed", args[2], sep = "/")
+outfile_base <- paste(path, "ordermarkers", "best.trimmed", filename, sep = "/")
 
 #========= PDF instantiation ========#
 PDFPath <- paste(outfile_base, "trim.pdf", sep = ".")
