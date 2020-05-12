@@ -170,7 +170,7 @@ rule find_bestlikelihoods:
 rule trimming:
     input:
         #TODO possibly remove dynamic())
-        "ordermarkers/best/{orderfile}"
+        dynamic("ordermarkers/best/{orderfile}")
     output:
         "ordermarkers/best.trim/{orderfile}.trimmed"
         #trimfile = ["ordermarkers/best.trim/trimmed"+i.split("/")[1] for i in open("{input}").read().splitlines()]
