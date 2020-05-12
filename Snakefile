@@ -257,7 +257,7 @@ rule reorder:
         grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
         """
 
-rule trimcheck:
+rule reordercheck:
     input:
         expand("reordermarkers/ordered.{lg}.{iter}.txt", lg = lg_range, iter = ITER)
     output:
