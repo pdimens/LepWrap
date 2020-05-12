@@ -9,7 +9,7 @@ setwd(args[1])
 file.names <- read.csv(args[2], header=FALSE, sep="/")[,2]
 no_rm <- c()
 #file.names <- file.names[order(nchar(file.names), file.names)] #sort by LG
-PDFPath <- paste(path, "/best.trimmed/trimming_plots.pdf", sep = "/")
+PDFPath <- paste(path, "best.trimmed/trimming_plots.pdf", sep = "/")
 pdf(file=PDFPath, height = 11, width = 8.5) 
 par(mfrow=(c(4,2))) # create 4x2 plots
 
