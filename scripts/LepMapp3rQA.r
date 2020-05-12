@@ -79,7 +79,7 @@ for(i in file.names){
   
   # outputting filtered files
   # should output ordermarkers/best.trimmed/trimmed.ordered.I.J.txt
-  filename<- paste(path, "best.trimmed", paste("trimmed",i, sep="."), sep = "/")
+  filename<- paste(path, "best.trimmed", paste(i, "trimmed", sep="."), sep = "/")
 
   no_rm <- c(no_rm, length(removed_markers))
 
