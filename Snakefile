@@ -217,8 +217,9 @@ rule trim_summary:
         echo -e "LG\trm_marker" >> {output}
         for each in ordermarkers/best.trim/ordered.*.removed ; do
             BASE=$(basename $each | cut -d "." -f1,2)
-            sed -e "s/^/$BASE /" $each >> {output} 
+            sed -e "s/^/$BASE /" $each >> {output}.tmp 
         done
+        sort -V {output}.tmp > {output} && rm {output}.tmp 
         """
 
 rule trimcheck:
