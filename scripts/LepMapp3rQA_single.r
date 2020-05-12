@@ -9,7 +9,7 @@ setwd(args[1])
 #file.names <- read.csv(args[2], header=FALSE, sep="/")[,2]
 
 lgfile <- read.delim(
-            args[2], 
+            Sys.readlink(args[2]), 
             header = FALSE, 
             sep = "\t", 
             comment.char="#"
