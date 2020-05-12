@@ -140,28 +140,57 @@ rule summarize_likelihoods:
         sort {output}.tmp -k1,1V -k3,3nr > {output} && rm {output}.tmp
         """
 
+# TODO: rewrite R code to take best likelihood of a particular LG. trim it,
+# and write the new files in best.trim
+# make a param the LG so it can iterate over that.
 
 rule find_bestlikelihoods:
-   input:
-       "ordermarkers/likelihoods.txt"
-   output:
-       #"ordermarkers/bestlikelihoods.txt"
-       dynamic("ordermarkers/best/{orderfile}")
-   message:
-       """
-       Identifying ordered maps with best likelihoods for each LG >> ordermarkers/bestlikelihoods.txt
-       """
-   shell:
-       """
-       LG=$(find ordermarkers -maxdepth 1 -name "ordered.*.*" | cut -d "." -f2 | sort -V | uniq)
-       NUMITER=$(find ordermarkers -maxdepth 1 -name "ordered.*.*" | cut -d "." -f3 | sort -V | uniq | tail -1)
-       TOTALMAPS=$(find ordermarkers -maxdepth 1 -name "ordered.*.*" | wc -l) 
-       for i in $(seq 1 $NUMITER $TOTALMAPS); do
-           LIKELYMAP=$(sed -n ${{i}}p ordermarkers/likelihoods.txt | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
-           echo "ordermarkers/$LIKELYMAP" >> ordermarkers/bestlikelihoods.txt
-           cp ordermarkers/$LIKELYMAP ordermarkers/best/$LIKELYMAP
-       done
-       """
+    input:
+        "ordermarkers/likelihoods.txt"
+    output:
+        #"ordermarkers/bestlikelihoods.txt"
+        dynamic("ordermarkers/best/{orderfile}")
+    message:
+        """
+        Identifying ordered maps with best likelihoods for each LG >> ordermarkers/bestlikelihoods.txt
+        """
+    params:
+        lg = "{lg_range}"
+    shell:
+        """
+        #LG=$(find ordermarkers -maxdepth 1 -name "ordered.{params.lg}.*" | cut -d "." -f2 | sort -V | uniq)
+        NUMITER=$(find ordermarkers -maxdepth 1 -name "ordered.{params.lg}.*" | cut -d "." -f3 | sort -V | uniq | tail -1)
+        TOTALMAPS=$(find ordermarkers -maxdepth 1 -name "ordered.{params.lg}.*" | wc -l) 
+        for i in $(seq 1 $NUMITER $TOTALMAPS); do
+            LIKELYMAP=$(sed -n ${{i}}p ordermarkers/likelihoods.txt | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
+            echo "ordermarkers/$LIKELYMAP" >> ordermarkers/bestlikelihoods.txt
+            cp ordermarkers/$LIKELYMAP ordermarkers/best/$LIKELYMAP
+        done
+        """
+
+#rule find_bestlikelihoods:
+#    input:
+#        "ordermarkers/likelihoods.txt"
+#    output:
+#        #"ordermarkers/bestlikelihoods.txt"
+#        dynamic("ordermarkers/best/{orderfile}")
+#    message:
+#        """
+#        Identifying ordered maps with best likelihoods for each LG >> ordermarkers/bestlikelihoods.txt
+#        """
+#    params:
+#        lg = "{lg_range}"
+#    shell:
+#        """
+#        #LG=$(find ordermarkers -maxdepth 1 -name "ordered.{params.lg}.*" | cut -d "." -f2 | sort -V | uniq)
+#        NUMITER=$(find ordermarkers -maxdepth 1 -name "ordered.{params.lg}.*" | cut -d "." -f3 | sort -V | uniq | tail -1)
+#        TOTALMAPS=$(find ordermarkers -maxdepth 1 -name "ordered.{params.lg}.*" | wc -l) 
+#        for i in $(seq 1 $NUMITER $TOTALMAPS); do
+#            LIKELYMAP=$(sed -n ${{i}}p ordermarkers/likelihoods.txt | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
+#            echo "ordermarkers/$LIKELYMAP" >> ordermarkers/bestlikelihoods.txt
+#            cp ordermarkers/$LIKELYMAP ordermarkers/best/$LIKELYMAP
+#        done
+#        """
 
 #def best_orders(infile):
 #    files = [i.split("/")[1] for i in open(infile).read().splitlines()])
@@ -172,11 +201,11 @@ rule trimming:
         #TODO possibly remove dynamic())
         dynamic("ordermarkers/best/{orderfile}")
     output:
-        dynamic("ordermarkers/best.trim/{orderfile}.trimmed")
+        "ordermarkers/best.trim/{orderfile}.trimmed"
         #trimfile = ["ordermarkers/best.trim/trimmed"+i.split("/")[1] for i in open("{input}").read().splitlines()]
     log:
-        dynamic("ordermarkers/best.trim/{orderfile}.removed"),
-        dynamic("ordermarkers/best.trim/{orderfile}.trim.pdf")
+        "ordermarkers/best.trim/{orderfile}.removed",
+        "ordermarkers/best.trim/{orderfile}.trim.pdf"
     params:
         trim_threshold = "10",
     message:
