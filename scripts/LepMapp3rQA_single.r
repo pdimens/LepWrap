@@ -57,24 +57,30 @@ for (j in 2:3){   # iterate over male (2) and female (3)
       x = lgfile[,2], 
       bty="n",
       main = "Male",
-      col = "slategray", 
+      col = "darkseagreen", 
       cex = 1.5,
       ylab = paste(just_ordernum, "distance"),
       cex.lab = 1.8,
       xlab = ""
     )
-    points(x = which(lgfile$Mpass == FALSE), y = lgfile$V2[lgfile$Mpass == FALSE], col = "coral3", pch = 19, cex = .8 )   # plot bad markers
+    # only plot if markers were removed
+    if(length(which(lgfile$Mpass == FALSE)) != 0){
+      points(x = which(lgfile$Mpass == FALSE), y = lgfile$V2[lgfile$Mpass == FALSE], col = "indianred2", pch = 19, cex = .8 )   # plot bad markers
+    }
   } else {
     plot(
       x = lgfile[,j], 
       bty="n",
-      col = "slategray", 
+      col = "deepskyblue3", 
       cex = 1.5,
       main = "Female",
       ylab = "",
       xlab = ""
     )
-    points(x = which(lgfile$Fpass == FALSE), y = lgfile$V3[lgfile$Fpass == FALSE] , col = "coral3", pch = 19, cex = .8 )
+    # only plot if markers were removed
+    if(length(which(lgfile$Fpass == FALSE)) != 0){
+      points(x = which(lgfile$Fpass == FALSE), y = lgfile$V3[lgfile$Fpass == FALSE] , col = "indianred2", pch = 19, cex = .8 )
+    }
   }
 }
 suppressMessages(dev.off())
