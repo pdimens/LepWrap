@@ -202,7 +202,7 @@ rule trimming:
         """
     shell:
         """
-        mkdir -p ordermarkers/best.trim
+        #mkdir -p ordermarkers/best.trim
         Rscript scripts/LepMapp3rQA_single.r $(pwd) {input} {params.trim_threshold}
         """
 

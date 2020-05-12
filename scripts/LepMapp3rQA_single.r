@@ -20,7 +20,7 @@ filename <- unlist(strsplit(args[2], "/"))[3]
 # instantiate QC columns
 lgfile$Mpass <- c(TRUE)
 lgfile$Fpass <- c(TRUE)
-outfile_base <- paste(path, "ordermarkers", "best.trimmed", filename, sep = "/")
+outfile_base <- paste(path, "ordermarkers", "best.trim", filename, sep = "/")
 
 #========= PDF instantiation ========#
 PDFPath <- paste(outfile_base, "trim.pdf", sep = ".")
