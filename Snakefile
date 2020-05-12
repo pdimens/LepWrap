@@ -210,8 +210,8 @@ rule trimming:
 #
 rule trimcheck:
     input:
-        #"ordermarkers/best.trim/{orderfile}.trimmed"
-        expand("ordermarkers/best.trim/ordered.{lg}.{iter}.trimmed", lg = lg_range, iter = ITER, allow_missing = True)
+        "ordermarkers/best.trim/{orderfile}.trimmed"
+        #expand("ordermarkers/best.trim/ordered.{lg}.{iter}.trimmed", lg = lg_range, iter = ITER, allow_missing = True)
     output:
         "trim.done"
     shell:
