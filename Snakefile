@@ -223,20 +223,21 @@ rule trim_summary:
         sort -V {output}.tmp > {output} && rm {output}.tmp 
         """
 
-rule trimcheck:
-    input:
-        "ordermarkers/best.trim/trim.log",
-        expand("ordermarkers/best.trim/ordered.{lg}.trimmed", lg = lg_range)
-        #expand("ordermarkers/best.trim/ordered.{lg}.{iter}.trimmed", lg = lg_range, iter = ITER, allow_missing = True)
-    output:
-        "trim.done"
-    shell:
-        "touch {output}"
+#rule trimcheck:
+#   input:
+#       "ordermarkers/best.trim/trim.log",
+#       expand("ordermarkers/best.trim/ordered.{lg}.trimmed", lg = lg_range)
+#       #expand("ordermarkers/best.trim/ordered.{lg}.{iter}.trimmed", lg = lg_range, iter = ITER, allow_missing = True)
+#   output:
+#       "trim.done"
+#   shell:
+#       "touch {output}"
 
 rule reorder:
     input:
         datacall = "data_f.call.gz",
         filt_map = "map.master",
+        trimlog = "ordermarkers/best.trim/trim.log",
         lg_order = "ordermarkers/best.trim/{trimfile}.trimmed"
     output:
         "reordermarkers/{trimfile}.{ITER}.txt"
