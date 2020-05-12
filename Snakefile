@@ -149,7 +149,7 @@ rule find_bestlikelihoods:
        dynamic("ordermarkers/best/{orderfile}")
    message:
        """
-       Identifying ordered maps with best likelihoods for each LG >> ordermarkers/bestlikelihoods.txt
+       Identifying ordered maps with best likelihoods for {output} each LG >> ordermarkers/bestlikelihoods.txt
        """
    shell:
        """
