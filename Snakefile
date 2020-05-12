@@ -170,7 +170,7 @@ rule find_bestlikelihoods:
 rule trimming:
     input:
         #TODO possibly remove dynamic())
-        dynamic("ordermarkers/best/{orderfile}")
+        "ordermarkers/best/{orderfile}"
     output:
         "ordermarkers/best.trim/{orderfile}.trimmed"
         #trimfile = ["ordermarkers/best.trim/trimmed"+i.split("/")[1] for i in open("{input}").read().splitlines()]
@@ -211,7 +211,7 @@ rule trimming:
 #
 rule trimcheck:
     input:
-        dynamic("ordermarkers/best.trim/{orderfile}.trimmed")
+        "ordermarkers/best.trim/{orderfile}.trimmed"
         #expand("ordermarkers/best.trim/ordered.{lg}.{iter}.trimmed", lg = lg_range, iter = ITER, allow_missing = True)
     output:
         "trim.done"
