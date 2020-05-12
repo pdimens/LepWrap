@@ -59,13 +59,13 @@ for (j in 2:3){   # iterate over male (2) and female (3)
       main = "Male",
       col = "darkseagreen", 
       cex = 1.5,
-      ylab = paste(just_ordernum, "distance"),
+      ylab = paste(filename, "distance"),
       cex.lab = 1.8,
       xlab = ""
     )
     # only plot if markers were removed
     if(length(which(lgfile$Mpass == FALSE)) != 0){
-      points(x = which(lgfile$Mpass == FALSE), y = lgfile$V2[lgfile$Mpass == FALSE], col = "indianred2", pch = 19, cex = .8 )   # plot bad markers
+      points(x = which(lgfile$Mpass == FALSE), y = lgfile$V2[lgfile$Mpass == FALSE], col = "indianred2", pch = 13, cex = 1.8 )   # plot bad markers
     }
   } else {
     plot(
@@ -79,7 +79,7 @@ for (j in 2:3){   # iterate over male (2) and female (3)
     )
     # only plot if markers were removed
     if(length(which(lgfile$Fpass == FALSE)) != 0){
-      points(x = which(lgfile$Fpass == FALSE), y = lgfile$V3[lgfile$Fpass == FALSE] , col = "indianred2", pch = 19, cex = .8 )
+      points(x = which(lgfile$Fpass == FALSE), y = lgfile$V3[lgfile$Fpass == FALSE] , col = "indianred2", pch = 13, cex = 1.8 )
     }
   }
 }
@@ -101,14 +101,16 @@ write.table(
   col.names = FALSE,
   append=TRUE
 )
-write.table(
-  removed_markers,
-  file=paste(outfile_base, "removed", sep = "."),
-  append=FALSE, 
-  sep = "\t", 
-  quote = FALSE, 
-  row.names = FALSE, 
-  col.names = FALSE
+
+supressMessages(
+    write.table(
+      removed_markers,
+      file=paste(outfile_base, "removed", sep = "."),
+      append=FALSE, 
+      sep = "\t", 
+      quote = FALSE, 
+      row.names = FALSE, 
+      col.names = FALSE
+  )
 )
-  
 
