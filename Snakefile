@@ -168,7 +168,7 @@ rule find_bestlikelihoods:
 rule trimming:
     input:
         "ordermarkers/bestlikelihoods.txt",
-        "ordermarkers/{orderfile}"
+        "ordermarkers/ordered.{lg_range}.{ITER}"
     output:
         dynamic("ordermarkers/best.trim/{orderfile}.trimmed")
         #trimfile = ["ordermarkers/best.trim/trimmed"+i.split("/")[1] for i in open("{input}").read().splitlines()]
@@ -184,7 +184,7 @@ rule trimming:
         """
     shell:
         """
-        Rscript scripts/LepMapp3rQA.r $(pwd)/ordermarkers bestlikelihoods.txt {params.trim_threshold}
+        Rscript scripts/LepMapp3rQA_single.r $(pwd)/ordermarkers {wildcards.orderfile} {params.trim_threshold}
         """
 
 rule trimcheck:
