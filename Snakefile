@@ -202,8 +202,22 @@ rule trimming:
         """
     shell:
         """
-        #mkdir -p ordermarkers/best.trim
         Rscript scripts/LepMapp3rQA_single.r $(pwd) {input} {params.trim_threshold}
+        """
+
+rule trim_summary:
+    input:
+        expand("ordermarkers/best.trim/ordered.{lg}.trimmed", lg = lg_range)
+    log:
+        "ordermarkers/best.trim/trim.log"
+    message:
+        "Summarizing trim logs into single trim.log file"
+    shell:
+        """
+        for each in $(sort -V {input}); do
+            BASE=$(echo $each | cut -d "." -f1,2)
+            sed -e "s/^/$BASE /" $each >> {log}
+        done
         """
 
 rule trimcheck:
