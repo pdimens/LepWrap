@@ -167,8 +167,7 @@ rule find_bestlikelihoods:
 
 rule trimming:
     input:
-        "ordermarkers/bestlikelihoods.txt",
-        "ordermarkers/ordered.{lg_range}.{ITER}"
+        "ordermarkers/bestlikelihoods.txt"
     output:
         dynamic("ordermarkers/best.trim/{orderfile}.trimmed")
         #trimfile = ["ordermarkers/best.trim/trimmed"+i.split("/")[1] for i in open("{input}").read().splitlines()]
