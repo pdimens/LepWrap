@@ -214,9 +214,10 @@ rule trim_summary:
         "Summarizing trim logs into single trim.log file"
     shell:
         """
-        for each in $(find ordermarkers/best.trim/ -maxdepth 1 -name "ordered.*.trimmed" | sort -V ); do
-            BASE=$(echo $each | cut -d "." -f1,2)
-            sed -e "s/^/$BASE /" $each >> {output}
+        echo -e "LG\trm_marker" >> {output}
+        for each in {input}; do
+            BASE=$(basename $each | cut -d "." -f1,2)
+            sed -e "s/^/$BASE /" $each >> {output} 
         done
         """
 
