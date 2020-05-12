@@ -24,7 +24,7 @@ outfile_base <- paste(path, "ordermarkers", "best.trim", filename, sep = "/")
 
 #========= PDF instantiation ========#
 PDFPath <- paste(outfile_base, "trim.pdf", sep = ".")
-pdf(file=PDFPath, height = 8.5, width = 11) 
+suppressMessages(pdf(file=PDFPath, height = 8.5, width = 11)) 
 par(mfrow=(c(1,2))) # create 1x2 plots
 
 ##### Pruning the ends #####
@@ -102,15 +102,13 @@ write.table(
   append=TRUE
 )
 
-suppressMessages(
-    write.table(
-      removed_markers,
-      file=paste(outfile_base, "removed", sep = "."),
-      append=FALSE, 
-      sep = "\t", 
-      quote = FALSE, 
-      row.names = FALSE, 
-      col.names = FALSE
-  )
+write.table(
+  removed_markers,
+  file=paste(outfile_base, "removed", sep = "."),
+  append=FALSE, 
+  sep = "\t", 
+  quote = FALSE, 
+  row.names = FALSE, 
+  col.names = FALSE
 )
 
