@@ -164,10 +164,14 @@ rule find_bestlikelihoods:
 #def best_orders(infile):
 #    files = [i.split("/")[1] for i in open(infile).read().splitlines()])
 #    return files
+def best_orders(infile):
+    files = [i.split("/")[1] for i in open(infile).read().splitlines()]
+    return files
 
 rule trimming:
     input:
-        "ordermarkers/bestlikelihoods.txt"
+        likes = "ordermarkers/bestlikelihoods.txt",
+        likefile = best_orders("ordermarkers/bestlikelihoods.txt")
     output:
         dynamic("ordermarkers/best.trim/{orderfile}.trimmed")
         #trimfile = ["ordermarkers/best.trim/trimmed"+i.split("/")[1] for i in open("{input}").read().splitlines()]
@@ -175,15 +179,14 @@ rule trimming:
         dynamic("ordermarkers/best.trim/{orderfile}.removed"),
         dynamic("ordermarkers/best.trim/{orderfile}.trim.pdf")
     params:
-        trim_threshold = "10",
-        infile = expand("ordermarkers/{orderfile}", orderfile = [i.split("/")[1] for i in open("ordermarkers/bestlikelihoods.txt").read().splitlines()])
+        trim_threshold = "10"
     message:
         """
         Scanning the first and last 15% of markers in each LG and removing clusters >{params.trim_threshold}cM apart from the other markers. 
         """
     shell:
         """
-        Rscript scripts/LepMapp3rQA_single.r $(pwd)/ordermarkers {wildcards.orderfile} {params.trim_threshold}
+        Rscript scripts/LepMapp3rQA_single.r $(pwd)/ordermarkers {input.likefile} {params.trim_threshold}
         """
 
 rule trimcheck:
