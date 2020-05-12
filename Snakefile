@@ -148,58 +148,47 @@ rule find_bestlikelihoods:
     input:
         "ordermarkers/likelihoods.txt"
     output:
-        #"ordermarkers/bestlikelihoods.txt"
-        dynamic("ordermarkers/best/{orderfile}")
+        "ordermarkers/bestlikelihoods.txt"
     message:
         """
         Identifying ordered maps with best likelihoods for each LG >> ordermarkers/bestlikelihoods.txt
         """
-    params:
-        lg = "{lg_range}"
     shell:
         """
-        #LG=$(find ordermarkers -maxdepth 1 -name "ordered.{params.lg}.*" | cut -d "." -f2 | sort -V | uniq)
-        NUMITER=$(find ordermarkers -maxdepth 1 -name "ordered.{params.lg}.*" | cut -d "." -f3 | sort -V | uniq | tail -1)
-        TOTALMAPS=$(find ordermarkers -maxdepth 1 -name "ordered.{params.lg}.*" | wc -l) 
+        LG=$(find ordermarkers -maxdepth 1 -name "ordered.*.*" | cut -d "." -f2 | sort -V | uniq)
+        NUMITER=$(find ordermarkers -maxdepth 1 -name "ordered.*.*" | cut -d "." -f3 | sort -V | uniq | tail -1)
+        TOTALMAPS=$(find ordermarkers -maxdepth 1 -name "ordered.*.*" | wc -l) 
         for i in $(seq 1 $NUMITER $TOTALMAPS); do
             LIKELYMAP=$(sed -n ${{i}}p ordermarkers/likelihoods.txt | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
             echo "ordermarkers/$LIKELYMAP" >> ordermarkers/bestlikelihoods.txt
-            cp ordermarkers/$LIKELYMAP ordermarkers/best/$LIKELYMAP
         done
         """
-
-#rule find_bestlikelihoods:
-#    input:
-#        "ordermarkers/likelihoods.txt"
-#    output:
-#        #"ordermarkers/bestlikelihoods.txt"
-#        dynamic("ordermarkers/best/{orderfile}")
-#    message:
-#        """
-#        Identifying ordered maps with best likelihoods for each LG >> ordermarkers/bestlikelihoods.txt
-#        """
-#    params:
-#        lg = "{lg_range}"
-#    shell:
-#        """
-#        #LG=$(find ordermarkers -maxdepth 1 -name "ordered.{params.lg}.*" | cut -d "." -f2 | sort -V | uniq)
-#        NUMITER=$(find ordermarkers -maxdepth 1 -name "ordered.{params.lg}.*" | cut -d "." -f3 | sort -V | uniq | tail -1)
-#        TOTALMAPS=$(find ordermarkers -maxdepth 1 -name "ordered.{params.lg}.*" | wc -l) 
-#        for i in $(seq 1 $NUMITER $TOTALMAPS); do
-#            LIKELYMAP=$(sed -n ${{i}}p ordermarkers/likelihoods.txt | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
-#            echo "ordermarkers/$LIKELYMAP" >> ordermarkers/bestlikelihoods.txt
-#            cp ordermarkers/$LIKELYMAP ordermarkers/best/$LIKELYMAP
-#        done
-#        """
 
 #def best_orders(infile):
 #    files = [i.split("/")[1] for i in open(infile).read().splitlines()])
 #    return files
 
+rule isolate_best:
+    input:
+        "ordermarkers/bestlikelihoods.txt"
+    output:
+        "ordermarkers/best/ordered.{lg_range}"
+    message:
+        """
+        Creating softlinks to iterations with highest likelihoods >> ordermarkers/best/ordered.LG
+        """
+    params:
+        grep_lg = "ordermarkers/ordered.{lg_range}."
+
+    shell:
+        """
+        BEST=$(grep -F {params.grep_lg} {input})
+        ln -s $BEST {output}
+        """
+
 rule trimming:
     input:
-        #TODO possibly remove dynamic())
-        dynamic("ordermarkers/best/{orderfile}")
+        "ordermarkers/best/{orderfile}"
     output:
         "ordermarkers/best.trim/{orderfile}.trimmed"
         #trimfile = ["ordermarkers/best.trim/trimmed"+i.split("/")[1] for i in open("{input}").read().splitlines()]
@@ -214,33 +203,13 @@ rule trimming:
         """
     shell:
         """
-        Rscript scripts/LepMapp3rQA_single.r $(pwd)/ordermarkers {input.likes} {params.trim_threshold}
+        touch {output}
+        #Rscript scripts/LepMapp3rQA_single.r $(pwd)/ordermarkers {params.trim_threshold}
         """
 
-#rule trimming:
-#    input:
-#        likes = "ordermarkers/bestlikelihoods.txt"
-#    output:
-#        dynamic("ordermarkers/best.trim/{orderfile}.trimmed")
-#        #trimfile = ["ordermarkers/best.trim/trimmed"+i.split("/")[1] for i in open("{input}").read().splitlines()]
-#    log:
-#        dynamic("ordermarkers/best.trim/{orderfile}.removed"),
-#        dynamic("ordermarkers/best.trim/{orderfile}.trim.pdf")
-#    params:
-#        trim_threshold = "10",
-#        likefile = expand("{orderfile}", orderfile = best_orders("ordermarkers/bestlikelihoods.txt"))
-#    message:
-#        """
-#        Scanning the first and last 15% of markers in each LG and removing clusters >{params.trim_threshold}cM apart from the other markers. 
-#        """
-#    shell:
-#        """
-#        Rscript scripts/LepMapp3rQA_single.r $(pwd)/ordermarkers {params.likefile} {params.trim_threshold}
-#        """
-#
 rule trimcheck:
     input:
-        dynamic("ordermarkers/best.trim/{orderfile}.trimmed")
+        "ordermarkers/best.trim/{orderfile}.trimmed"
         #expand("ordermarkers/best.trim/ordered.{lg}.{iter}.trimmed", lg = lg_range, iter = ITER, allow_missing = True)
     output:
         "trim.done"
