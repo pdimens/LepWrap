@@ -179,7 +179,7 @@ rule trimming:
         dynamic("ordermarkers/best.trim/{orderfile}.trim.pdf")
     params:
         trim_threshold = "10",
-        likefile = best_orders("{input.likes}")
+        likefile = best_orders("{{input.likes}}")
     message:
         """
         Scanning the first and last 15% of markers in each LG and removing clusters >{params.trim_threshold}cM apart from the other markers. 
