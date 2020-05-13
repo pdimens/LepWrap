@@ -194,9 +194,7 @@ rule trim_edges_clusters:
         """
     shell:
         """
-        mkdir -p ordermarkers/best.trim
         LG=$(grep -F {params.grep_lg} {input})
-        echo $LG
         Rscript scripts/LepMapp3rQA_single.r $(pwd) $LG {params.trim_threshold}
         """
 

@@ -25,7 +25,6 @@ filename_trunc <- paste(filename_trunc[1], filename_trunc[2], sep = ".")
 lgfile$Mpass <- c(TRUE)
 lgfile$Fpass <- c(TRUE)
 outfile_base <- paste(path, "ordermarkers", "best.trim", filename_trunc, sep = "/")
-print(paste(filename, filename_trunc, outfile_base, sep = "\t"))
 
 #========= PDF instantiation ========#
 PDFPath <- paste(outfile_base, "trim.pdf", sep = ".")
@@ -87,7 +86,8 @@ for (j in 2:3){   # iterate over male (2) and female (3)
     }
   }
 }
-suppressMessages(dev.off())
+graphics.off()
+#suppressMessages(dev.off())
 # isolate bad markers
 removed_markers <- (lgfile %>% filter(Mpass == FALSE | Fpass == FALSE))$V1 
 
