@@ -16,7 +16,7 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        "ordermarkers/best.trim/trim.log"
+        "reordermarkers/bestlikelihoods.txt"
         #"reorder.done"
         #"trim.done"
 
@@ -232,10 +232,50 @@ rule reorder:
         grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
         """
 
-rule reordercheck:
+rule summarize_likelihoods2:
     input:
-        expand("reordermarkers/ordered.{lg}.{iter}", lg = lg_range, iter = ITER)
+        expand("reordermarkers/ordered.{LG}.{ITER}", LG = lg_range, ITER = ITER)
     output:
-        "reorder.done"
+        "reordermarkers/likelihoods.txt"
+    message:
+        """
+        Summarizing + sorting likelihoods from each iteration >> reordermarkers/likelihoods.txt
+        """
     shell:
-        "touch {output}"
+        """
+        for LIKE in {input}; do 
+            LG=$(echo $(basename $LIKE) | cut -d "." -f1,2)
+            ITERUN=$(echo $LIKE | cut -d "." -f3)
+            LIKELIHOOD=$(cat $LIKE | grep "likelihood = " | cut -d " " -f7)
+            echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output}.tmp
+        done
+        sort {output}.tmp -k1,1V -k3,3nr > {output} && rm {output}.tmp
+        """
+
+rule find_bestlikelihoods2:
+    input:
+        "reordermarkers/likelihoods.txt"
+    output:
+        "reordermarkers/bestlikelihoods.txt"
+    message:
+        """
+        Identifying ordered maps with best likelihoods for each LG >> ordermarkers/bestlikelihoods.txt
+        """
+    shell:
+        """
+        LG=$(find reordermarkers -maxdepth 1 -name "ordered.*.*" | cut -d "." -f2 | sort -V | uniq)
+        NUMITER=$(find reordermarkers -maxdepth 1 -name "ordered.*.*" | cut -d "." -f3 | sort -V | uniq | tail -1)
+        TOTALMAPS=$(find reordermarkers -maxdepth 1 -name "ordered.*.*" | wc -l) 
+        for i in $(seq 1 $NUMITER $TOTALMAPS); do
+            LIKELYMAP=$(sed -n ${{i}}p reordermarkers/likelihoods.txt | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
+            echo "reordermarkers/$LIKELYMAP" >> reordermarkers/bestlikelihoods.txt
+        done
+        """
+
+#rule reordercheck:
+#    input:
+#        expand("reordermarkers/ordered.{lg}.{iter}", lg = lg_range, iter = ITER)
+#    output:
+#        "reorder.done"
+#    shell:
+#        "touch {output}"
