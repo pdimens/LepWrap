@@ -105,7 +105,7 @@ rule ordermarkers:
         "ordermarkers/logs/ordered.{lg_range}.{ITER}.log"
     message:
         """
-        Ordering the markers on linkage groups {lg_range}. Iteration: {ITER}
+        Ordering the markers on linkage group {output}
         """
     params:
         dist_method = "useKosambi=1",
@@ -170,7 +170,7 @@ rule trim_edges_clusters:
         trim_threshold = "10",
     message:
         """
-        Scanning the first and last 15% of markers in {input} and removing clusters >{params.trim_threshold}cM apart from the other markers. 
+        Removing edge clusters >{params.trim_threshold}cM apart from the other markers in first+last 15% of {params.grep_lg}. 
         """
     shell:
         """
@@ -184,7 +184,7 @@ rule trim_summary:
     output:
         "ordermarkers/best.trim/trim.log"
     message:
-        "Summarizing trim logs into single trim.log file"
+        "Summarizing trim logs into ordermarkers/best.trim/trim.log"
     shell:
         """
         echo -e "LG\trm_marker" >> {output}
@@ -217,7 +217,7 @@ rule reorder:
         "reordermarkers/logs/{trimfile}.{ITER}.log"
     message:
         """
-        Reordering {input.lg_order}. Iteration: {ITER}
+        Reordering {input.lg_order} >> {output}
         """
     params:
         dist_method = "useKosambi=1",
