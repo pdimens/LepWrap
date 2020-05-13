@@ -159,24 +159,6 @@ rule find_bestlikelihoods:
         done
         """
 
-#rule isolate_best:
-#    input:
-#        "ordermarkers/bestlikelihoods.txt"
-#    output:
-#        "ordermarkers/best/ordered.{lg_range}"
-#    message:
-#        """
-#        Creating softlinks to iterations with highest likelihoods >> ordermarkers/best/ordered.LG
-#        """
-#    params:
-#        grep_lg = "ordermarkers/ordered.{lg_range}."
-#
-#    shell:
-#        """
-#        BEST=$(grep -F {params.grep_lg} {input})
-#        ln -sr $BEST {output}
-#        """
-
 rule trim_edges_clusters:
     input:
         "ordermarkers/bestlikelihoods.txt"
@@ -197,26 +179,6 @@ rule trim_edges_clusters:
         LG=$(grep -F {params.grep_lg} {input})
         Rscript scripts/LepMapp3rQA_single.r $(pwd) $LG {params.trim_threshold}
         """
-
-
-#rule trimming:
-#    input:
-#        "ordermarkers/best/{orderfile}"
-#    output:
-#        "ordermarkers/best.trim/{orderfile}.trimmed"
-#    log:
-#        "ordermarkers/best.trim/{orderfile}.removed",
-#        "ordermarkers/best.trim/{orderfile}.trim.pdf"
-#    params:
-#        trim_threshold = "10",
-#    message:
-#        """
-#        Scanning the first and last 15% of markers in {input} and removing clusters >{params.trim_threshold}cM apart from the other markers. 
-#        """
-#    shell:
-#        """
-#        Rscript scripts/LepMapp3rQA_single.r $(pwd) {input} {params.trim_threshold}
-#        """
 
 rule trim_summary:
     input:
