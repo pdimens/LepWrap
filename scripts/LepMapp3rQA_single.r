@@ -20,12 +20,12 @@ filename <- unlist(strsplit(args[2], "/"))[3]
 # chop off the iteration number
 filename_trunc <- unlist(strsplit(filename, "\\."))
 filename_trunc <- paste(filename_trunc[1], filename_trunc[2], sep = ".")
-print(paste(filename, filename_trunc, outfile_base, sep = "\t"))
 
 # instantiate QC columns
 lgfile$Mpass <- c(TRUE)
 lgfile$Fpass <- c(TRUE)
 outfile_base <- paste(path, "ordermarkers", "best.trim", filename_trunc, sep = "/")
+print(paste(filename, filename_trunc, outfile_base, sep = "\t"))
 
 #========= PDF instantiation ========#
 PDFPath <- paste(outfile_base, "trim.pdf", sep = ".")
