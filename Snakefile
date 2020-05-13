@@ -16,11 +16,9 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        "reorder.done"
+        "ordermarkers/best.trim/trim.log"
+        #"reorder.done"
         #"trim.done"
-        #expand("ordermarkers/best.trimmed/trimmed.{trimfile}", trimfile = best_orders)
-        #"ordermarkers/likelihoods.txt"
-
 
 rule parentcall:
     input:
