@@ -20,6 +20,7 @@ filename <- unlist(strsplit(args[2], "/"))[3]
 # chop off the iteration number
 filename_trunc <- unlist(strsplit(filename, "\\."))
 filename_trunc <- paste(filename_trunc[1], filename_trunc[2], sep = ".")
+print(paste(filename, filename_trunc, outfile_base, sep = "\t"))
 
 # instantiate QC columns
 lgfile$Mpass <- c(TRUE)
