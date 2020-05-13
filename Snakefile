@@ -196,7 +196,8 @@ rule trim_edges_clusters:
         """
     shell:
         """
-        Rscript scripts/LepMapp3rQA_single.r $(pwd) {params.grep_lg} {params.trim_threshold}
+        LG=$(grep -F {params.grep_lg} {input})
+        Rscript scripts/LepMapp3rQA_single.r $(pwd) $LG {params.trim_threshold}
         """
 
 
