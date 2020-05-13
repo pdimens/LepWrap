@@ -17,7 +17,6 @@ ITER = list(range(1,100+1))
 rule all:
     input:
         "reordermarkers/bestlikelihoods.txt"
-        #"reorder.done"
         #"trim.done"
 
 rule parentcall:
@@ -106,8 +105,7 @@ rule ordermarkers:
         "ordermarkers/logs/ordered.{lg_range}.{ITER}.log"
     message:
         """
-        Ordering the markers on linkage groups 1:N
-        This may take a while depending on the number of provided threads and requested iterations
+        Ordering the markers on linkage groups {lg_range}. Iteration: {ITER}
         """
     params:
         dist_method = "useKosambi=1",
@@ -219,8 +217,7 @@ rule reorder:
         "reordermarkers/logs/{trimfile}.{ITER}.log"
     message:
         """
-        Reordering the markers for each linkage group using the trimmed orders with the best likelihoods from initial ordering.
-        This may take a while depending on the number of provided threads and requested iterations
+        Reordering {input.lg_order}. Iteration: {ITER}
         """
     params:
         dist_method = "useKosambi=1",
