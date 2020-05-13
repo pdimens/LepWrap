@@ -15,12 +15,16 @@ lgfile <- read.delim(
             comment.char="#"
           )
 
+# pull out just the filename
 filename <- unlist(strsplit(args[2], "/"))[3]
+# chop off the iteration number
+filename_trunc <- unlist(strsplit(filename, "\\."))
+filename_trunc <- paste(filename_trunc[1], filename_trunc[2], sep = ".")
 
 # instantiate QC columns
 lgfile$Mpass <- c(TRUE)
 lgfile$Fpass <- c(TRUE)
-outfile_base <- paste(path, "ordermarkers", "best.trim", filename, sep = "/")
+outfile_base <- paste(path, "ordermarkers", "best.trim", filename_trunc, sep = "/")
 
 #========= PDF instantiation ========#
 PDFPath <- paste(outfile_base, "trim.pdf", sep = ".")
@@ -51,7 +55,6 @@ for (j in 2:3){   # iterate over male (2) and female (3)
   
   # diagnostic plots
   par(mar=c(3,4.3,2,1)+0.1)  # reduce the padding somewhat
-  just_ordernum <- args[2]
   if(j == 2){
     plot( 
       x = lgfile[,2], 
