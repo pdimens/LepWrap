@@ -16,7 +16,7 @@ lgfile <- read.delim(
           )
 
 # pull out just the filename
-filename <- unlist(strsplit(args[2], "/"))[3]
+filename <- unlist(strsplit(args[2], "/"))[2]
 # chop off the iteration number
 filename_trunc <- unlist(strsplit(filename, "\\."))
 filename_trunc <- paste(filename_trunc[1], filename_trunc[2], sep = ".")
