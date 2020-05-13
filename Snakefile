@@ -1,7 +1,5 @@
 from os import path
 import glob
-#FILENAMES = [os.path.basename(i) for i in glob.iglob("test/*.R1.fq.gz")]
-#FILEBASENAMES = [i.replace('.R1.fq.gz', '') for i in FILENAMES]
 
 #initial VCF file
 vcf_file = [os.path.basename(i) for i in glob.glob("./*.vcf")]
@@ -17,7 +15,6 @@ ITER = list(range(1,100+1))
 rule all:
     input:
         "reordermarkers/bestlikelihoods.txt"
-        #"trim.done"
 
 rule parentcall:
     input:
@@ -195,16 +192,6 @@ rule trim_summary:
         sort -V {output}.tmp > {output} && rm {output}.tmp 
         """
 
-#rule trimcheck:
-#   input:
-#       "ordermarkers/best.trim/trim.log",
-#       expand("ordermarkers/best.trim/ordered.{lg}.trimmed", lg = lg_range)
-#       #expand("ordermarkers/best.trim/ordered.{lg}.{iter}.trimmed", lg = lg_range, iter = ITER, allow_missing = True)
-#   output:
-#       "trim.done"
-#   shell:
-#       "touch {output}"
-
 rule reorder:
     input:
         datacall = "data_f.call.gz",
@@ -268,6 +255,16 @@ rule find_bestlikelihoods2:
             echo "reordermarkers/$LIKELYMAP" >> reordermarkers/bestlikelihoods.txt
         done
         """
+
+#rule trimcheck:
+#   input:
+#       "ordermarkers/best.trim/trim.log",
+#       expand("ordermarkers/best.trim/ordered.{lg}.trimmed", lg = lg_range)
+#       #expand("ordermarkers/best.trim/ordered.{lg}.{iter}.trimmed", lg = lg_range, iter = ITER, allow_missing = True)
+#   output:
+#       "trim.done"
+#   shell:
+#       "touch {output}"
 
 #rule reordercheck:
 #    input:
