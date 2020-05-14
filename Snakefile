@@ -208,7 +208,7 @@ rule reorder:
         "reordermarkers/{trimfile}.{ITER}"
     log:
         run = "ordermarkers/logs/runs/ordered.{lg_range}.{ITER}.log",
-        recomb = "ordermarkers/logs/recombination/ordered.{lg_range}.{ITER}.recombinations"
+        #recomb = "ordermarkers/logs/recombination/ordered.{lg_range}.{ITER}.recombinations"
     message:
         """
         Reordering {input.lg_order} >> {output}
