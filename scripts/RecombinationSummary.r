@@ -4,7 +4,8 @@
 suppressMessages(if (!require("dplyr")) install.packages("dplyr"))
 suppressMessages(library("dplyr"))
 
-# setup outfile
+## setup outfile
+# format trailing arguments for script
 args = commandArgs(trailingOnly = TRUE)
 # path = ordermarkers or reordermarkers (for reusability)
 path = args[1]
@@ -17,7 +18,7 @@ files <- list.files(getwd())
 # instantiate empty dataframe that will hold all the recombination info
 recomb_df <- data.frame()
 
-# read in recombination logs, add LG info, and append to recomb_df
+## read in recombination logs, add LG info, and append to recomb_df
 for(i in files){
   # pull out linkage group number from filename
   LG <- unlist(strsplit(i, "\\."))[2]
@@ -29,7 +30,8 @@ for(i in files){
   recomb_df <- rbind(recomb_df, recomb)
 }
 
-# summarize (min, max, mean, sd) across iterations for each individual in each LG
+## summary information
+# calculate min, max, mean, and sd across iterations for each individual in each LG
 recomb_summary <- recomb_df %>% group_by(V2,V3) %>% summarise(min(V5), max(V5), mean(V5), sd(V5))
 
 # rename columns for clarity
@@ -38,7 +40,7 @@ names(recomb_summary) <- c("family", "sample", "minimum", "maximum", "mean", "st
 # generate output file's name based on whether it's re/ordermarkers
 outfile <- paste(getwd(),"recombination.summary", sep = "/")
 
-# write summary to file
+## write summary to file
 write.table(
   recomb_summary,
   file=outfile,
