@@ -103,7 +103,7 @@ rule ordermarkers:
         recomb = "ordermarkers/logs/recombination/ordered.{lg_range}.{ITER}.recombinations"
     message:
         """
-        Ordering the markers with {params.dist_method} on {params.chrom} >> {output}
+        Ordering the markers with {params.dist_method} on linkage group:{params.chrom} >> {output}
         """
     params:
         dist_method = "useKosambi=1",
