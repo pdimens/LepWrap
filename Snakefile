@@ -212,7 +212,7 @@ rule reorder:
         recomb = "ordermarkers/logs/recombination/{trimfile}.{ITER}.recombinations"
     message:
         """
-        Reordering {input.lg_order}, iteration: {params.iteration} >> {output}
+        Reordering {input.lg_order}, iteration: {params.iteration}
         """
     params:
         dist_method = "useKosambi=1",
