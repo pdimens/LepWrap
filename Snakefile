@@ -103,11 +103,12 @@ rule ordermarkers:
         recomb = "ordermarkers/logs/recombination/ordered.{lg_range}.{ITER}.recombinations"
     message:
         """
-        Ordering the markers with {params.dist_method} on linkage group:{params.chrom} >> {output}
+        Ordering the markers with {params.dist_method} on linkage group {params.chrom}, iteration: {params.iteration}
         """
     params:
         dist_method = "useKosambi=1",
-        chrom = "{lg_range}"
+        chrom = "{lg_range}",
+        iteration = "{ITER}"
     threads: 2
     shell:
         """
@@ -211,11 +212,12 @@ rule reorder:
         recomb = "ordermarkers/logs/recombination/{trimfile}.{ITER}.recombinations"
     message:
         """
-        Reordering {input.lg_order} >> {output}
+        Reordering {input.lg_order}, iteration: {params.iteration} >> {output}
         """
     params:
         dist_method = "useKosambi=1",
-        eval_order="evaluateOrder=ordermarkers/best.trim/{trimfile}.trimmed"
+        eval_order="evaluateOrder=ordermarkers/best.trim/{trimfile}.trimmed",
+        iteration = "{ITER}"
     threads: 2
     shell:
         """
