@@ -99,7 +99,8 @@ rule ordermarkers:
     output:
         "ordermarkers/ordered.{lg_range}.{ITER}"
     log:
-        "ordermarkers/logs/ordered.{lg_range}.{ITER}.log"
+        run = "ordermarkers/logs/runs/ordered.{lg_range}.{ITER}.log",
+        recomb = "ordermarkers/logs/recombinations/ordered.{lg_range}.{ITER}.recombinations"
     message:
         """
         Ordering the markers on linkage group {output}
@@ -110,11 +111,13 @@ rule ordermarkers:
     threads: 2
     shell:
         """
-        zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.dist_method} chromosome={params.chrom} &> {log}
-        grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
+        zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.dist_method} chromosome={params.chrom} &> {log.run}.tmp
+        grep -A 100000 \*\*\*\ LG\ \= {log.run}.tmp > {output}
+        grep "recombin" {log.run}.tmp > {log.recomb}
+        awk '/#java/{flag=1} flag; /logL/{flag=0}' {log.run}.tmp > {log.run} && rm {log.run}.tmp
         """
         
-rule summarize_likelihoods:
+rule summarize_ordering:
     input:
         expand("ordermarkers/ordered.{LG}.{ITER}", LG = lg_range, ITER = ITER)
     output:
@@ -132,6 +135,7 @@ rule summarize_likelihoods:
             echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output}.tmp
         done
         sort {output}.tmp -k1,1V -k3,3nr > {output} && rm {output}.tmp
+        Rscript scripts/ RecombinationSummary.r
         """
 
 rule find_bestlikelihoods:
@@ -201,7 +205,8 @@ rule reorder:
     output:
         "reordermarkers/{trimfile}.{ITER}"
     log:
-        "reordermarkers/logs/{trimfile}.{ITER}.log"
+        run = "ordermarkers/logs/runs/ordered.{lg_range}.{ITER}.log",
+        recomb = "ordermarkers/logs/recombinations/ordered.{lg_range}.{ITER}.recombinations"
     message:
         """
         Reordering {input.lg_order} >> {output}
@@ -212,8 +217,10 @@ rule reorder:
     threads: 2
     shell:
         """
-        zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.eval_order} {params.dist_method} &> {log}
-        grep -A 100000 \*\*\*\ LG\ \= {log} > {output}
+        zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.eval_order} {params.dist_method} &> {log.run}
+        grep -A 100000 \*\*\*\ LG\ \= {log.run}.tmp > {output}
+        grep "recombin" {log.run}.tmp > {log.recomb}
+        awk '/#java/{flag=1} flag; /logL/{flag=0}' {log.run}.tmp > {log.run} && rm {log.run}.tmp
         """
 
 rule summarize_likelihoods2:
