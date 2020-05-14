@@ -9,26 +9,36 @@ args = commandArgs(trailingOnly = TRUE)
 # path = ordermarkers or reordermarkers (for reusability)
 path = args[1]
 # working dir = project_folder/[re]ordermarkers/logs/recombinations
-setwd(paste(getwd(),path, "logs/recombinations", sep = "/"))
+setwd(paste(getwd(),path, "logs/recombination", sep = "/"))
 
 # generate list of recombination files
-files <- list.files(paste(path, "logs", "recombination", sep = "/"))
+files <- list.files(getwd())
 
-files <- c("~/ordered.1.1.recombinations", "~/ordered.2.1.recombinations")
+# instantiate empty dataframe that will hold all the recombination info
 recomb_df <- data.frame()
 
-for(i in files){ 
+# read in recombination logs, add LG info, and append to recomb_df
+for(i in files){
+  # pull out linkage group number from filename
   LG <- unlist(strsplit(i, "\\."))[2]
+  # read in file and keep only family|sample|recombinations
   recomb <- read.csv(i, skip = 1, header = FALSE, sep="")[,c(2,3,5)]
+  # add column identifying the linkage group
   recomb$LG <- LG
+  # append the formatted dataframe to the total dataframe
   recomb_df <- rbind(recomb_df, recomb)
 }
 
+# summarize (min, max, mean, sd) across iterations for each individual in each LG
 recomb_summary <- recomb_df %>% group_by(V2,V3) %>% summarise(min(V5), max(V5), mean(V5), sd(V5))
+
+# rename columns for clarity
 names(recomb_summary) <- c("family", "sample", "minimum", "maximum", "mean", "standard_deviation")
 
+# generate output file's name based on whether it's re/ordermarkers
 outfile <- paste(getwd(),"recombination.summary", sep = "/")
 
+# write summary to file
 write.table(
   recomb_summary,
   file=outfile,
