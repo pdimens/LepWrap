@@ -100,7 +100,7 @@ rule ordermarkers:
         "ordermarkers/ordered.{lg_range}.{ITER}"
     log:
         run = "ordermarkers/logs/runs/ordered.{lg_range}.{ITER}.log",
-        recomb = "ordermarkers/logs/recombinations/ordered.{lg_range}.{ITER}.recombinations"
+        recomb = "ordermarkers/logs/recombination/ordered.{lg_range}.{ITER}.recombinations"
     message:
         """
         Ordering the markers on linkage group {output}
@@ -121,10 +121,12 @@ rule summarize_ordering:
     input:
         expand("ordermarkers/ordered.{LG}.{ITER}", LG = lg_range, ITER = ITER)
     output:
-        "ordermarkers/likelihoods.txt"
+        like = "ordermarkers/likelihoods.txt",
+        recomb = "ordermarkers/logs/recombination/recombination.summary"
     message:
         """
         Summarizing + sorting likelihoods from each iteration >> ordermarkers/likelihoods.txt
+        Summarizing recombination information across linkage groups and iterations >> ordermarkers/logs/recombination/recombination.summary
         """
     shell:
         """
@@ -132,10 +134,10 @@ rule summarize_ordering:
             LG=$(echo $(basename $LIKE) | cut -d "." -f1,2)
             ITERUN=$(echo $LIKE | cut -d "." -f3)
             LIKELIHOOD=$(cat $LIKE | grep "likelihood = " | cut -d " " -f7)
-            echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output}.tmp
+            echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.like}.tmp
         done
-        sort {output}.tmp -k1,1V -k3,3nr > {output} && rm {output}.tmp
-        Rscript scripts/ RecombinationSummary.r
+        sort {output}.tmp -k1,1V -k3,3nr > {output.like} && rm {output.like}.tmp
+        Rscript scripts/RecombinationSummary.r ordermarkers
         """
 
 rule find_bestlikelihoods:
@@ -206,7 +208,7 @@ rule reorder:
         "reordermarkers/{trimfile}.{ITER}"
     log:
         run = "ordermarkers/logs/runs/ordered.{lg_range}.{ITER}.log",
-        recomb = "ordermarkers/logs/recombinations/ordered.{lg_range}.{ITER}.recombinations"
+        recomb = "ordermarkers/logs/recombination/ordered.{lg_range}.{ITER}.recombinations"
     message:
         """
         Reordering {input.lg_order} >> {output}
@@ -227,10 +229,12 @@ rule summarize_likelihoods2:
     input:
         expand("reordermarkers/ordered.{LG}.{ITER}", LG = lg_range, ITER = ITER)
     output:
-        "reordermarkers/likelihoods.txt"
+        like = "reordermarkers/likelihoods.txt",
+        recomb = "reordermarkers/logs/recombination/recombination.summary"
     message:
         """
         Summarizing + sorting likelihoods from each iteration >> reordermarkers/likelihoods.txt
+        Summarizing recombination information across linkage groups and iterations >> reordermarkers/logs/recombination/recombination.summary
         """
     shell:
         """
@@ -238,9 +242,10 @@ rule summarize_likelihoods2:
             LG=$(echo $(basename $LIKE) | cut -d "." -f1,2)
             ITERUN=$(echo $LIKE | cut -d "." -f3)
             LIKELIHOOD=$(cat $LIKE | grep "likelihood = " | cut -d " " -f7)
-            echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output}.tmp
+            echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.like}.tmp
         done
-        sort {output}.tmp -k1,1V -k3,3nr > {output} && rm {output}.tmp
+        sort {output.like}.tmp -k1,1V -k3,3nr > {output.like} && rm {output.like}.tmp
+        Rscript scripts/RecombinationSummary.r reordermarkers
         """
 
 rule find_bestlikelihoods2:

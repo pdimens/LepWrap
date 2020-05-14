@@ -1,12 +1,12 @@
 #! /usr/bin/env Rscript
 
-args = commandArgs(trailingOnly = TRUE)
-
 suppressMessages(if (!require("dplyr")) install.packages("dplyr"))
 suppressMessages(library("dplyr"))
+args = commandArgs(trailingOnly = TRUE)
+
 path = args[1]
 # path = project directory
-setwd(args[1])
+setwd(path)
 
 lgfile <- read.delim(
             args[2], 
@@ -17,6 +17,7 @@ lgfile <- read.delim(
 
 # pull out just the filename
 filename <- unlist(strsplit(args[2], "/"))[2]
+
 # chop off the iteration number
 filename_trunc <- unlist(strsplit(filename, "\\."))
 filename_trunc <- paste(filename_trunc[1], filename_trunc[2], sep = ".")
