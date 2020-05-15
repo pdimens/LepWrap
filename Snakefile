@@ -117,7 +117,7 @@ rule ordermarkers:
         grep "recombin" {log.run}.tmp > {log.recomb}
         awk '/#java/{{flag=1}} flag; /logL/{{flag=0}}' {log.run}.tmp > {log.run} && rm {log.run}.tmp
         """
-#TODO FIX THIS RSCRIPT TO OUTPUT THE RIGHT THING    
+
 rule summarize_ordering:
     input:
         expand("ordermarkers/iterations/ordered.{LG}.{iter}", LG = lg_range, iter= ITER)
