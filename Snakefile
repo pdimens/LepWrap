@@ -97,13 +97,13 @@ rule ordermarkers:
         datacall = "data_f.call.gz",
         filt_map = "map.master"
     output:
-        "ordermarkers/ordered.{lg_range}.{ITER}"
+        "ordermarkers/iterations/ordered.{lg_range}.{ITER}"
     log:
         run = "ordermarkers/logs/runs/ordered.{lg_range}.{ITER}.log",
         recomb = "ordermarkers/logs/recombination/ordered.{lg_range}.{ITER}.recombinations"
     message:
         """
-        Ordering the markers with {params.dist_method} on linkage group {params.chrom}, iteration: {params.iteration}
+        Ordering the markers with {params.dist_method} on linkage group: {params.chrom}, iteration: {params.iteration}
         """
     params:
         dist_method = "useKosambi=1",
@@ -117,17 +117,17 @@ rule ordermarkers:
         grep "recombin" {log.run}.tmp > {log.recomb}
         awk '/#java/{{flag=1}} flag; /logL/{{flag=0}}' {log.run}.tmp > {log.run} && rm {log.run}.tmp
         """
-        
+#TODO FIX THIS RSCRIPT TO OUTPUT THE RIGHT THING    
 rule summarize_ordering:
     input:
-        expand("ordermarkers/ordered.{LG}.{ITER}", LG = lg_range, ITER = ITER)
+        expand("ordermarkers/iterations/ordered.{LG}.{iter}", LG = lg_range, iter= ITER)
     output:
-        like = "ordermarkers/likelihoods.txt",
-        recomb = "ordermarkers/logs/recombination/recombination.summary"
+        like = "ordermarkers/likelihoods.summary",
+        recomb = "ordermarkers/recombination.summary"
     message:
         """
-        Summarizing + sorting likelihoods from each iteration >> ordermarkers/likelihoods.txt
-        Summarizing recombination information across linkage groups and iterations >> ordermarkers/logs/recombination/recombination.summary
+        Iteration likelihood summary >> {output.like}
+        Recombination summary >> {output.recomb}
         """
     shell:
         """
@@ -137,44 +137,44 @@ rule summarize_ordering:
             LIKELIHOOD=$(cat $LIKE | grep "likelihood = " | cut -d " " -f7)
             echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.like}.tmp
         done
-        sort {output}.tmp -k1,1V -k3,3nr > {output.like} && rm {output.like}.tmp
+        sort {output.like}.tmp -k1,1V -k3,3nr > {output.like} && rm {output.like}.tmp
         Rscript scripts/RecombinationSummary.r ordermarkers
         """
 
 rule find_bestlikelihoods:
     input:
-        "ordermarkers/likelihoods.txt"
+        "ordermarkers/likelihoods.summary"
     output:
-        "ordermarkers/bestlikelihoods.txt"
+        "ordermarkers/best.likelihoods"
     message:
         """
-        Identifying ordered maps with best likelihoods for each LG >> ordermarkers/bestlikelihoods.txt
+        Identifying orders with best likelihoods for each LG >> {output}
         """
     shell:
         """
-        LG=$(find ordermarkers -maxdepth 1 -name "ordered.*.*" | cut -d "." -f2 | sort -V | uniq)
-        NUMITER=$(find ordermarkers -maxdepth 1 -name "ordered.*.*" | cut -d "." -f3 | sort -V | uniq | tail -1)
-        TOTALMAPS=$(find ordermarkers -maxdepth 1 -name "ordered.*.*" | wc -l) 
+        LG=$(find ordermarkers/iterations -maxdepth 1 -name "ordered.*.*" | cut -d "." -f2 | sort -V | uniq)
+        NUMITER=$(find ordermarkers/iterations -maxdepth 1 -name "ordered.*.*" | cut -d "." -f3 | sort -V | uniq | tail -1)
+        TOTALMAPS=$(find ordermarkers/iterations -maxdepth 1 -name "ordered.*.*" | wc -l) 
         for i in $(seq 1 $NUMITER $TOTALMAPS); do
-            LIKELYMAP=$(sed -n ${{i}}p ordermarkers/likelihoods.txt | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
-            echo "ordermarkers/$LIKELYMAP" >> ordermarkers/bestlikelihoods.txt
+            LIKELYMAP=$(sed -n ${{i}}p {input} | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
+            echo "ordermarkers/$LIKELYMAP" >> {output}
         done
         """
 
 rule trim_edges_clusters:
     input:
-        "ordermarkers/bestlikelihoods.txt"
+        "ordermarkers/best.likelihoods"
     output:
         "ordermarkers/best.trim/ordered.{lg_range}.trimmed"
     log:
-        "ordermarkers/best.trim/ordered.{lg_range}.removed",
-        "ordermarkers/best.trim/ordered.{lg_range}.trim.pdf"
+        "ordermarkers/logs/trimming/ordered.{lg_range}.removed",
+        "ordermarkers/logs/trimming/ordered.{lg_range}.trim.pdf"
     params:
-        grep_lg = "ordermarkers/ordered.{lg_range}.",
-        trim_threshold = "10",
+        grep_lg = "ordermarkers/iterations/ordered.{lg_range}",
+        trim_threshold = "10"
     message:
         """
-        Removing edge clusters >{params.trim_threshold}cM apart from the other markers in first+last 15% of {params.grep_lg}. 
+        Removing edge clusters >{params.trim_threshold}cM apart from the other markers in first+last 15% of {params.grep_lg}.
         """
     shell:
         """
@@ -186,13 +186,14 @@ rule trim_summary:
     input:
         expand("ordermarkers/best.trim/ordered.{lg}.trimmed", lg = lg_range)
     output:
-        "ordermarkers/best.trim/trim.log"
+        "ordermarkers/trim.summary"
     message:
-        "Summarizing trim logs into ordermarkers/best.trim/trim.log"
+        "Summarizing trim logs >> {output}
     shell:
         """
+        echo "# this is a summary of which markers were removed from which linkage group via trimming distant edge clusters" >> {output}
         echo -e "LG\trm_marker" >> {output}
-        for each in ordermarkers/best.trim/ordered.*.removed ; do
+        for each in ordermarkers/logs/trimming/ordered.*.removed ; do
             BASE=$(basename $each | cut -d "." -f1,2)
             sed -e "s/^/$BASE /" $each >> {output}.tmp 
         done
@@ -203,10 +204,10 @@ rule reorder:
     input:
         datacall = "data_f.call.gz",
         filt_map = "map.master",
-        trimlog = "ordermarkers/best.trim/trim.log",
+        trimlog = "ordermarkers/summary/trimming.summary",
         lg_order = "ordermarkers/best.trim/{trimfile}.trimmed"
     output:
-        "reordermarkers/{trimfile}.{ITER}"
+        "reordermarkers/iterations/{trimfile}.{ITER}"
     log:
         run = "ordermarkers/logs/runs/{trimfile}.{ITER}.log",
         recomb = "ordermarkers/logs/recombination/{trimfile}.{ITER}.recombinations"
@@ -229,14 +230,14 @@ rule reorder:
 
 rule summarize_likelihoods2:
     input:
-        expand("reordermarkers/ordered.{LG}.{ITER}", LG = lg_range, ITER = ITER)
+        expand("reordermarkers/iterations/ordered.{LG}.{iter}", LG = lg_range, iter = ITER)
     output:
-        like = "reordermarkers/likelihoods.txt",
-        recomb = "reordermarkers/logs/recombination/recombination.summary"
+        like = "reordermarkers/likelihoods.summary",
+        recomb = "reordermarkers/recombination.summary"
     message:
         """
-        Summarizing + sorting likelihoods from each iteration >> reordermarkers/likelihoods.txt
-        Summarizing recombination information across linkage groups and iterations >> reordermarkers/logs/recombination/recombination.summary
+        Iteration likelihood summary >> {output.like}
+        Recombination summary >> {output.recomb}        
         """
     shell:
         """
@@ -252,21 +253,21 @@ rule summarize_likelihoods2:
 
 rule find_bestlikelihoods2:
     input:
-        "reordermarkers/likelihoods.txt"
+        "reordermarkers/likelihoods.summary"
     output:
-        "reordermarkers/bestlikelihoods.txt"
+        "reordermarkers/best.likelihoods"
     message:
         """
-        Identifying ordered maps with best likelihoods for each LG >> ordermarkers/bestlikelihoods.txt
+        Identifying ordered maps with best likelihoods for each LG >> {output}
         """
     shell:
         """
-        LG=$(find reordermarkers -maxdepth 1 -name "ordered.*.*" | cut -d "." -f2 | sort -V | uniq)
-        NUMITER=$(find reordermarkers -maxdepth 1 -name "ordered.*.*" | cut -d "." -f3 | sort -V | uniq | tail -1)
-        TOTALMAPS=$(find reordermarkers -maxdepth 1 -name "ordered.*.*" | wc -l) 
+        LG=$(find reordermarkers/iterations -maxdepth 1 -name "ordered.*.*" | cut -d "." -f2 | sort -V | uniq)
+        NUMITER=$(find reordermarkers/iterations -maxdepth 1 -name "ordered.*.*" | cut -d "." -f3 | sort -V | uniq | tail -1)
+        TOTALMAPS=$(find reordermarkers/iterations -maxdepth 1 -name "ordered.*.*" | wc -l) 
         for i in $(seq 1 $NUMITER $TOTALMAPS); do
-            LIKELYMAP=$(sed -n ${{i}}p reordermarkers/likelihoods.txt | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
-            echo "reordermarkers/$LIKELYMAP" >> reordermarkers/bestlikelihoods.txt
+            LIKELYMAP=$(sed -n ${{i}}p {input} | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
+            echo "reordermarkers/$LIKELYMAP" >> {output}
         done
         """
 

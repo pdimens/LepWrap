@@ -9,6 +9,7 @@ suppressMessages(library("dplyr"))
 args = commandArgs(trailingOnly = TRUE)
 # path = ordermarkers or reordermarkers (for reusability)
 path = args[1]
+original_wd <- getwd()
 # working dir = project_folder/[re]ordermarkers/logs/recombinations
 setwd(paste(getwd(),path, "logs/recombination", sep = "/"))
 
@@ -38,7 +39,7 @@ recomb_summary <- recomb_df %>% group_by(V2,V3) %>% summarise(min(V5), max(V5), 
 names(recomb_summary) <- c("family", "sample", "minimum", "maximum", "mean", "standard_deviation")
 
 # generate output file's name based on whether it's re/ordermarkers
-outfile <- paste(getwd(),"recombination.summary", sep = "/")
+outfile <- paste(original_wd,"recombination.summary", sep = "/")
 
 ## write summary to file
 write.table(
