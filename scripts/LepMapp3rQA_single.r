@@ -26,7 +26,7 @@ filename_trunc <- paste(filename_trunc[1], filename_trunc[2], sep = ".")
 lgfile$Mpass <- c(TRUE)
 lgfile$Fpass <- c(TRUE)
 outfile_base <- paste(path, "ordermarkers", "best.trim", filename_trunc, sep = "/")
-outfile_log_base <- paste(path, "ordermarkers", "logs/trimmming", filename_trunc, sep = "/")
+outfile_log_base <- paste(path, "ordermarkers", "logs/trimming", filename_trunc, sep = "/")
 
 #========= PDF instantiation ========#
 PDFPath <- paste(outfile_log_base, "trim.pdf", sep = ".")
