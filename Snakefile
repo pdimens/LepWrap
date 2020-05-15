@@ -188,7 +188,7 @@ rule trim_summary:
     output:
         "ordermarkers/trim.summary"
     message:
-        "Summarizing trim logs >> {output}
+        "Summarizing trim logs >> {output}"
     shell:
         """
         echo "# this is a summary of which markers were removed from which linkage group via trimming distant edge clusters" >> {output}
