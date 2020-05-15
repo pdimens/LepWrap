@@ -26,9 +26,10 @@ filename_trunc <- paste(filename_trunc[1], filename_trunc[2], sep = ".")
 lgfile$Mpass <- c(TRUE)
 lgfile$Fpass <- c(TRUE)
 outfile_base <- paste(path, "ordermarkers", "best.trim", filename_trunc, sep = "/")
+outfile_log_base <- paste(path, "ordermarkers", "logs/trimmming", filename_trunc, sep = "/")
 
 #========= PDF instantiation ========#
-PDFPath <- paste(outfile_base, "trim.pdf", sep = ".")
+PDFPath <- paste(outfile_log_base, "trim.pdf", sep = ".")
 suppressMessages(pdf(file=PDFPath, height = 8.5, width = 11)) 
 par(mfrow=(c(1,2))) # create 1x2 plots
 
@@ -109,7 +110,7 @@ write.table(
 
 write.table(
   removed_markers,
-  file=paste(outfile_base, "removed", sep = "."),
+  file=paste(outfile_log_base, "removed", sep = "."),
   append=FALSE, 
   sep = "\t", 
   quote = FALSE, 
