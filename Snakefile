@@ -222,7 +222,7 @@ rule reorder:
     threads: 2
     shell:
         """
-        zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.eval_order} {params.dist_method} &> {log.run}
+        zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.eval_order} {params.dist_method} &> {log.run}.tmp
         grep -A 100000 \*\*\*\ LG\ \= {log.run}.tmp > {output}
         grep "recombin" {log.run}.tmp > {log.recomb}
         awk '/#java/{{flag=1}} flag; /logL/{{flag=0}}' {log.run}.tmp > {log.run} && rm {log.run}.tmp
