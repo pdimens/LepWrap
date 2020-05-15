@@ -14,7 +14,7 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        "ordermarkers/trim.summary"
+        "reordermarkers/best.likelihoods"
 
 rule parentcall:
     input:
@@ -204,7 +204,7 @@ rule reorder:
     input:
         datacall = "data_f.call.gz",
         filt_map = "map.master",
-        trimlog = "ordermarkers/summary/trimming.summary",
+        trimlog = "ordermarkers/trim.summary",
         lg_order = "ordermarkers/best.trim/{trimfile}.trimmed"
     output:
         "reordermarkers/iterations/{trimfile}.{ITER}"
