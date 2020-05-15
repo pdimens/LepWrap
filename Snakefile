@@ -209,15 +209,15 @@ rule reorder:
     output:
         "reordermarkers/iterations/{trimfile}.{ITER}"
     log:
-        run = "ordermarkers/logs/runs/{trimfile}.{ITER}.log",
-        recomb = "ordermarkers/logs/recombination/{trimfile}.{ITER}.recombinations"
+        run = "reordermarkers/logs/runs/{trimfile}.{ITER}.log",
+        recomb = "reordermarkers/logs/recombination/{trimfile}.{ITER}.recombinations"
     message:
         """
         Reordering {input.lg_order}, iteration: {params.iteration}
         """
     params:
         dist_method = "useKosambi=1",
-        eval_order="evaluateOrder=ordermarkers/best.trim/{trimfile}.trimmed",
+        eval_order="evaluateOrder={input.lg_order}",
         iteration = "{ITER}"
     threads: 2
     shell:
