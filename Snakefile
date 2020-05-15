@@ -14,7 +14,7 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        "reordermarkers/bestlikelihoods.txt"
+        "ordermarkers/best.likelihoods"
 
 rule parentcall:
     input:
