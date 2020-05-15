@@ -157,7 +157,7 @@ rule find_bestlikelihoods:
         TOTALMAPS=$(find ordermarkers/iterations -maxdepth 1 -name "ordered.*.*" | wc -l) 
         for i in $(seq 1 $NUMITER $TOTALMAPS); do
             LIKELYMAP=$(sed -n ${{i}}p {input} | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
-            echo "ordermarkers/$LIKELYMAP" >> {output}
+            echo "ordermarkers/iterations/$LIKELYMAP" >> {output}
         done
         """
 
