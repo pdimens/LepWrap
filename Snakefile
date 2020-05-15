@@ -14,7 +14,7 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        "ordermarkers/best.likelihoods"
+        "ordermarkers/trim.summary"
 
 rule parentcall:
     input:
