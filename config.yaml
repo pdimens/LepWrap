@@ -39,6 +39,10 @@ iter: 100
 # Set threads_per to the number of threads you would like to use per iteration
 threads_per: 2
 
+# Choose your distance method by commenting the line you dont want
+dist_method: "useKosambi=1"
+#dist_method: "useMorgan=1"
+
 #-----------------#
 #  Edge Trimming  #
 #-----------------#

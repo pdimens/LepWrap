@@ -13,10 +13,10 @@ rule reorder:
         Reordering {input.lg_order}, iteration: {params.iteration}
         """
     params:
-        dist_method = "useKosambi=1",
+        dist_method = "{dist_method}",
         eval_order="evaluateOrder=ordermarkers/best.trim/{trimfile}.trimmed",
         iteration = "{ITER}"
-    threads: config["threads_per"]
+    threads: "{threads_per}"
     shell:
         """
         zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.eval_order} {params.dist_method} &> {log.run}.tmp
@@ -27,7 +27,7 @@ rule reorder:
 
 rule reorder_summary:
     input:
-        expand("reordermarkers/iterations/ordered.{LG}.{iter}", LG = lg_range, iter = ITER)
+        expand("reordermarkers/iterations/ordered.{lg}.{iter}", LG = lg_range, iter = ITER)
     output:
         like = "reordermarkers/likelihoods.summary",
         recomb = "reordermarkers/recombination.summary"

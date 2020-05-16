@@ -12,10 +12,10 @@ rule order_markers:
         Ordering the markers with {params.dist_method} on linkage group: {params.chrom}, iteration: {params.iteration}
         """
     params:
-        dist_method = "useKosambi=1",
+        dist_method = "{dist_method}",
         chrom = "{lg_range}",
         iteration = "{ITER}"
-    threads: config["threads_per"]
+    threads: "{threads_per}"
     shell:
         """
         zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.dist_method} chromosome={params.chrom} &> {log.run}.tmp
@@ -26,7 +26,7 @@ rule order_markers:
 
 rule order_summary:
     input:
-        expand("ordermarkers/iterations/ordered.{LG}.{iter}", LG = lg_range, iter= ITER)
+        expand("ordermarkers/iterations/ordered.{lg}.{iter}", lg = lg_range, iter= ITER)
     output:
         like = "ordermarkers/likelihoods.summary",
         recomb = "ordermarkers/recombination.summary"

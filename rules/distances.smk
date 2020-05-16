@@ -14,9 +14,9 @@ rule calculate_distances:
         sex_averaged = "distances_sexaverage/logs/ordered.{lg_range}.sexavg.log",
         intervals = "intervals/logs/ordered.{lg_range}.int.log"
     params:
-        dist_method = "useKosambi=1",
+        dist_method = "{dist_method}",
         lg = "{lg_range}"
-    threads: config["threads_per"]
+    threads: "{threads_per}"
     shell:
         """
         LG=$(grep -F "reordermarkers/iterations/ordered.{params.lg}." {input.lg})
