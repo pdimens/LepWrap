@@ -285,18 +285,18 @@ rule calculate_distances:
         intervals = "intervals/ordered.{lg_range}.intervals"
     message:
         """
-        Calculating sex-averaged marker distances and intervals for linkage group: {lg_range}
+        Calculating sex-averaged marker distances and intervals for linkage group: {params.lg}
         """
     log:
         sex_averaged = "distances_sexaverage/logs/ordered.{lg_range}.sexavg.log",
         intervals = "intervals/logs/ordered.{lg_range}.int.log"
     params:
         dist_method = "useKosambi=1",
-        grep_lg = "reordermarkers/iterations/ordered.{lg_range}."
+        lg = "{lg_range}"
     threads: 2
     shell:
         """
-        LG=$(grep -F {params.grep_lg} {input.lg})
+        LG=$(grep -F "reordermarkers/iterations/ordered.{params.lg}." {input.lg})
         cp $LG {output.distance}
         
         zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} numThreads={threads} improveOrder=0 sexAveraged=1 2&> {log.sex_averaged}.tmp
