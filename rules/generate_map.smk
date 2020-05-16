@@ -7,7 +7,7 @@ rule separatechromosomes:
         """
         Creating maps for specified LOD range >> maps.splitchrom/map.LG
         """
-    threads: "{sepchrom_threads}"
+    threads: sepchrom_threads
     params:
         lod_lim = "lodLimit={lod_range}",
         dist_lod = "distortionLod=1"
@@ -32,7 +32,7 @@ rule joinsingles:
         map_summ = "maps.splitchrom/maps.summary.txt"
     output:
         "map.master"
-    threads: "{sepchrom_threads}"
+    threads: sepchrom_threads
     params:
         lod_limit = "lodLimit=10",
         lod_diff = "lodDifference=2",

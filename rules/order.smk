@@ -15,7 +15,7 @@ rule order_markers:
         dist_method = "{dist_method}",
         chrom = "{lg_range}",
         iteration = "{ITER}"
-    threads: "{threads_per}"
+    threads: threads_per
     shell:
         """
         zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.dist_method} chromosome={params.chrom} &> {log.run}.tmp

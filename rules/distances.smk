@@ -16,7 +16,7 @@ rule calculate_distances:
     params:
         dist_method = "{dist_method}",
         lg = "{lg_range}"
-    threads: "{threads_per}"
+    threads: threads_per
     shell:
         """
         LG=$(grep -F "reordermarkers/iterations/ordered.{params.lg}." {input.lg})

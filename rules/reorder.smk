@@ -16,7 +16,7 @@ rule reorder:
         dist_method = "{dist_method}",
         eval_order="evaluateOrder=ordermarkers/best.trim/{trimfile}.trimmed",
         iteration = "{ITER}"
-    threads: "{threads_per}"
+    threads: threads_per
     shell:
         """
         zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.eval_order} {params.dist_method} &> {log.run}.tmp
