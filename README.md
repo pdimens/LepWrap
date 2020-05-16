@@ -1,5 +1,9 @@
 ![logo](misc/logo.png)
 
+```
+[![alt text](https://img.shields.io/badge/docs-wiki-75ae6c?style=for-the-badge&logo=Read%20The%20Docs)](https://github.com/pdimens/LepMak3r/wiki) 
+```
+
 # LepMak3r
 
 LepMak3r is a reusable pipeline to use the linkage map software [Lep-Map3](https://sourceforge.net/projects/lep-map3/). It is the Snakemake-based successor to [LepMapp3r](https://github.com/pdimens/LepMapp3r). Check out [the wiki](https://github.com/pdimens/LepMak3r/wiki) for detailed installation, usage, and workflow information.
