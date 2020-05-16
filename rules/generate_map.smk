@@ -2,7 +2,9 @@ rule separatechromosomes:
     input:
         "data_f.call.gz"
     output:
-        map = "maps.splitchrom/map.{lod_range}"
+        "maps.splitchrom/map.{lod_range}"
+    log:
+        "maps.splitchrom/logs/map.{lod_range}.log"
     message:
         """
         Creating maps for specified LOD range >> maps.splitchrom/map.LG
@@ -12,7 +14,7 @@ rule separatechromosomes:
         lod_lim = "lodLimit={lod_range}",
         dist_lod = "distortionLod=1"
     shell:
-        "zcat {input} | java -cp LM3 SeparateChromosomes2 data=- {params.lod_lim} {params.dist_lod} numThreads={threads} > {output}" 
+        "zcat {input} | java -cp LM3 SeparateChromosomes2 data=- {params.lod_lim} {params.dist_lod} numThreads={threads} > {output} &> {log}" 
 
 rule mapsummary:
     input:
@@ -23,8 +25,10 @@ rule mapsummary:
         """
         Combining map summaries >> maps.splitchrom/maps.summary.txt
         """
+    params:
+        lod_max = lod_max
     shell:
-        "scripts/map_summary.sh {lod_max}"
+        "scripts/map_summary.sh {params.lod_max}"
 
 rule joinsingles:
     input:

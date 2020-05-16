@@ -1,9 +1,27 @@
-![logo](logo.png)
+![logo](misc/logo.png)
 
 # LepMak3r
 
-A Snakemake variant to LepMapp3r. Check out [the wiki](https://github.com/pdimens/LepMak3r/wiki) for more information.
+LepMak3r is a reusable pipeline to use the linkage map software [Lep-Map3](https://sourceforge.net/projects/lep-map3/). It is the Snakemake-based successor to [LepMapp3r](https://github.com/pdimens/LepMapp3r). Check out [the wiki](https://github.com/pdimens/LepMak3r/wiki) for detailed installation, usage, and workflow information.
 
 
 
-== CURRENTLY UNDER CONSTRUCTION ==
+### How to install
+
+Download a zip of this repository using the "Clone or Download" button on the top-right and unzip it on your machine or:
+
+```bash
+git clone https://github.com/pdimens/LepMak3r.git
+```
+
+
+
+### Something to keep in mind
+
+LepMap3 is a **very** comprehensive software, and LepMak3r does incorporate all the features and nuances within the various modules. Your study is unique, so you are encouraged to clone or fork this repo and adapt LepMak3r to your needs! All of the code in LepMak3r is written in human-readable bash or aggressively annotated R, so give it a shot and adapt it to your workflow. If using LepMak3r in a publication, cite **Pasi Rastas** for his work on Lep-Map3 with a link to this repository, and if you like using it, give Pavel Dimens a shout out on Twitter [@pvdimens](https://twitter.com/PVDimens) [![alt text](http://i.imgur.com/wWzX9uB.png)](https://twitter.com/PVDimens)  =)
+
+
+
+## Citation
+
+Pasi Rastas, Lep-MAP3: robust linkage mapping even for low-coverage whole genome sequencing data, Bioinformatics, Volume 33, Issue 23, 01 December 2017, Pages 3726–3732,https://doi.org/10.1093/bioinformatics/btx494
