@@ -27,7 +27,7 @@ rule reorder:
 
 rule reorder_summary:
     input:
-        expand("reordermarkers/iterations/ordered.{lg}.{iter}", LG = lg_range, iter = ITER)
+        expand("reordermarkers/iterations/ordered.{lg}.{iter}", lg = lg_range, iter = ITER)
     output:
         like = "reordermarkers/likelihoods.summary",
         recomb = "reordermarkers/recombination.summary"
