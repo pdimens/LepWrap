@@ -18,7 +18,7 @@ git clone https://github.com/pdimens/LepMak3r.git
 
 ### Something to keep in mind
 
-LepMap3 is a **very** comprehensive software, and LepMak3r does incorporate all the features and nuances within the various modules. Your study is unique, so you are encouraged to clone or fork this repo and adapt LepMak3r to your needs! All of the code in LepMak3r is written in human-readable bash or aggressively annotated R, so give it a shot and adapt it to your workflow. If using LepMak3r in a publication, cite **Pasi Rastas** for his work on Lep-Map3 with a link to this repository, and if you like using it, give Pavel Dimens a shout out on Twitter [@pvdimens](https://twitter.com/PVDimens) [![alt text](http://i.imgur.com/wWzX9uB.png)](https://twitter.com/PVDimens)  =)
+Lep-Map3 is a **very** comprehensive software, and LepMak3r does incorporate all the features and nuances. Your study is unique, so you are encouraged to clone or fork this repo and adapt LepMak3r to your needs! All of the code in LepMak3r is written in human-readable bash or aggressively annotated R, so give it a shot and adapt it to your workflow. If using LepMak3r in a publication, cite **Pasi Rastas** for his work on Lep-Map3 with a link to this repository, and if you like using it, give Pavel Dimens a shout out on Twitter [@pvdimens](https://twitter.com/PVDimens) [![alt text](http://i.imgur.com/wWzX9uB.png)](https://twitter.com/PVDimens)  =)
 
 
 
