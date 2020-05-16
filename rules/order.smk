@@ -47,7 +47,7 @@ rule order_summary:
         Rscript scripts/RecombinationSummary.r ordermarkers
         """
 
-rule find_bestlikelihoods:
+rule best_likelihoods:
     input:
         "ordermarkers/likelihoods.summary"
     output:
