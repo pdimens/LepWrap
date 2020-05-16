@@ -1,8 +1,6 @@
 ![logo](misc/logo.png)
 
-```
 [![alt text](https://img.shields.io/badge/docs-wiki-75ae6c?style=for-the-badge&logo=Read%20The%20Docs)](https://github.com/pdimens/LepMak3r/wiki) 
-```
 
 # LepMak3r
 
