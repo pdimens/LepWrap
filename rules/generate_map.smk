@@ -41,8 +41,8 @@ rule join_singles:
         "maps.splitchrom/chosen.map"
     threads: sepchrom_threads
     params:
-        lod_limit = "lodLimit=10",
-        lod_diff = "lodDifference=2",
+        lod_limit = lod_lim,
+        lod_diff = lod_diff,
         iterate = "iterate=1",
     shell:
         """

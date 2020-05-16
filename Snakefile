@@ -14,6 +14,8 @@ trim_thresh = str(config["trim_cutoff"])
 lod_max = str(config["lod_max"])
 lod_range = list(range(config["lod_min"], config["lod_max"]+1))
 lg_range = list(range(1, config["exp_lg"]+1))
+lod_lim = config["lod_limit"]
+lod_diff = config["lod_difference"]
 ITER = list(range(1,config["iter"]+1))
 
 include: "rules/data_prep.smk"

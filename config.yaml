@@ -25,6 +25,17 @@ lod_max: 40
 # The number of threads you would like to use for this module
 SepChrom_threads: 8
 
+
+#-------------------#
+#  JoinSingles2ALL  #
+#-------------------#
+# these are the parameters for JoinSingles2ALL, and are highly data-dependent
+# start with lower values for lod_limit and increase as necessary
+lod_limit: "lodLimit=10"
+
+# start with lower values for lod_limit and increase as necessary
+lod_difference: "lodDifference=2"
+
 #-----------------#
 #  OrderMarkers2  #
 #-----------------#
