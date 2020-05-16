@@ -14,7 +14,9 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        expand("distances/ordered.{lg}.distances", lg = lg_range)
+        expand("distances/ordered.{lg}.distances", lg = lg_range),
+        expand("distances_sexaverage/ordered.{lg}.sexaverage", lg = lg_range),
+        expand("intervals/ordered.{lg}.intervals", lg = lg_range)
     message:
         """
         LepMak3r is finished! Good luck with the rest of your analyses!
@@ -281,14 +283,14 @@ rule calculate_distances:
         lg = "reordermarkers/best.likelihoods"
     output:
         distance = "distances/ordered.{lg_range}.distances",
-        sex_averaged = "distances_sexaveraged/ordered.{lg_range}.sexaveraged",
+        sex_averaged = "distances_sexaverage/ordered.{lg_range}.sexaverage",
         intervals = "intervals/ordered.{lg_range}.intervals"
     message:
         """
         Calculating sex-averaged marker distances and intervals for: {params.grep_lg}
         """
     log:
-        sex_averaged = "distances_sexaveraged/logs/ordered.{lg_range}.sexavg.log",
+        sex_averaged = "distances_sexaverage/logs/ordered.{lg_range}.sexavg.log",
         intervals = "intervals/logs/ordered.{lg_range}.int.log"
     params:
         dist_method = "useKosambi=1",
@@ -298,8 +300,8 @@ rule calculate_distances:
         """
         LG=$(grep -F {params.grep_lg} {input.lg})
         cp $LG {output.distance}
-        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} numThreads={threads} improveOrder=0 sexAveraged=1 > {output.sex_averaged} 2> {log.sex_averaged}
-        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} numThreads={threads} calculateIntervals={output.intervals} 2> {log.intervals}
+        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} numThreads={threads} improveOrder=0 sexAveraged=1 > {output.sex_averaged} 2&> {log.sex_averaged}
+        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} numThreads={threads} calculateIntervals={output.intervals} 2&> {log.intervals}
         """
 
 
