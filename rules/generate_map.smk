@@ -7,15 +7,15 @@ rule separatechromosomes:
         "maps.splitchrom/logs/map.{lod_range}.log"
     message:
         """
-        Creating maps for specified LOD range >> maps.splitchrom/map.LG
+        Creating map for lodLimit={params.lod} >> maps.splitchrom/map.{params.lod}
         """
     threads: sepchrom_threads
     params:
-        lod_lim = "lodLimit={lod_range}",
+        lod = "{lod_range}",
         dist_lod = "distortionLod=1"
     shell:
         """
-        zcat {input} | java -cp LM3 SeparateChromosomes2 data=- {params.lod_lim} {params.dist_lod} numThreads={threads} > {output} 2> {log}
+        zcat {input} | java -cp LM3 SeparateChromosomes2 data=- lodLimit={params.lod} {params.dist_lod} numThreads={threads} > {output} 2> {log}
         """
 rule mapsummary:
     input:
@@ -46,6 +46,7 @@ rule joinsingles:
         """
         echo -n -e '\nWhich map would you like to use (e.g. map.15)? map.'
         read -r
+        echo "map.$REPLY" > maps.splitchrom/chosen.map
         zcat {input.datacall} | java -cp LM3 JoinSingles2All map=maps.splitchrom/map.$REPLY data=- {params.lod_limit} {params.lod_diff} {params.iterate} numThreads={threads} > {output}
-        echo 'Your filtered map can be found in the working directory'
+        echo 'Your filtered map can be found in the working directory as map.master'
         """
