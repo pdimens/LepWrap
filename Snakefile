@@ -304,13 +304,13 @@ rule calculate_distances:
         awk '/#java/{{flag=1}} flag; /*** LG =/{{flag=0}}' {log.sex_averaged}.tmp > {log.sex_averaged} && rm {log.sex_averaged}.tmp
         sed 's/LG \= 0/LG \= {params.lg}/g' {log.sex_averaged}
 
-        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} numThreads={threads} calculateIntervals={output.intervals} # &2> {log.intervals}.tmp
-        #sed -n '/\*\*\* LG \=/,$p' {log.intervals}.tmp > {output.intervals} 
-        #awk '/#java/{{flag=1}} flag; /*** LG =/{{flag=0}}' {log.intervals}.tmp > {log.intervals} && rm {log.intervals}.tmp
-        #sed 's/LG \= 0/LG \= {params.lg}/g' {log.sex_averaged}
+        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} numThreads={threads} calculateIntervals={output.intervals} # 
         """
 
-
+#&2> {log.intervals}.tmp
+#sed -n '/\*\*\* LG \=/,$p' {log.intervals}.tmp > {output.intervals} 
+#awk '/#java/{{flag=1}} flag; /*** LG =/{{flag=0}}' {log.intervals}.tmp > {log.intervals} && rm {log.intervals}.tmp
+#sed 's/LG \= 0/LG \= {params.lg}/g' {log.sex_averaged}
 
 #rule trimcheck:
 #   input:
