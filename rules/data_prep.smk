@@ -1,4 +1,4 @@
-rule parentcall:
+rule parent_call:
     input:
         vcf = vcf,
         pedigree = pedigree

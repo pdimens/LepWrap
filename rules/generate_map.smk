@@ -1,4 +1,4 @@
-rule separatechromosomes:
+rule separate_chromosomes:
     input:
         "data_f.call.gz"
     output:
@@ -17,7 +17,7 @@ rule separatechromosomes:
         """
         zcat {input} | java -cp LM3 SeparateChromosomes2 data=- lodLimit={params.lod} {params.dist_lod} numThreads={threads} > {output} 2> {log}
         """
-rule mapsummary:
+rule map_summary:
     input:
         expand("maps.splitchrom/map.{LOD}", LOD = lod_range)
     output:
@@ -31,7 +31,7 @@ rule mapsummary:
     shell:
         "scripts/map_summary.sh {params.lod_max}"
 
-rule joinsingles:
+rule join_singles:
     input:
         datacall = "data_f.call.gz",
         map_summ = "maps.splitchrom/maps.summary.txt"

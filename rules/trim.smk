@@ -1,4 +1,4 @@
-rule trim_edges_clusters:
+rule trim_edge_clusters:
     input:
         "ordermarkers/best.likelihoods"
     output:
@@ -17,7 +17,7 @@ rule trim_edges_clusters:
     shell:
         """
         LG=$(grep -F {params.grep_lg} {input})
-        Rscript scripts/LepMapp3rQA_single.r $(pwd) $LG {params.trim_threshold} {params.edge_length}
+        Rscript scripts/LepMak3rQA.r $(pwd) $LG {params.trim_threshold} {params.edge_length}
         """
 
 rule trim_summary:

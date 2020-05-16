@@ -1,4 +1,4 @@
-rule reorder:
+rule reorder_markers:
     input:
         datacall = "data_f.call.gz",
         filt_map = "map.master",
