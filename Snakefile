@@ -285,8 +285,11 @@ rule calculate_distances:
         intervals = "intervals/ordered.{lg_range}.intervals"
     message:
         """
-        Calculating marker distances, sex-averaged marker distances, and intervals for: {params.grep_lg}
+        Calculating sex-averaged marker distances and intervals for: {params.grep_lg}
         """
+    log:
+        sex_averaged = "distances_sexaveraged/logs/ordered.{lg_range}.sexavg.log",
+        intervals = "intervals/logs/ordered.{lg_range}.int.log"
     params:
         dist_method = "useKosambi=1",
         grep_lg = "reordermarkers/iterations/ordered.{lg_range}."
@@ -294,10 +297,9 @@ rule calculate_distances:
     shell:
         """
         LG=$(grep -F {params.grep_lg} {input.lg})
-        #cp $LG {output.distance}
-        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} numThreads={threads} improveOrder=0 > {output.distance}
-        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} numThreads={threads} improveOrder=0 sexAveraged=1 > {output.sex_averaged}
-        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} numThreads={threads} calculateIntervals={output.intervals}
+        cp $LG {output.distance}
+        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} numThreads={threads} improveOrder=0 sexAveraged=1 > {output.sex_averaged} 2> {log.sex_averaged}
+        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} numThreads={threads} calculateIntervals={output.intervals} 2> {log.intervals}
         """
 
 
