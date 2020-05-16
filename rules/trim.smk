@@ -9,7 +9,7 @@ rule trim_edges_clusters:
     params:
         grep_lg = "ordermarkers/iterations/ordered.{lg_range}.",
         trim_threshold = trim_thresh,
-        edge_length = edge_length
+        edge_length = edge_len
     message:
         """
         Removing edge clusters >{params.trim_threshold}cM apart from the other markers in first+last 15% of {params.grep_lg}.
