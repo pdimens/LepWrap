@@ -3,9 +3,12 @@
 suppressMessages(if (!require("dplyr")) install.packages("dplyr"))
 suppressMessages(library("dplyr"))
 args = commandArgs(trailingOnly = TRUE)
+# args[1] is the path to the working directory
+# args[2] is either the ordermarkers or reordermarkers folder
+# args[3] is the centimorgan cutoff distance
+# args[4] is the % of edge markers to scan
 
 path = args[1]
-# path = project directory
 setwd(path)
 
 lgfile <- read.delim(
