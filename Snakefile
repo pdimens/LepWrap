@@ -289,7 +289,7 @@ rule calculate_distances:
         """
     log:
         sex_averaged = "distances_sexaverage/logs/ordered.{lg_range}.sexavg.log",
-        intervals = "intervals/logs/ordered.{lg_range}.int.log"
+        #intervals = "intervals/logs/ordered.{lg_range}.int.log"
     params:
         dist_method = "useKosambi=1",
         lg = "{lg_range}"
@@ -302,10 +302,12 @@ rule calculate_distances:
         zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} numThreads={threads} improveOrder=0 sexAveraged=1 &> {log.sex_averaged}.tmp
         sed -n '/\*\*\* LG \=/,$p' {log.sex_averaged}.tmp > {output.sex_averaged} 
         awk '/#java/{{flag=1}} flag; /*** LG =/{{flag=0}}' {log.sex_averaged}.tmp > {log.sex_averaged} && rm {log.sex_averaged}.tmp
+        sed 's/LG \= 0/LG \= {params.lg}/g' {log.sex_averaged}
 
-        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} numThreads={threads} calculateIntervals={output.intervals} &> {log.intervals}.tmp
-        sed -n '/\*\*\* LG \=/,$p' {log.intervals}.tmp > {output.intervals} 
-        awk '/#java/{{flag=1}} flag; /*** LG =/{{flag=0}}' {log.intervals}.tmp > {log.intervals} && rm {log.intervals}.tmp
+        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} numThreads={threads} calculateIntervals={output.intervals} # &2> {log.intervals}.tmp
+        #sed -n '/\*\*\* LG \=/,$p' {log.intervals}.tmp > {output.intervals} 
+        #awk '/#java/{{flag=1}} flag; /*** LG =/{{flag=0}}' {log.intervals}.tmp > {log.intervals} && rm {log.intervals}.tmp
+        #sed 's/LG \= 0/LG \= {params.lg}/g' {log.sex_averaged}
         """
 
 
