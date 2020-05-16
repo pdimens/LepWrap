@@ -1,7 +1,7 @@
 rule parentcall:
     input:
-        vcf = config["vcf"],
-        pedigree = config["predigree"]
+        vcf = {config["vcf"]},
+        pedigree = {config["predigree"]}
     output:
         "data.call.gz"
     message:
