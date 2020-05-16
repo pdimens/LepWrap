@@ -92,7 +92,7 @@ rule joinsingles:
         echo 'Your filtered map can be found in the working directory'
         """
 
-rule ordermarkers:
+rule order_markers:
     input:
         datacall = "data_f.call.gz",
         filt_map = "map.master"
@@ -118,7 +118,7 @@ rule ordermarkers:
         awk '/#java/{{flag=1}} flag; /logL/{{flag=0}}' {log.run}.tmp > {log.run} && rm {log.run}.tmp
         """
 
-rule summarize_ordering:
+rule order_summary:
     input:
         expand("ordermarkers/iterations/ordered.{LG}.{iter}", LG = lg_range, iter= ITER)
     output:
@@ -228,7 +228,7 @@ rule reorder:
         awk '/#java/{{flag=1}} flag; /logL/{{flag=0}}' {log.run}.tmp > {log.run} && rm {log.run}.tmp
         """
 
-rule summarize_likelihoods2:
+rule reorder_summary:
     input:
         expand("reordermarkers/iterations/ordered.{LG}.{iter}", LG = lg_range, iter = ITER)
     output:
