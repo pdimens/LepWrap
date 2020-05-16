@@ -14,7 +14,7 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        "distances/ordered.{lg_range}.distances"
+        expand("distances/ordered.{lg}.distances", lg = lg_range)
 
 rule parentcall:
     input:
