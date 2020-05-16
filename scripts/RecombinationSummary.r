@@ -33,7 +33,7 @@ for(i in files){
 
 ## summary information
 # calculate min, max, mean, and sd across iterations for each individual in each LG
-recomb_summary <- recomb_df %>% group_by(V2,V3) %>% summarise(min(V5), max(V5), mean(V5), sd(V5))
+recomb_summary <- recomb_df %>% group_by(V2,V3) %>% summarise(min(V5), max(V5), format(round(mean(V5), digits = 4), nsmall = 4), format(round(sd(V5), digits = 4), nsmall = 4)
 
 # rename columns for clarity
 names(recomb_summary) <- c("family", "sample", "minimum", "maximum", "mean", "standard_deviation")
