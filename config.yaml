@@ -1,0 +1,53 @@
+# Configuration file for LepMak3r
+
+#---------------#
+#  ParentCall2  #
+#---------------#
+# the filtered VCF file with your genotype likelihoods:
+vcf: "YFT70_maxmiss80.recode.vcf"
+
+# Instructions to create pedigree file: https://sourceforge.net/p/lep-map3/wiki/LM3 Home/#parentcall2
+# the pedigree file associated with your data
+pedigree: "pedigree.txt"
+
+#------------------------#
+#  SeperateChromosomes2  #
+#------------------------#
+# LepMak3r will iteratively perform SeperateChromosomes2 for each
+# LOD score in the range of lod_min to lod_max
+
+# The minimum LOD for SeperateChromosomes2
+lod_min: 20
+
+# The maximum LOD for SeperateChromosomes2
+lod_max: 40
+
+# The number of threads you would like to use for this module
+SepChrom_threads: 8
+
+#-----------------#
+#  OrderMarkers2  #
+#-----------------#
+# LepMak3r will iteratively order markers for each of 1:exp_lg number of chromosomes  
+
+# Set exp_lg to your expected number of chromosomes
+exp_lg: 24
+
+# Set iter to the number of iterations you want per chromosome (more is better). Recommend 30 or more
+iter: 100
+
+# Set threads_per to the number of threads you would like to use per iteration
+threads_per: 2
+
+#-----------------#
+#  Edge Trimming  #
+#-----------------#
+# Edge trimming will examine the first and last X% of markers in a linkage group
+# and remove clusters that are N centimorgans away from the next marker
+
+# Set edge_length to the percent number of markers you would like to examine from either end of the linkage group
+# Value can be an integer or decimal, i.e. 15 is the same as 0.15, which both mean "15%"
+edge_length: 15
+
+# Set trim_cuttoff to the centiMorgan distance cutoff (10 is reasonable)
+trim_cutoff: 10 

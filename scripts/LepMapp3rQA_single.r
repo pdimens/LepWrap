@@ -36,21 +36,28 @@ suppressMessages(pdf(file=PDFPath, height = 8.5, width = 11))
 par(mfrow=(c(1,2))) # create 1x2 plots
 
 ##### Pruning the ends #####
+dist_thresh <- args[3]
+# if the percent threshold is given as an interger, convert it to a decimal
+edge_length <- args[4]
+if(edge_length >= 1){
+  edge_length <- edge_length * .01
+}
+
 for (j in 2:3){   # iterate over male (2) and female (3)
   # trim beginning
-  filelength15 <- length(lgfile$V1) * 0.15
-  for(a in 1:filelength15){ #first 15% of total markers from the beginning
+  n_markers <- length(lgfile$V1) * edge_length
+  for(a in 1:n_markers){ #first n% of total markers from the beginning
     diff <- abs(lgfile[a+1,j]-lgfile[a,j]) # difference between two points
-    if( diff > 10 ){ # is the difference between the two points > distance argument?
-      lgfile[1:a, j+4] <- FALSE
+    if( diff > dist_thresh ){ # is the difference between the two points > distance argument?
+      lgfile[1:a, j+4] <- FALSE # mark that marker and all markers BEFORE it as FALSE
     }
   }
   # trim end
   filelen<-length(lgfile$V1)  # get new file lengths for each time we remove NA's
-  for(z in filelen:(filelen-filelength15)){  #iterate 15% total markers in starting from the end
+  for(z in filelen:(filelen-n_markers)){  #iterate n% total markers in starting from the end
     diff <- abs(lgfile[z,j]-lgfile[z-1,j]) # difference between two points
-    if( diff > 10 ){ # is the difference between the two points > distance argument?
-      lgfile[filelen:z,j+4] <- FALSE # mark that marker and all markers AFTER it as NA
+    if( diff > dist_thresh ){ # is the difference between the two points > distance argument?
+      lgfile[filelen:z,j+4] <- FALSE # mark that marker and all markers AFTER it as FALSE
     }
   }
   
