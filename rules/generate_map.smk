@@ -37,6 +37,8 @@ rule joinsingles:
         map_summ = "maps.splitchrom/maps.summary.txt"
     output:
         "map.master"
+    log:
+        "maps.splitchrom/chosen.map"
     threads: sepchrom_threads
     params:
         lod_limit = "lodLimit=10",
@@ -46,7 +48,8 @@ rule joinsingles:
         """
         echo -n -e '\nWhich map would you like to use (e.g. map.15)? map.'
         read -r
-        echo "map.$REPLY" > maps.splitchrom/chosen.map
+        echo "map.$REPLY" > {log}
         zcat {input.datacall} | java -cp LM3 JoinSingles2All map=maps.splitchrom/map.$REPLY data=- {params.lod_limit} {params.lod_diff} {params.iterate} numThreads={threads} > {output}
-        echo 'Your filtered map can be found in the working directory as map.master'
+        echo "Your filtered map can be found in the working directory as {output}"
+        echo "A record of your choice can be found in {log}"
         """
