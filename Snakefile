@@ -304,7 +304,7 @@ rule calculate_distances:
         sed -n '/\*\*\* LG \=/,$p' {log.sex_averaged}.tmp > {output.sex_averaged} 
         awk '/#java/{{flag=1}} flag; /*** LG =/{{flag=0}}' {log.sex_averaged}.tmp > {log.sex_averaged} && rm {log.sex_averaged}.tmp
 
-        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} numThreads={threads} calculateIntervals={output.intervals} > {log.intervals}
+        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} numThreads={threads} calculateIntervals={output.intervals} > {log.intervals} 2>&1
         #sed -n '/\*\*\* LG \=/,$p' {log.intervals}.tmp > {output.intervals} 
         #awk '/#java/{{flag=1}} flag; /*** LG =/{{flag=0}}' {log.intervals}.tmp > {log.intervals} && rm {log.intervals}.tmp
         #sed 's/LG \= 0/LG \= {params.lg}/g' {log.sex_averaged}
