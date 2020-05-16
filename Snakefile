@@ -15,6 +15,10 @@ ITER = list(range(1,100+1))
 rule all:
     input:
         expand("distances/ordered.{lg}.distances", lg = lg_range)
+    message:
+        """
+        LepMak3r is finished! Good luck with the rest of your analyses!
+        """
 
 rule parentcall:
     input:
@@ -170,7 +174,7 @@ rule trim_edges_clusters:
         "ordermarkers/logs/trimming/ordered.{lg_range}.removed",
         "ordermarkers/logs/trimming/ordered.{lg_range}.trim.pdf"
     params:
-        grep_lg = "ordermarkers/iterations/ordered.{lg_range}",
+        grep_lg = "ordermarkers/iterations/ordered.{lg_range}.",
         trim_threshold = "10"
     message:
         """
@@ -285,13 +289,15 @@ rule calculate_distances:
         """
     params:
         dist_method = "useKosambi=1",
-        grep_lg = "reordermarkers/iterations/ordered.{lg_range}"
+        grep_lg = "reordermarkers/iterations/ordered.{lg_range}."
+    threads: 2
     shell:
         """
         LG=$(grep -F {params.grep_lg} {input.lg})
-        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} improveOrder=0 > {output.distance}
-        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} improveOrder=0 sexAveraged=1 > {output.sex_averaged}
-        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} calculateIntervals={output.intervals}
+        #cp $LG {output.distance}
+        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} numThreads={threads} improveOrder=0 > {output.distance}
+        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} numThreads={threads} improveOrder=0 sexAveraged=1 > {output.sex_averaged}
+        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} numThreads={threads} calculateIntervals={output.intervals}
         """
 
 
