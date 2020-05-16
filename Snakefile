@@ -29,21 +29,3 @@ rule all:
         """
         LepMak3r is finished! Good luck with the rest of your analyses!
         """
-
-#rule trimcheck:
-#   input:
-#       "ordermarkers/best.trim/trim.log",
-#       expand("ordermarkers/best.trim/ordered.{lg}.trimmed", lg = lg_range)
-#       #expand("ordermarkers/best.trim/ordered.{lg}.{iter}.trimmed", lg = lg_range, iter = ITER, allow_missing = True)
-#   output:
-#       "trim.done"
-#   shell:
-#       "touch {output}"
-
-#rule reordercheck:
-#    input:
-#        expand("reordermarkers/ordered.{lg}.{iter}", lg = lg_range, iter = ITER)
-#    output:
-#        "reorder.done"
-#    shell:
-#        "touch {output}"
