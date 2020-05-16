@@ -52,4 +52,5 @@ rule joinsingles:
         zcat {input.datacall} | java -cp LM3 JoinSingles2All map=maps.splitchrom/map.$REPLY data=- {params.lod_limit} {params.lod_diff} {params.iterate} numThreads={threads} > {output}
         echo "Your filtered map can be found in the working directory as {output}"
         echo "A record of your choice can be found in {log}"
+        sleep 5s
         """
