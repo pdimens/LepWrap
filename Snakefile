@@ -285,7 +285,7 @@ rule calculate_distances:
         intervals = "intervals/ordered.{lg_range}.intervals"
     message:
         """
-        Calculating sex-averaged marker distances and intervals for: {params.grep_lg}
+        Calculating sex-averaged marker distances and intervals for linkage group: {lg_range}
         """
     log:
         sex_averaged = "distances_sexaverage/logs/ordered.{lg_range}.sexavg.log",
