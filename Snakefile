@@ -14,7 +14,7 @@ ITER = list(range(1,100+1))
 
 rule all:
     input:
-        "reordermarkers/best.likelihoods"
+        "distances/ordered.{lg_range}.distances"
 
 rule parentcall:
     input:
@@ -152,7 +152,7 @@ rule find_bestlikelihoods:
         """
     shell:
         """
-        LG=$(find ordermarkers/iterations -maxdepth 1 -name "ordered.*.*" | cut -d "." -f2 | sort -V | uniq)
+        #LG=$(find ordermarkers/iterations -maxdepth 1 -name "ordered.*.*" | cut -d "." -f2 | sort -V | uniq)
         NUMITER=$(find ordermarkers/iterations -maxdepth 1 -name "ordered.*.*" | cut -d "." -f3 | sort -V | uniq | tail -1)
         TOTALMAPS=$(find ordermarkers/iterations -maxdepth 1 -name "ordered.*.*" | wc -l) 
         for i in $(seq 1 $NUMITER $TOTALMAPS); do
@@ -262,14 +262,39 @@ rule find_bestlikelihoods2:
         """
     shell:
         """
-        LG=$(find reordermarkers/iterations -maxdepth 1 -name "ordered.*.*" | cut -d "." -f2 | sort -V | uniq)
+        #LG=$(find reordermarkers/iterations -maxdepth 1 -name "ordered.*.*" | cut -d "." -f2 | sort -V | uniq)
         NUMITER=$(find reordermarkers/iterations -maxdepth 1 -name "ordered.*.*" | cut -d "." -f3 | sort -V | uniq | tail -1)
         TOTALMAPS=$(find reordermarkers/iterations -maxdepth 1 -name "ordered.*.*" | wc -l) 
         for i in $(seq 1 $NUMITER $TOTALMAPS); do
             LIKELYMAP=$(sed -n ${{i}}p {input} | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
-            echo "reordermarkers/$LIKELYMAP" >> {output}
+            echo "reordermarkers/iterations/$LIKELYMAP" >> {output}
         done
         """
+
+rule calculate_distances:
+    input:
+        data_call = "data_f.call.gz",
+        lg = "reordermarkers/best.likelihoods"
+    output:
+        distance = "distances/ordered.{lg_range}.distances",
+        sex_averaged = "distances_sexaveraged/ordered.{lg_range}.sexaveraged",
+        intervals = "intervals/ordered.{lg_range}.intervals"
+    message:
+        """
+        Calculating marker distances, sex-averaged marker distances, and intervals for: {params.grep_lg}
+        """
+    params:
+        dist_method = "useKosambi=1",
+        grep_lg = "reordermarkers/iterations/ordered.{lg_range}"
+    shell:
+        """
+        LG=$(grep -F {params.grep_lg} {input.lg})
+        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} improveOrder=0 > {output.distance}
+        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} improveOrder=0 sexAveraged=1 > {output.sex_averaged}
+        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} calculateIntervals={output.intervals}
+        """
+
+
 
 #rule trimcheck:
 #   input:
