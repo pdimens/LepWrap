@@ -12,7 +12,7 @@ rule order_markers:
         Ordering the markers with {params.dist_method} on linkage group: {params.chrom}, iteration: {params.iteration}
         """
     params:
-        dist_method = "{dist_method}",
+        dist_method = dist_method,
         chrom = "{lg_range}",
         iteration = "{ITER}"
     threads: threads_per

@@ -14,7 +14,7 @@ rule calculate_distances:
         sex_averaged = "distances_sexaverage/logs/ordered.{lg_range}.sexavg.log",
         intervals = "intervals/logs/ordered.{lg_range}.int.log"
     params:
-        dist_method = "{dist_method}",
+        dist_method = dist_method,
         lg = "{lg_range}"
     threads: threads_per
     shell:

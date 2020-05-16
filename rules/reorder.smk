@@ -13,7 +13,7 @@ rule reorder:
         Reordering {input.lg_order}, iteration: {params.iteration}
         """
     params:
-        dist_method = "{dist_method}",
+        dist_method = dist_method,
         eval_order="evaluateOrder=ordermarkers/best.trim/{trimfile}.trimmed",
         iteration = "{ITER}"
     threads: threads_per
