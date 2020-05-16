@@ -15,7 +15,7 @@ ITER = list(range(1,100+1))
 rule all:
     input:
         expand("distances/ordered.{lg}.distances", lg = lg_range),
-        expand("distances_sexaverage/ordered.{lg}.sexaverage", lg = lg_range),
+        expand("distances_sexaverage/ordered.{lg}.sexavg", lg = lg_range),
         expand("intervals/ordered.{lg}.intervals", lg = lg_range)
     message:
         """
@@ -283,7 +283,7 @@ rule calculate_distances:
         lg = "reordermarkers/best.likelihoods"
     output:
         distance = "distances/ordered.{lg_range}.distances",
-        sex_averaged = "distances_sexaverage/ordered.{lg_range}.sexaverage",
+        sex_averaged = "distances_sexaverage/ordered.{lg_range}.sexavg",
         intervals = "intervals/ordered.{lg_range}.intervals"
     message:
         """
