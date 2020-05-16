@@ -14,8 +14,9 @@ rule separatechromosomes:
         lod_lim = "lodLimit={lod_range}",
         dist_lod = "distortionLod=1"
     shell:
-        "zcat {input} | java -cp LM3 SeparateChromosomes2 data=- {params.lod_lim} {params.dist_lod} numThreads={threads} > {output} &> {log}" 
-
+        """
+        zcat {input} | java -cp LM3 SeparateChromosomes2 data=- {params.lod_lim} {params.dist_lod} numThreads={threads} > {output} 2>& {log}
+        """
 rule mapsummary:
     input:
         expand("maps.splitchrom/map.{LOD}", LOD = lod_range)
