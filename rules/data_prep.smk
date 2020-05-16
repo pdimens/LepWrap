@@ -1,7 +1,7 @@
 rule parentcall:
     input:
         vcf = vcf,
-        pedigree = predigree
+        pedigree = pedigree
     output:
         "data.call.gz"
     message:
