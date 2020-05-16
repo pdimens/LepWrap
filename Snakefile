@@ -119,7 +119,7 @@ rule order_markers:
     shell:
         """
         zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.dist_method} chromosome={params.chrom} &> {log.run}.tmp
-        grep -A 100000 \*\*\*\ LG\ \= {log.run}.tmp > {output}
+        sed -n '/\*\*\* LG \=/,$p' {log.run}.tmp > {output}
         grep "recombin" {log.run}.tmp > {log.recomb}
         awk '/#java/{{flag=1}} flag; /logL/{{flag=0}}' {log.run}.tmp > {log.run} && rm {log.run}.tmp
         """
@@ -158,7 +158,6 @@ rule find_bestlikelihoods:
         """
     shell:
         """
-        #LG=$(find ordermarkers/iterations -maxdepth 1 -name "ordered.*.*" | cut -d "." -f2 | sort -V | uniq)
         NUMITER=$(find ordermarkers/iterations -maxdepth 1 -name "ordered.*.*" | cut -d "." -f3 | sort -V | uniq | tail -1)
         TOTALMAPS=$(find ordermarkers/iterations -maxdepth 1 -name "ordered.*.*" | wc -l) 
         for i in $(seq 1 $NUMITER $TOTALMAPS); do
@@ -229,7 +228,7 @@ rule reorder:
     shell:
         """
         zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} {params.eval_order} {params.dist_method} &> {log.run}.tmp
-        grep -A 100000 \*\*\*\ LG\ \= {log.run}.tmp > {output}
+        sed -n '/\*\*\* LG \=/,$p' {log.run}.tmp > {output}
         grep "recombin" {log.run}.tmp > {log.recomb}
         awk '/#java/{{flag=1}} flag; /logL/{{flag=0}}' {log.run}.tmp > {log.run} && rm {log.run}.tmp
         """
@@ -268,7 +267,6 @@ rule find_bestlikelihoods2:
         """
     shell:
         """
-        #LG=$(find reordermarkers/iterations -maxdepth 1 -name "ordered.*.*" | cut -d "." -f2 | sort -V | uniq)
         NUMITER=$(find reordermarkers/iterations -maxdepth 1 -name "ordered.*.*" | cut -d "." -f3 | sort -V | uniq | tail -1)
         TOTALMAPS=$(find reordermarkers/iterations -maxdepth 1 -name "ordered.*.*" | wc -l) 
         for i in $(seq 1 $NUMITER $TOTALMAPS); do
@@ -300,7 +298,8 @@ rule calculate_distances:
         """
         LG=$(grep -F {params.grep_lg} {input.lg})
         cp $LG {output.distance}
-        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} numThreads={threads} improveOrder=0 sexAveraged=1 > {output.sex_averaged} 2&> {log.sex_averaged}
+        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} numThreads={threads} improveOrder=0 sexAveraged=1 2&> {log.sex_averaged}
+        sed -n '/\*\*\* LG \=/,$p' {log.sex_averaged} > {output.sex_averaged} 
         zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} numThreads={threads} calculateIntervals={output.intervals} 2&> {log.intervals}
         """
 
