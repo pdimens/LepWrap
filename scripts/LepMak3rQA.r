@@ -39,9 +39,9 @@ suppressMessages(pdf(file=PDFPath, height = 8.5, width = 11))
 par(mfrow=(c(1,2))) # create 1x2 plots
 
 ##### Pruning the ends #####
-dist_thresh <- args[3]
+dist_thresh <- as.numeric(args[3])
 # if the percent threshold is given as an interger, convert it to a decimal
-edge_length <- args[4]
+edge_length <- as.numeric(args[4])
 if(edge_length >= 1){
   edge_length <- edge_length * .01
 }
