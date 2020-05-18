@@ -7,15 +7,15 @@ import sys
 
 def usage():
     print("\n", "Converts LepMap3 format linkage map(s) to ALLMAPS input format. Requires:")
-    print("1. A file that is the output of running `vcftools --012 --vcf yourvcf` ")
+    print("1. The .pos file that is the output of running `vcftools --012 --vcf yourvcf` ")
     print("2. LepMap3 files must be named 'something.LGnumber.extension' (ex. chromosome.1.dist)", "\n")
     
     print(":: For separate male + female output ::")
-    print("[usage] lepmap2allmaps splitsex <outfile from vcftools --012> <lepmapfile extension>")
+    print("[usage] lepmap2allmaps splitsex <outfile from vcftools --012> <distancefile extension>")
     print("[example] lepmap2allmaps splitsex chrom_positions.pos .dist \n")
     
     print(":: For sex-averaged in/output ::")
-    print("[usage] lepmap2allmaps sexaverage <outfile from vcftools --012>")
+    print("[usage] lepmap2allmaps sexaverage <outfile from vcftools --012> <sexavg_distancefile extension>")
     print("[example] lepmap2allmaps sexaverage chrom_positions.pos .sexdist")
 
 if len(sys.argv) != 4:
