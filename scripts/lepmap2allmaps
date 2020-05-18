@@ -24,7 +24,7 @@ if len(sys.argv) != 4:
 
 # define the sex-averaged function of this script
 def sexdist():
-    outfile = open("sexaverage_distances_ALLMAPS.csv", "w")
+    outfile = open("sexaverage_distances.csv", "w")
     outfile.write("Scaffold ID,scaffold position,LG,genetic position" + "\n")
 
     for lg in filelist:
@@ -48,9 +48,9 @@ def sexdist():
 
 # define the slit-by-sex function of this script
 def mapdistance():
-    m_outfile = open("male_distances_ALLMAPS.csv", "w")
+    m_outfile = open("male_distances.csv", "w")
     m_outfile.write("Scaffold ID,scaffold position,LG,genetic position" + "\n")
-    f_outfile = open("female_distances_ALLMAPS.csv", "w")
+    f_outfile = open("female_distances.csv", "w")
     f_outfile.write("Scaffold ID,scaffold position,LG,genetic position" + "\n")
 
     for lg in filelist:
@@ -76,7 +76,7 @@ def mapdistance():
     pos_file.close()
 
 # if wrong input format, then error and usage
-if (sys.argv[1] ) != "sexaverage" and (sys.argv[1] ) != "splitsex":
+if sys.argv[1] not in ["sexaverage", "splitsex"]:
     print("incorrect usage, please read below for proper use")
     usage()
     exit()
@@ -96,6 +96,5 @@ for line in pos_file.readlines():
 
 if (sys.argv)[1] == "sexaverage":
     sexdist()
-    mapdistance()
 else:
     mapdistance()
