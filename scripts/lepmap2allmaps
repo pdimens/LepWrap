@@ -11,11 +11,11 @@ def usage():
     print("2. LepMap3 files must be named 'something.LGnumber.extension' (ex. chromosome.1.dist)", "\n")
     
     print(":: For separate male + female output ::")
-    print("[usage] lepmap2allmaps splitsex <outfile from vcftools --012> <distancefile extension>")
+    print("[usage] lepmap2allmaps splitsex <outfile.POS from vcftools --012> <distancefile extension>")
     print("[example] lepmap2allmaps splitsex chrom_positions.pos .dist \n")
     
     print(":: For sex-averaged in/output ::")
-    print("[usage] lepmap2allmaps sexaverage <outfile from vcftools --012> <sexavg_distancefile extension>")
+    print("[usage] lepmap2allmaps sexaverage <outfile.POS from vcftools --012> <sexavg_distancefile extension>")
     print("[example] lepmap2allmaps sexaverage chrom_positions.pos .sexdist")
 
 if len(sys.argv) != 4:
