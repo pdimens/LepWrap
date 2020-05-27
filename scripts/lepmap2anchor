@@ -26,7 +26,7 @@ java -cp /bin CleanMap map=cleanMap.input > map.clean 2>/dev/null && echo "done!
 echo -ne "\n3) Using Map2Bed module to convert cleaned mapfile....." 
 java -cp /bin Map2Bed map=map.clean contigLength=$(basename $1).sizes > bedfiles/map.bed  && echo "done!"
 
-NUMCHROM=$(ls intervals | wc -l)
+NUMCHROM=$(ls intervals/*.intervals | wc -l)
 
 mkdir -p oriented intervals/LepAnchor_input
 
