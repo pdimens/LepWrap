@@ -10,7 +10,7 @@ LepMak3r is a reusable pipeline to use the linkage map software [Lep-Map3](https
 
 ### How to install
 
-Download a zip of this repository using the "Clone or Download" button on the top-right and unzip it on your machine or:
+Download a zip of this repository using the "Code" button on the top-right and unzip it on your machine or:
 
 ```bash
 git clone https://github.com/pdimens/LepMak3r.git
