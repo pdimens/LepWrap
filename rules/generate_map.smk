@@ -12,11 +12,12 @@ rule separate_chromosomes:
     threads: sepchrom_threads
     params:
         lod = "{lod_range}",
-        dist_lod = "distortionLod=1"
+        dist_lod = "distortionLod=1",
     shell:
         """
-        zcat {input} | java -cp LM3 SeparateChromosomes2 data=- lodLimit={params.lod} {params.dist_lod} numThreads={threads} > {output} 2> {log}
+        zcat {input} | java -cp LM3 SeparateChromosomes2 data=- sizeLimit=10 {informative} lodLimit={params.lod} {params.dist_lod} numThreads={threads} > {output} 2> {log}
         """
+
 rule map_summary:
     input:
         expand("maps.splitchrom/map.{LOD}", LOD = lod_range)

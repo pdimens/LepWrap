@@ -4,7 +4,7 @@
 #  ParentCall2  #
 #---------------#
 # the filtered VCF file with your genotype likelihoods:
-vcf: "YFT70_maxmiss80.recode.vcf"
+vcf: "final_biallelic.vcf"
 
 # Instructions to create pedigree file: https://sourceforge.net/p/lep-map3/wiki/LM3 Home/#parentcall2
 # the pedigree file associated with your data
@@ -17,13 +17,17 @@ pedigree: "pedigree.txt"
 # LOD score in the range of lod_min to lod_max
 
 # The minimum LOD for SeperateChromosomes2
-lod_min: 20
+lod_min: 1
 
 # The maximum LOD for SeperateChromosomes2
-lod_max: 40
+lod_max: 100
+
+# Use only markers with informative father (1), mother(2), both parents(3) or neither parent(0)
+informative: "informativeMask=1"
+
 
 # The number of threads you would like to use for this module
-SepChrom_threads: 8
+SepChrom_threads: 16
 
 
 #-------------------#
@@ -31,7 +35,7 @@ SepChrom_threads: 8
 #-------------------#
 # these are the parameters for JoinSingles2ALL, and are highly data-dependent
 # start with lower values for lod_limit and increase as necessary
-lod_limit: "lodLimit=10"
+lod_limit: "lodLimit=2"
 
 # start with lower values for lod_limit and increase as necessary
 lod_difference: "lodDifference=2"

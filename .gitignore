@@ -1,0 +1,5 @@
+.snakemake
+maps.splitchrom
+pedigree.txt
+data.call.gz
+data_f.call.gz
