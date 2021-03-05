@@ -18,12 +18,12 @@ lod_lim = config["lod_limit"]
 lod_diff = config["lod_difference"]
 ITER = list(range(1,config["iter"]+1))
 
-include: "rules/data_prep.smk"
-include: "rules/generate_map.smk"
-include: "rules/order.smk"
-include: "rules/trim.smk"
-include: "rules/reorder.smk"
-include: "rules/distances.smk"
+include: "data_prep.smk"
+include: "generate_map.smk"
+include: "order.smk"
+include: "trim.smk"
+include: "reorder.smk"
+include: "distances.smk"
 
 rule all:
     input:
