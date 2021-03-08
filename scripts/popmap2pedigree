@@ -1,0 +1,63 @@
+#! /usr/bin/env python3
+import sys
+import os.path
+from os import path
+
+if len(sys.argv) < 2 :
+    print("\nConvert a Stacks/dDocent \'population map\' file into a LepMap3 pedigree file.")
+    print("See https://catchenlab.life.illinois.edu/stacks/manual/#genmapbyhand for details.")
+    print("Parents must be designated as \'parent\' and offspring as \'offspring\'")
+    print("\n[usage] popmap2pedigree <popmap_file>")
+    print("[example] popmap2pedigree popmap_cross", "\n")
+    exit()
+
+
+popmap = open(sys.argv[1], "r").readlines()
+# pull out sample names (column 1)
+samples = [i.split()[0] for i in popmap]
+# pull out family distinctions (column 2)
+pops = [i.split()[1] for i in popmap]
+
+# identify the parents by looking for `parent` in pops
+idx_parents = [i for i, x in enumerate(pops) if x == 'parent']
+# identify offspring by inverting the condition
+idx_offspring = [i for i, x in enumerate(pops) if x != 'parent']
+
+# index the source with the indices corresponding to parents
+parents = [samples[i] for i in idx_parents]
+# same with offspring
+offspring = [samples[i] for i in idx_offspring]
+
+# making sure not to overwrite any existing pedigree file
+# code adopted from https://stackoverflow.com/a/47410481
+file_name = "pedigree.txt"
+if os.path.isfile(file_name):
+    expand = 1
+    while True:
+        expand += 1
+        outfile = file_name.split(".txt")[0] + "." + str(expand) + ".txt"
+        if os.path.isfile(outfile):
+            continue
+        else:
+            file_name = outfile
+            break
+
+print("Writing to " + file_name)
+
+with open(file_name, "w") as pedigree_out:
+    #family row
+    pedigree_out.write("chrom\tpos" + ("\tFamily_1" * len(samples)))
+    #all sample names
+    pedigree_out.write("\nchrom\tpos\t" + "\t".join(samples))
+    #parent_1 row
+    pedigree_out.write("\nchrom\tpos" + "\t0\t0" + (("\t" + parents[0]) * len(offspring)))
+    #parent_2 row
+    pedigree_out.write("\nchrom\tpos" + "\t0\t0" + (("\t" + parents[1]) * len(offspring)))
+    #parental sex
+    pedigree_out.write("\nchrom\tpos" + "\t1\t2" + ("\t0" * len(offspring)))
+    #bunch of zeroes
+    pedigree_out.write("\nchrom\tpos" + ("\t0" * len(samples)))
+
+print("\nPlease check " + file_name + " for accuracy and completeness.")
+print("Make sure the sex and family information is correct as these were auto-assigned")
+print("Sexes: 1 = male | 2 = female | 0 = unknown")
