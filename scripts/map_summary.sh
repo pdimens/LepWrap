@@ -10,8 +10,10 @@ for i in maps.splitchrom/map.*; do
     sed  -i "1i $FNAME LG" maps.splitchrom/.$FNAME.summary.txt
 done
 
+# find the map file with the largest number of linkage groups
+MAXLG=$(find maps.splitchrom -type f -name ".map.*.summary.txt" -exec grep -H -c '[^[:space:]]' {} \; | sort -nr -t":" -k2 | awk -F: '{print $1; exit;}')
 # initialize max number of LG's in summary file
-cut -f2 -d " " maps.splitchrom/.map.$1.summary.txt > maps.splitchrom/maps.summary.txt
+cut -f2 -d " " $MAXLG > maps.splitchrom/maps.summary.txt
 
 # merge summaries into one file
 for summfile in $(find ./maps.splitchrom -maxdepth 1 -name ".map.*.summary.txt" | sort -V) ; do
@@ -20,6 +22,9 @@ for summfile in $(find ./maps.splitchrom -maxdepth 1 -name ".map.*.summary.txt" 
 done
 # replace all spaces with tabs
 sed -i 's/ /\t/g' maps.splitchrom/maps.summary.txt
+
+cat maps.splitchrom/maps.summary.txt | column -t > maps.splitchrom/summary.txt
+rm maps.splitchrom/maps.summary.txt && mv maps.splitchrom/summary.txt maps.splitchrom/maps.summary.txt
 
 echo -e "\nExamine the maps produced ("maps.splitchrom/maps.summary.txt") and decide on the best map before proceeding"
 echo "if using a screen/tmux environment, detach this session and return to it with the appropriate command when ready"
