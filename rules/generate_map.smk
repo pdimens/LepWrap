@@ -15,7 +15,7 @@ rule separate_chromosomes:
         dist_lod = "distortionLod=1",
     shell:
         """
-        zcat {input} | java -cp LM3 SeparateChromosomes2 data=- sizeLimit=10 {informative} lodLimit={params.lod} {params.dist_lod} numThreads={threads} > {output} 2> {log}
+        zcat {input} | java -cp LM3 SeparateChromosomes2 data=- sizeLimit=5 {informative} lodLimit={params.lod} {params.dist_lod} numThreads={threads} > {output} 2> {log}
         """
 
 rule map_summary:

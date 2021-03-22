@@ -4,7 +4,7 @@
 #  ParentCall2  #
 #---------------#
 # the filtered VCF file with your genotype likelihoods:
-vcf: "final_biallelic.vcf"
+vcf: "populations.snps.vcf"
 
 # Instructions to create pedigree file: https://sourceforge.net/p/lep-map3/wiki/LM3 Home/#parentcall2
 # the pedigree file associated with your data
@@ -20,10 +20,10 @@ pedigree: "pedigree.txt"
 lod_min: 1
 
 # The maximum LOD for SeperateChromosomes2
-lod_max: 100
+lod_max: 40
 
 # Use only markers with informative father (1), mother(2), both parents(3) or neither parent(0)
-informative: "informativeMask=1"
+informative: "informativeMask=123"
 
 
 # The number of threads you would like to use for this module
