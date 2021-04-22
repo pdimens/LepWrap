@@ -10,6 +10,12 @@ vcf: "populations.snps.vcf"
 # the pedigree file associated with your data
 pedigree: "pedigree.txt"
 
+#---------------#
+#   Filtering2  #
+#---------------#
+# set this to 0 if you don't want a data tolerance level set
+data_tol: 0.01
+
 #------------------------#
 #  SeperateChromosomes2  #
 #------------------------#
