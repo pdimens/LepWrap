@@ -20,9 +20,13 @@ rule filtering:
         """
         Filtering the data
         """
+    params:
+        data_tolerance = data_tol
     shell:
         """
-        echo -e -n '\nSpecify your data tolerance (0.0001 to 0.01):  '
-        read -r
-        zcat {input} | java -cp LM3 Filtering2 data=- dataTolerance=$REPLY | gzip > data_f.call.gz
+        if [ {params} == 0 ]; then
+            ln -sr {input} {output}
+        else
+            zcat {input} | java -cp LM3 Filtering2 data=- dataTolerance={params} | gzip > {output}
+        fi
         """
