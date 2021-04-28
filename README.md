@@ -39,7 +39,7 @@ where `<number_of_cores>` is an integer of the maximum number of cores/threads y
 
 ### Something to keep in mind
 
-Lep-Map3 is a **very** comprehensive software, and LepMak3r does incorporate all the features and nuances. Your study is unique, so you are encouraged to clone or fork this repo and adapt LepMak3r to your needs! All of the code in LepMak3r is written in human-readable bash or aggressively annotated R, so give it a shot and adapt it to your workflow. If using LepMak3r in a publication, cite **Pasi Rastas** for his work on Lep-Map3 and please include a link to this repository. If you like using it, give me (Pavel) a shout out on Twitter [@pvdimens](https://twitter.com/PVDimens) [![alt text](http://i.imgur.com/wWzX9uB.png)](https://twitter.com/PVDimens)  =)
+Lep-Map3 is a **very** comprehensive software, and LepMak3r doesn't incorporate all the features and nuances. Your study is unique, so you are encouraged to clone or fork this repo and adapt LepMak3r to your needs! All of the code in LepMak3r is written in human-readable bash or aggressively annotated R, so give it a shot and adapt it to your workflow. If using LepMak3r in a publication, cite **Pasi Rastas** for his work on Lep-Map3 and please include a link to this repository. If you like using it, give me (Pavel) a shout out on Twitter [@pvdimens](https://twitter.com/PVDimens) [![alt text](http://i.imgur.com/wWzX9uB.png)](https://twitter.com/PVDimens)  =)
 
 
 
