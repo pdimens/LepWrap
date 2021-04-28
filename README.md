@@ -22,6 +22,7 @@ git clone https://github.com/pdimens/LepMak3r.git
 #### 2. Installing other dependencies
 Assuming you have `anaconda` or `miniconda` installed:
 ```bash
+cd LepMak3r
 conda create -f conda_LepMak3r.yml
 ```
 This will create an environment called `lepmak3r` that can be activated with:
