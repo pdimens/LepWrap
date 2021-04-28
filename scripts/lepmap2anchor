@@ -1,46 +1,12 @@
 #! /usr/bin/env bash
 
-if [[ -z "$1" ]]; then
-    echo -e "\nThis script will create Lep-Anchor inputs from LepMap3 output files.\nRequires the reference genome as the only argument."
-    echo -e "\n [usage]: lepmap2anchor.sh genome.fasta"
-    exit
+LG=$(ls *.intervals | wc -l)
+
+if [ ! -f $1 ]; then
+echo "error: marker file $(echo $1) not found"
+exit 1
 fi
 
-#rm -r bedfiles oriented cleanMap.input LepAnchor_snps.txt map.clean *.sizes intervals/LepAnchor_input
-mkdir -p LepAnchor/bedfiles
-
-# generate the snp file
-zcat data_f.call.gz | awk '(NR>=7){print $1"\t"$2}' > LepAnchor/LepAnchor_snps.txt
-
-
-# generate CleanMap input
-echo -n "#" > LepAnchor/cleanMap.input
-paste LepAnchor/LepAnchor_snps.txt map.master >> LepAnchor/cleanMap.input
-
-# get contig sizes
-echo -ne "\n1) Calculating contig sizes from $(basename $1)....."
-awk -f /bin/contigLength.awk $1 > LepAnchor/$(basename $1).sizes && echo "done!"
-
-# make the bed files
-echo -ne "\n2) Using CleanMap module on generated mapfile....."
-java -cp /bin CleanMap map=LepAnchor/cleanMap.input > LepAnchor/map.clean 2>/dev/null && echo "done!"
-echo -ne "\n3) Using Map2Bed module to convert cleaned mapfile....." 
-java -cp /bin Map2Bed map=LepAnchor/map.clean contigLength=LepAnchor/$(basename $1).sizes > LepAnchor/bedfiles/map.bed  && echo "done!"
-
-#mkdir -p LepAnchor/oriented
-
-NUMCHROM=$(ls intervals/*.intervals | wc -l)
-
-# generate PlaceAndOrientContigs input
-echo -ne "\n4) Creating interval input files for $NUMCHROM chromosomes....."
-for i in $(seq 1 $NUMCHROM)
-do
-    awk -vn=$i '(NR==FNR){map[NR-1]=$0}(NR!=FNR){$1=map[$1] "\t" n;print}' LepAnchor/LepAnchor_snps.txt intervals/ordered.$i.intervals > LepAnchor/order.$i.input
-    #java -cp /bin PlaceAndOrientContigs map=order${i}.intervals.input bed=chr.$i.bed
-    #java -cp /bin PlaceAndOrientContigs bed=bedfiles/map.bed chromosome=$i > oriented/chr$i.la
-    #awk -vn=X '(NR==FNR){map[NR-1]=$0}(NR!=FNR && /^[^#]/){print map[$1],n,$2,$3}' LepAnchor_snps.txt reordered.$i.txt > order.$i.m.input
-    #java -cp /bin PlaceAndOrientContigs map=order.$i.m.input bed=bedfiles/map.bed noIntervals=1 ...
-
-done && echo "done!"
-
-
+for i in $(seq 1 $LG); do
+    awk -vn=$i '(NR==FNR){map[NR-1]=$0}(NR!=FNR){$1=map[$1] "\t" n;print}' $1 ordered.$i.intervals >> lepmap3_map.la
+done

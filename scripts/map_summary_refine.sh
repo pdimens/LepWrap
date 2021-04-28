@@ -27,6 +27,3 @@ cat refine_map/maps.summary.txt | column -t > refine_map/summary.txt
 rm refine_map/maps.summary.txt && mv refine_map/summary.txt refine_map/maps.summary.txt
 
 echo -e "\nExamine the maps produced ("refine_map/maps.summary.txt") and decide on the best map before proceeding"
-echo "if using a screen/tmux environment, detach this session and return to it with the appropriate command when ready"
-echo "When you have decided on a map, press Enter to proceed"
-read
