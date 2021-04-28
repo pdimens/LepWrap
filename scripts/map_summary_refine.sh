@@ -1,7 +1,10 @@
 #! /usr/bin/env bash
 
+<<<<<<< HEAD
 #$1 = LOD end 
 
+=======
+>>>>>>> fcbd3d6aee246208167a70d055f2f0551f8cfe0f
 for i in refine_map/map.*; do
     FNAME=$(basename $i)
     # summarizes the maps, removes leading whitespaces, and sorts by LG
@@ -25,5 +28,8 @@ sed -i 's/ /\t/g' refine_map/maps.summary.txt
 
 cat refine_map/maps.summary.txt | column -t > refine_map/summary.txt
 rm refine_map/maps.summary.txt && mv refine_map/summary.txt refine_map/maps.summary.txt
+<<<<<<< HEAD
 
 echo -e "\nExamine the maps produced ("refine_map/maps.summary.txt") and decide on the best map before proceeding"
+=======
+>>>>>>> fcbd3d6aee246208167a70d055f2f0551f8cfe0f

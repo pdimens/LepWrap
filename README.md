@@ -12,16 +12,21 @@ LepMak3r is a reusable pipeline to use the linkage map software [Lep-Map3](https
 
 ### How to install
 You will need a `Snakemake` installation, along with cloning this repository locally.
-#### 1. Installing snakemake
-Assuming you have `anaconda` or `miniconda` installed:
-```bash
-conda create -n environment_name -c bioconda snakemake
-```
-where `environment_name` is whatever name you want to call the the snakemake conda environment.
-#### 2. Cloning LepMak3r
+
+#### 1. Cloning LepMak3r
 Download a zip of this repository using the "Code" button on the top-right and unzip it on your machine or:
 ```bash
 git clone https://github.com/pdimens/LepMak3r.git
+```
+
+#### 2. Installing other dependencies
+Assuming you have `anaconda` or `miniconda` installed:
+```bash
+conda create -f conda_LepMak3r.yml
+```
+This will create an environment called `lepmak3r` that can be activated with:
+```bash
+conda activate lepmak3r
 ```
 
 ### How to run
