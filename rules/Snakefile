@@ -6,6 +6,7 @@ configfile: "config.yaml"
 # load in parameters set in config.yaml
 vcf = config["vcf"]
 pedigree = config["pedigree"]
+data_tol=config["data_tol"]
 sepchrom_threads = config["SepChrom_threads"]
 threads_per = config["threads_per"]
 dist_method = config["dist_method"]
