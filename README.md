@@ -33,7 +33,6 @@ conda activate lepmak3r
 ### How to run
 You will need to modify `config.yaml` to suit your needs, then you can simply run the pipeline with the wrapper:
 ```bash
-cd LepMak3r
 ./LepMak3r <number_of_cores>
 ```
 where `<number_of_cores>` is an integer of the maximum number of cores/threads you want the pipeline to use.
