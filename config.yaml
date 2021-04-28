@@ -4,7 +4,7 @@
 #  ParentCall2  #
 #---------------#
 # the filtered VCF file with your genotype likelihoods:
-vcf: "populations.snps.vcf"
+vcf: "out.14.missrecode.vcf"
 
 # Instructions to create pedigree file: https://sourceforge.net/p/lep-map3/wiki/LM3 Home/#parentcall2
 # the pedigree file associated with your data
@@ -27,7 +27,7 @@ informative: "informativeMask=123"
 
 
 # The number of threads you would like to use for this module
-SepChrom_threads: 16
+SepChrom_threads: 30
 
 
 #-------------------#
