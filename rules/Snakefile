@@ -32,6 +32,7 @@ rule all:
         expand("distances/ordered.{lg}.distances", lg = lg_range),
         expand("distances_sexaverage/ordered.{lg}.sexavg", lg = lg_range),
         expand("intervals/ordered.{lg}.intervals", lg = lg_range),
+        expand("intervals_sexaverage/ordered.{lg}.sexavg.intervals", lg = lg_range),
         "ordermarkers/trim.summary"
     message:
         """
