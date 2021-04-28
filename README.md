@@ -11,7 +11,7 @@ LepMak3r is a reusable pipeline to use the linkage map software [Lep-Map3](https
 
 
 ### How to install
-You will need a `conda` installation, along with cloning this repository locally.
+You will need a `conda` installation (Anaconda or Miniconda), along with cloning this repository locally.
 
 #### 1. Cloning LepMak3r
 Download a zip of this repository using the "Code" button on the top-right and unzip it on your machine or:
