@@ -17,7 +17,7 @@ rule trim_edge_clusters:
     shell:
         """
         LG=$(grep -F {params.grep_lg} {input})
-        Rscript scripts/LepMak3rQA.r $(pwd) $LG {params.trim_threshold} {params.edge_length}
+        Rscript scripts/LepWrapQA.r $(pwd) $LG {params.trim_threshold} {params.edge_length}
         """
 
 rule trim_summary:
