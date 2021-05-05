@@ -3,15 +3,15 @@
 if which snakemake &>/dev/null; then
   foo=1
 else
-  echo -e "ERROR:\nSnakemake installation is required to run LepMak3r, but not found in the current environment."
+  echo -e "ERROR:\nSnakemake installation is required to run LepWrap, but not found in the current environment."
   exit 1
 fi
 
 if [[ -z "$1" ]]; then
   echo "Perform the modules of Lep-Map3. Make sure config.yaml is properly configured for how you intend to run things."
   echo ""
-  echo "[usage] LepMak3r <number of threads to use>"
-  echo "[example] LepMak3r 16" 
+  echo "[usage] LepMWrap <number of threads to use>"
+  echo "[example] LepWrap 16" 
   exit 1
 fi
 
