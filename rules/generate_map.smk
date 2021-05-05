@@ -30,7 +30,7 @@ rule map_summary:
     params:
         lod_max = lod_max
     shell:
-        "scripts/map_summary.sh {params.lod_max}"
+        "scripts/map_summary.sh maps.splitchrom {params.lod_max}"
 
 rule join_singles:
     input:
