@@ -27,10 +27,8 @@ rule map_summary:
         """
         Combining map summaries >> maps.splitchrom/maps.summary.txt
         """
-    params:
-        lod_max = lod_max
     shell:
-        "scripts/map_summary.sh maps.splitchrom {params.lod_max}"
+        "scripts/map_summary.sh maps.splitchrom"
 
 rule join_singles:
     input:
