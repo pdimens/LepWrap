@@ -21,4 +21,4 @@ for i in $(seq $LODMIN $LODMAX); do
 done
 
 # generate a summary of the results
-scripts/map_summary_refine.sh
+scripts/map_summary_refine.sh refine_map
