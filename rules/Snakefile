@@ -29,12 +29,11 @@ include: "distances.smk"
 
 rule all:
     input:
-        expand("distances/ordered.{lg}.distances", lg = lg_range),
-        expand("distances_sexaverage/ordered.{lg}.sexavg", lg = lg_range),
-        expand("intervals/ordered.{lg}.intervals", lg = lg_range),
-        expand("intervals_sexaverage/ordered.{lg}.sexavg.intervals", lg = lg_range),
-        "ordermarkers/trim.summary"
+        expand("7_Distances/ordered.{lg}.distances", lg = lg_range),
+        expand("7_DistancesSexAverage/ordered.{lg}.sexavg", lg = lg_range),
+        expand("7_Intervals/ordered.{lg}.intervals", lg = lg_range),
+        "5_Trim/trim.summary"
     message:
         """
-        LepMak3r is finished! Good luck with the rest of your analyses!
+        LepWrap is finished! Good luck with the rest of your analyses!
         """

@@ -1,20 +1,20 @@
 rule reorder_markers:
     input:
-        datacall = "data_f.call.gz",
+        datacall = "2_Filtering/data_f.call.gz",
         filt_map = "map.master",
-        lg_order = "ordermarkers/best.trim/{trimfile}.trimmed"
+        lg_order = "5_Trim/{trimfile}.trimmed"
     output:
-        "reordermarkers/iterations/{trimfile}.{ITER}"
+        "6_OrderMarkers/iterations/{trimfile}.{ITER}"
     log:
-        run = "reordermarkers/logs/runs/{trimfile}.{ITER}.log",
-        recomb = "reordermarkers/logs/recombination/{trimfile}.{ITER}.recombinations"
+        run = "6_OrderMarkers/logs/runs/{trimfile}.{ITER}.log",
+        recomb = "6_OrderMarkers/logs/recombination/{trimfile}.{ITER}.recombinations"
     message:
         """
         Reordering {input.lg_order}, iteration: {params.iteration}
         """
     params:
         dist_method = dist_method,
-        eval_order="evaluateOrder=ordermarkers/best.trim/{trimfile}.trimmed",
+        eval_order="evaluateOrder=5_Trim/{trimfile}.trimmed",
         iteration = "{ITER}"
     threads: threads_per
     shell:
@@ -27,10 +27,10 @@ rule reorder_markers:
 
 rule reorder_summary:
     input:
-        expand("reordermarkers/iterations/ordered.{lg}.{iter}", lg = lg_range, iter = ITER)
+        expand("6_OrderMarkers/iterations/ordered.{lg}.{iter}", lg = lg_range, iter = ITER)
     output:
-        like = "reordermarkers/likelihoods.summary",
-        recomb = "reordermarkers/recombination.summary"
+        like = "6_OrderMarkers/likelihoods.summary",
+        recomb = "6_OrderMarkers/recombination.summary"
     message:
         """
         Iteration likelihood summary >> {output.like}
@@ -45,24 +45,24 @@ rule reorder_summary:
             echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.like}.tmp
         done
         sort {output.like}.tmp -k1,1V -k3,3nr > {output.like} && rm {output.like}.tmp
-        Rscript scripts/RecombinationSummary.r reordermarkers
+        Rscript scripts/RecombinationSummary.r 6_OrderMarkers
         """
 
 rule best_likelihoods2:
     input:
-        "reordermarkers/likelihoods.summary"
+        "6_OrderMarkers/likelihoods.summary"
     output:
-        "reordermarkers/best.likelihoods"
+        "6_OrderMarkers/best.likelihoods"
     message:
         """
         Identifying ordered maps with best likelihoods for each LG >> {output}
         """
     shell:
         """
-        NUMITER=$(find reordermarkers/iterations -maxdepth 1 -name "ordered.*.*" | cut -d "." -f3 | sort -V | uniq | tail -1)
-        TOTALMAPS=$(find reordermarkers/iterations -maxdepth 1 -name "ordered.*.*" | wc -l) 
+        NUMITER=$(find 6_OrderMarkers/iterations -maxdepth 1 -name "ordered.*.*" | cut -d "." -f3 | sort -V | uniq | tail -1)
+        TOTALMAPS=$(find 6_OrderMarkers/iterations -maxdepth 1 -name "ordered.*.*" | wc -l) 
         for i in $(seq 1 $NUMITER $TOTALMAPS); do
             LIKELYMAP=$(sed -n ${{i}}p {input} | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
-            echo "reordermarkers/iterations/$LIKELYMAP" >> {output}
+            echo "6_OrderMarkers/iterations/$LIKELYMAP" >> {output}
         done
         """

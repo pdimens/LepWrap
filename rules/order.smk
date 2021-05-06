@@ -1,16 +1,13 @@
 rule order_markers:
     input:
-        datacall = "data_f.call.gz",
+        datacall = "2_Filtering/data_f.call.gz",
         filt_map = "map.master"
     output:
-        "ordermarkers/iterations/ordered.{lg_range}.{ITER}"
+        "4_OrderMarkers/iterations/ordered.{lg_range}.{ITER}"
     log:
-        run = "ordermarkers/logs/runs/ordered.{lg_range}.{ITER}.log",
-        recomb = "ordermarkers/logs/recombination/ordered.{lg_range}.{ITER}.recombinations"
-    message:
-        """
-        Ordering the markers with {params.dist_method} on linkage group: {params.chrom}, iteration: {params.iteration}
-        """
+        run = "4_OrderMarkers/logs/runs/ordered.{lg_range}.{ITER}.log",
+        recomb = "4_OrderMarkers/logs/recombination/ordered.{lg_range}.{ITER}.recombinations"
+    message: "Ordering the markers with {params.dist_method} on linkage group: {params.chrom}, iteration: {params.iteration}"
     params:
         dist_method = dist_method,
         chrom = "{lg_range}",
@@ -26,10 +23,10 @@ rule order_markers:
 
 rule order_summary:
     input:
-        expand("ordermarkers/iterations/ordered.{lg}.{iter}", lg = lg_range, iter= ITER)
+        expand("4_OrderMarkers/iterations/ordered.{lg}.{iter}", lg = lg_range, iter= ITER)
     output:
-        like = "ordermarkers/likelihoods.summary",
-        recomb = "ordermarkers/recombination.summary"
+        like = "4_OrderMarkers/likelihoods.summary",
+        recomb = "4_OrderMarkers/recombination.summary"
     message:
         """
         Iteration likelihood summary >> {output.like}
@@ -44,24 +41,24 @@ rule order_summary:
             echo -e "$LG\t$ITERUN\t$LIKELIHOOD" >> {output.like}.tmp
         done
         sort {output.like}.tmp -k1,1V -k3,3nr > {output.like} && rm {output.like}.tmp
-        Rscript scripts/RecombinationSummary.r ordermarkers
+        Rscript scripts/RecombinationSummary.r 4_OrderMarkers
         """
 
 rule best_likelihoods:
     input:
-        "ordermarkers/likelihoods.summary"
+        "4_OrderMarkers/likelihoods.summary"
     output:
-        "ordermarkers/best.likelihoods"
+        "4_OrderMarkers/best.likelihoods"
     message:
         """
         Identifying orders with best likelihoods for each LG >> {output}
         """
     shell:
         """
-        NUMITER=$(find ordermarkers/iterations -maxdepth 1 -name "ordered.*.*" | cut -d "." -f3 | sort -V | uniq | tail -1)
-        TOTALMAPS=$(find ordermarkers/iterations -maxdepth 1 -name "ordered.*.*" | wc -l) 
+        NUMITER=$(find 4_OrderMarkers/iterations -maxdepth 1 -name "ordered.*.*" | cut -d "." -f3 | sort -V | uniq | tail -1)
+        TOTALMAPS=$(find 4_OrderMarkers/iterations -maxdepth 1 -name "ordered.*.*" | wc -l) 
         for i in $(seq 1 $NUMITER $TOTALMAPS); do
             LIKELYMAP=$(sed -n ${{i}}p {input} | cut -f1,2 | awk '{{print $0, $1 "." $NF}}' | cut -d ' ' -f2)
-            echo "ordermarkers/iterations/$LIKELYMAP" >> {output}
+            echo "4_OrderMarkers/iterations/$LIKELYMAP" >> {output}
         done
         """

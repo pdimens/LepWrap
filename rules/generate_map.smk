@@ -1,14 +1,11 @@
 rule separate_chromosomes:
     input:
-        "data_f.call.gz"
+        "2_Filtering/data_f.call.gz"
     output:
-        "maps.splitchrom/map.{lod_range}"
+        "3_SeparateChromosomes/map.{lod_range}"
     log:
-        "maps.splitchrom/logs/map.{lod_range}.log"
-    message:
-        """
-        Creating map for lodLimit={params.lod} >> maps.splitchrom/map.{params.lod}
-        """
+        "3_SeparateChromosomes/logs/map.{lod_range}.log"
+    message: "Creating map for lodLimit={params.lod} >> 3_SeparateChromosomes/map.{params.lod}"
     threads: sepchrom_threads
     params:
         lod = "{lod_range}",
@@ -19,26 +16,20 @@ rule separate_chromosomes:
         """
 
 rule map_summary:
-    input:
-        expand("maps.splitchrom/map.{LOD}", LOD = lod_range)
-    output:
-        "maps.splitchrom/maps.summary.txt"
-    message:
-        """
-        Combining map summaries >> maps.splitchrom/maps.summary.txt
-        """
-    shell:
-        "scripts/map_summary.sh maps.splitchrom"
+    input: expand("3_SeparateChromosomes/map.{LOD}", LOD = lod_range)
+    output: "3_SeparateChromosomes/maps.summary.txt"
+    message: "Combining map summaries >> 3_SeparateChromosomes/maps.summary.txt"
+    shell: "scripts/map_summary.sh 3_SeparateChromosomes"
 
 rule join_singles:
     input:
-        datacall = "data_f.call.gz",
-        map_summ = "maps.splitchrom/maps.summary.txt"
+        datacall = "2_Filtering/data_f.call.gz",
+        map_summ = "3_SeparateChromosomes/maps.summary.txt"
     output:
         "map.master"
-    log:
-        "maps.splitchrom/chosen.map"
+    log: "3_SeparateChromosomes/chosen.map"
     threads: sepchrom_threads
+    message: "Joining singles"
     params:
         lod_limit = lod_lim,
         lod_diff = lod_diff,
@@ -48,7 +39,7 @@ rule join_singles:
         echo -n -e '\nWhich map would you like to use (e.g. map.15)? map.'
         read -r
         echo "map.$REPLY" > {log}
-        zcat {input.datacall} | java -cp LM3 JoinSingles2All map=maps.splitchrom/map.$REPLY data=- {params.lod_limit} {params.lod_diff} {params.iterate} numThreads={threads} > {output}
+        zcat {input.datacall} | java -cp LM3 JoinSingles2All map=3_SeparateChromosomes/map.$REPLY data=- {params.lod_limit} {params.lod_diff} {params.iterate} numThreads={threads} > {output}
         echo "Your filtered map can be found in the working directory as {output}"
         echo "A record of your choice can be found in {log}"
         sleep 5s
