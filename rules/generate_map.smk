@@ -19,7 +19,7 @@ rule map_summary:
     input: expand("3_SeparateChromosomes/map.{LOD}", LOD = lod_range)
     output: "3_SeparateChromosomes/maps.summary.txt"
     message: "Combining map summaries >> 3_SeparateChromosomes/maps.summary.txt"
-    shell: "scripts/map_summary.sh 3_SeparateChromosomes"
+    shell: "scripts/map_summary.r 3_SeparateChromosomes"
 
 rule join_singles:
     input:
@@ -40,7 +40,7 @@ rule join_singles:
         read -r
         echo "map.$REPLY" > {log}
         zcat {input.datacall} | java -cp LM3 JoinSingles2All map=3_SeparateChromosomes/map.$REPLY data=- {params.lod_limit} {params.lod_diff} {params.iterate} numThreads={threads} > {output}
-        echo "Your filtered map can be found in the working directory as {output}"
+        echo "Your chosen map can be found in the working directory as {output}"
         echo "A record of your choice can be found in {log}"
         sleep 5s
         """
