@@ -38,7 +38,8 @@ rule join_singles:
         """
         echo -n -e '\nWhich map would you like to use (e.g. map.15)? map.'
         read -r
-        echo "map.$REPLY" > {log}
+        echo "# the map chosen to use with OrderMarkers2" > {log}
+        echo "map.$REPLY" >> {log}
         zcat {input.datacall} | java -cp LM3 JoinSingles2All map=3_SeparateChromosomes/map.$REPLY data=- {params.lod_limit} {params.lod_diff} {params.iterate} numThreads={threads} > {output}
         echo "Your chosen map can be found in the working directory as {output}"
         echo "A record of your choice can be found in {log}"
