@@ -38,4 +38,4 @@ for i in $(seq $LODMIN $LODMAX); do
 done
 
 # generate a summary of the results
-scripts/map_summary.sh refine_map
+scripts/map_summary.r refine_map
