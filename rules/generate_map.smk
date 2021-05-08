@@ -24,7 +24,7 @@ rule map_summary:
 rule join_singles:
     input:
         datacall = "2_Filtering/data_f.call.gz",
-        map_summ = "3_SeparateChromosomes/maps.summary.txt"
+        map_summ = "3_SeparateChromosomes/all.maps.summary"
     output:
         "map.master"
     log: "3_SeparateChromosomes/chosen.map"
