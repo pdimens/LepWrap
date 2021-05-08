@@ -46,7 +46,7 @@ cmd <- paste("column -t", out_tmp, ">", out_file, "&& rm", out_tmp)
 system(cmd)
 
 cat(paste0("Examine the map summary (", out_file, ") and decide on the best map before proceeding"))
-cat("\nIf using a screen/tmux environment, detach this session and return to it with the appropriate command when ready")
+cat("\nIf using a screen/tmux environment, detach this session and return to it with the appropriate command when ready\n")
 
 ### these plots are completely unnecessary, but I'll leave them here anyway
 #plot_table <- summtable %>% 
