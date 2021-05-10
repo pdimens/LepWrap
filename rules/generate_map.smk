@@ -19,7 +19,7 @@ rule map_summary:
     input: expand("3_SeparateChromosomes/map.{LOD}", LOD = lod_range)
     output: "3_SeparateChromosomes/all.maps.summary"
     message: "Summarizing SeperateChromosomes2 maps >> 3_SeparateChromosomes/all.maps.summary"
-    shell: "scripts/map_summary.r 3_SeparateChromosomes"
+    shell: "scripts/MapSummary.r 3_SeparateChromosomes"
 
 rule join_singles:
     input:
