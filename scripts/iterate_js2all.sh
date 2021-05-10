@@ -13,17 +13,14 @@ fi
 
 mkdir -p JoinSingles2All_iter/logs
 
-echo "# The maps in this folder were created based on the map below" > JoinSingles2All_iter/chosen.map
-echo $1 >> JoinSingles2All_iter/chosen.map
+echo "# The maps in this folder were created based on the map below" > JoinSingles2All_iter/source.map
+echo $1 >> JoinSingles2All_iter/source.map
 
 # the map you want to refine
-#TARGETMAP=map.31
 TARGETMAP=$1
-# the linkage group you want to try to split
 # minimum LOD score for iterating
 LODMIN=$2
 # maximum LOD score for iterating
-#LODMAX=70
 LODMAX=$3
 # LOD difference cutoff
 LODDIFF=$4

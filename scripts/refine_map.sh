@@ -14,8 +14,8 @@ fi
 
 mkdir -p refine_map
 
-echo "# The maps in this folder were refined based on the map below" > refine_map/chosen.map
-echo $1 >> refine_map/chosen.map
+echo "# The maps in this folder were refined based on the map below" > refine_map/source.map
+echo $1 >> refine_map/source.map
 
 # the map you want to refine
 #TARGETMAP=map.31
