@@ -35,6 +35,7 @@ for (i in flist){
 
 # replace NA's as 0
 summtable[is.na(summtable)] <- 0
+summtable <- summtable[order(summtable$LG),]
 
 # generate output filenames
 out_tmp <-paste0(targetdir, "/all.map.summary")
