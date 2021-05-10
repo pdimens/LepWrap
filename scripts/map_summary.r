@@ -9,7 +9,7 @@ args <- commandArgs(trailingOnly = TRUE)
 targetdir <- args[1]
 
 # pattern match to find the map files
-flist <- list.files(targetdir, full.names = TRUE, pattern = "^map.[0-9]+")
+flist <- list.files(targetdir, full.names = TRUE, pattern = "^map.")
 # natural language sort
 flist <- str_sort(flist, numeric = TRUE)
 
