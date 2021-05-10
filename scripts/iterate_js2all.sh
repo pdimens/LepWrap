@@ -5,8 +5,8 @@
 if [[ -z "$1" ]]; then
 cat <<EOF
 Iterate JoinSingles2All over a range of LODlimit values.
-[usage]:	iterate_js2all.sh <mapfile> <LOD start> <LOD end> <LOD difference>
-[example]: 	scripts/iterate_js2all.sh 3_SeparateChromosomes/map.31 22 31 5
+[usage]:	iterate_js2all.sh <mapfile> <LOD start> <LOD end> <LOD difference> <informativemask OPTIONAL>
+[example]: 	scripts/iterate_js2all.sh 3_SeparateChromosomes/map.31 22 31 5 123
 EOF
   exit 1
 fi
@@ -28,8 +28,14 @@ LODMAX=$3
 # LOD difference cutoff
 LODDIFF=$4
 
+if [[ -z "$5" ]]; then
+  INFMASK=123
+else
+  INFMASK=$5
+fi
+
 for i in $(seq $LODMIN $LODMAX); do
-    zcat 2_Filtering/data_f.call.gz | java -cp LM3 JoinSingles2All map=$TARGETMAP data=- lodLimit=$i lodDifference=4 iterate=1 distortionLod=1 numThreads=10 > JoinSingles2All_iter/logs/map.$i.$4.js2all
+    zcat 2_Filtering/data_f.call.gz | java -cp LM3 JoinSingles2All map=$TARGETMAP data=- lodLimit=$i lodDifference=4 iterate=1 distortionLod=1 numThreads=10 informativeMask=$INFMASK > JoinSingles2All_iter/logs/map.$i.$4.js2all
     cut -f1 JoinSingles2All_iter/logs/map.$i.$4.js2all > JoinSingles2All_iter/map.$i.$4.js2all
 done
 
