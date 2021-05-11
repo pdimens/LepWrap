@@ -31,11 +31,6 @@ lod_max: 40
 # Use only markers with informative father (1), mother(2), both parents(3) or neither parent(0)
 informative: "informativeMask=123"
 
-
-# The number of threads you would like to use for this module
-SepChrom_threads: 30
-
-
 #-------------------#
 #  JoinSingles2ALL  #
 #-------------------#
