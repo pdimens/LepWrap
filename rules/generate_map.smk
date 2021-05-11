@@ -6,7 +6,7 @@ rule separate_chromosomes:
     log:
         "3_SeparateChromosomes/logs/map.{lod_range}.log"
     message: "Creating map for lodLimit={params.lod} >> 3_SeparateChromosomes/map.{params.lod}"
-    threads: sepchrom_threads
+    threads: 30
     params:
         lod = "{lod_range}",
         dist_lod = "distortionLod=1",
