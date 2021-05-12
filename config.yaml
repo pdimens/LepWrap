@@ -78,3 +78,12 @@ trim_cutoff: 10
 # change this to true if you also want to run Lep-Anchor
 run_anchor: false
 
+# the path to the genome assembly you are trying to anchor
+assembly: "some.assembly.fasta"
+
+# if you have a PAF file of long reads mapped to your genome, add it here, otherwise leave the text as "none"
+PAF_file: "none"
+
+# which system is appropriate for running the HaploMerger2 section? Comment out the one that doesn't apply.
+OS_info:
+OS_info:
