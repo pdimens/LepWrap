@@ -1,5 +1,6 @@
 # Configuration file for LepWrap
 
+#### Lep-Map 3 ####
 #---------------#
 #  ParentCall2  #
 #---------------#
@@ -71,3 +72,9 @@ edge_length: 15
 
 # Set trim_cuttoff to the centiMorgan distance cutoff (10 is reasonable)
 trim_cutoff: 10 
+
+
+#### Lep-Anchor ####
+# change this to true if you also want to run Lep-Anchor
+run_anchor: false
+
