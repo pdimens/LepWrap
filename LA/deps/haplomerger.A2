@@ -1,0 +1,67 @@
+#### hm.batchA2.chainNet_and_netToMaf v1.50
+#### this has been taken and modified from HaploMerger2
+
+#### This shell script does two things:
+#### 1) to create chain and net files.
+#### 2) to creates an alignment file (in gzip-compressed maf format) based on the net file.
+
+#### setting variables
+name=$1								# the species_name or the prefix of the genome file name
+threads=$2						# the number of cpu cores to use (default=1)
+
+###################################################################################################
+#### running
+if [ $# -eq 0 ]
+	then
+		echo
+		echo "Species name or the prefix of your genome file name is required !"
+		echo ""
+		echo "USAGE: $0 species_name num_threads"
+		echo
+		echo "Note that your genome sequence file should be"
+		echo "gzip compressed fasta file called assembly_name.fa.gz ."
+		echo 
+		exit 1
+	elif [ ! -f $1.fa.gz ]
+	then
+		echo
+		echo "$1.fa.gz is not found !"
+		echo 
+		exit 1	
+fi
+
+#### print out output file names
+echo "These files/directories are going to be output :"
+echo "  $name.${name}x.result/all.chain.gz - raw chain file, gzip compressed"
+echo "  $name.${name}x.result/all.tbest.chain.gz - target-best chain file"
+echo "  $name.${name}x.result/all.tbest.net - target-best net file"
+echo "  *** $name.${name}x.result/all.rbest.chain.gz - reciprocal best chain file, gzip compressed"
+echo "  *** $name.${name}x.result/all.rbest.net.gz - reciprocal best net file, gzip compressed"
+echo "  *** $name.${name}x.result/zeroMinSpace.rbest.net.gz - the zeroMinSpace net file"
+echo "log files:"
+echo "  $name.${name}x.result/*.log - log files for HM_axtChainRecipBestNet.pl"
+echo "  HM.axtChainRecipBestNet.log - log file"
+echo
+echo "*** NOTE THAT you may delete the directory"
+echo "*** $name.${name}x.result/raw.axt after having sucessfully finished this script!"
+echo
+
+#### ===========================================================
+#### run axtChainRecipBestNet
+#### ===========================================================
+
+perl ../bin/HM_axtChainRecipBestNet.pl \
+  --rbestNet \
+  --axtChain \
+  --tbest \
+  --zeroMinSpaceNet \
+  --threads=$threads \
+	--axtSuffix=axt.noself \
+  --linearGap=medium \
+  --minScore=5000 \
+  --minSpace=100 \
+  --minScore2=10000 \
+	--Species $name ${name}x \
+  --Force \
+  --Delete \
+	1> HM.axtChainRecipBestNet.log 2>> HM.axtChainRecipBestNet.log
