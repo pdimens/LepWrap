@@ -38,11 +38,25 @@ rule chain_1:
   message: "Running Lastz via HaploMerger2"
   threads: 30
   params:
-    os = 
+    os = os
   shell:
     """
-    export PATH="$PATH:test"
-
+    OS=$(echo {params.os} | tr '[:upper:]' '[:lower:]')
+    echo "Trying to use the {params.os} chainNet binaries"
+    if [ $OS == "ubuntu" ]
+    then
+      export PATH="$PATH:deps/chainNet_ubuntu"
+    elif [ $OS == "centos5" ]
+    then
+      export PATH="$PATH:deps/chainNet_centOS5"
+    elif [ $OS == "centos6" ]
+    then
+      export PATH="$PATH:deps/chainNet_centOS6"
+    else
+      echo "{params.os} is not recognized as one of Ubuntu, CentOS5, or CentOS6, defaulting to Ubuntu"
+      export PATH="$PATH:deps/chainNet_ubuntu"
+    fi
+    deps/step1.HM2
     """
 
 rule chain_2:
@@ -52,6 +66,22 @@ rule chain_2:
   threads: 30
   shell:
     """
+    OS=$(echo {params.os} | tr '[:upper:]' '[:lower:]')
+    echo "Trying to use the {params.os} chainNet binaries"
+    if [ $OS == "ubuntu" ]
+    then
+      export PATH="$PATH:deps/chainNet_ubuntu"
+    elif [ $OS == "centos5" ]
+    then
+      export PATH="$PATH:deps/chainNet_centOS5"
+    elif [ $OS == "centos6" ]
+    then
+      export PATH="$PATH:deps/chainNet_centOS6"
+    else
+      echo "{params.os} is not recognized as one of Ubuntu, CentOS5, or CentOS6, defaulting to Ubuntu"
+      export PATH="$PATH:deps/chainNet_ubuntu"
+    fi
+    deps/step2.HM2
     """
 
 rule extract_markers:
@@ -83,13 +113,14 @@ rule lepanchor:
     chain = ,
     intervals = "lepmap3_intervals.la"
   output:
+  log: "LepAnchor.log"
   message: "Running LepAnchor"
   threads: 30
   shell: 
   """
   if [ {input.paf_file} == "none" ]; then
-    lepanchor_wrapper.sh -t {threads} -f {input.genome} -n {lg} -c {input.chain} -m {input.intervals} 2> err.log
+    lepanchor_wrapper.sh -t {threads} -f {input.genome} -n {lg} -c {input.chain} -m {input.intervals} 2> {log}
   else
-    lepanchor_wrapper.sh -t {threads} -f {input.genome} -n {lg} -c {input.chain} -m {input.intervals} -p {input.paf} 2> err.log
+    lepanchor_wrapper.sh -t {threads} -f {input.genome} -n {lg} -c {input.chain} -m {input.intervals} -p {input.paf} 2> {log}
   fi
   """
