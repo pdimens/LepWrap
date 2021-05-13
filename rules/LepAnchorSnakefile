@@ -13,7 +13,7 @@ rule all:
 
 
 rule repeatmask:
-  input: assembly
+  input: {assembly}
   output: "8_Repeatmask/repeatmasked.fa.gz"
   message: "Using Red to repeat-mask the genome assembly {input}"
   threads: 30
@@ -41,7 +41,7 @@ rule chain_1:
   message: "Running Lastz via HaploMerger2"
   threads: 30
   params:
-    os = os
+    os = {os}
   shell:
     """
     OS=$(echo {params.os} | tr '[:upper:]' '[:lower:]')
@@ -103,7 +103,7 @@ rule generate_intervals:
     intervals = "8_Anchoring/lepmap3_intervals.la"
   message: "Combining Lep-Map3 intervals files into LepAnchor input"
   params:
-    lg = exp_lg
+    lg = {exp_lg}
   shell: 
     """
     for i in $(seq 1 {params.lg}); do
@@ -113,8 +113,8 @@ rule generate_intervals:
 
 rule lepanchor:
   input:
-    genome = assembly,
-    paf_file = paf,
+    genome = {assembly},
+    paf_file = {paf},
     chain = "",
     intervals = "10_Anchoring/lepmap3_intervals.la"
   output:
