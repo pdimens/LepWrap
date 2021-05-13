@@ -400,7 +400,7 @@ sub read_ctl_q($$) {
 }
 
 #the workhorse for lastz (multithreads)
-sub lastz_workhorse($$$){ #parameters in this order: $target, $query, $chrT, $thread_id, $cat_string, $option_string
+sub lastz_workhorse($$$$){ #parameters in this order: $target, $query, $chrT, $thread_id, $cat_string, $option_string
 
 	my ($target_fa, $query_fa, $thread_id, $option_string) = @_;
 	
@@ -419,3 +419,4 @@ sub lastz_workhorse($$$){ #parameters in this order: $target, $query, $chrT, $th
 	
 	return($thread_id);
 }
+

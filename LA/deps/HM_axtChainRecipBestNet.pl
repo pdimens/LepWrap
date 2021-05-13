@@ -1,4 +1,4 @@
-#!/usr/bin/env perl  
+#!/usr/bin/perl  
 
 ## Version 2.50
 
@@ -262,7 +262,7 @@ sub axtChain {
 					if ($workhorses[$i]->is_joinable()){
 						$rv = $workhorses[$i]->join();
 						print "WARNING: an error occurred to thread ID $i !!!!!!!\n" if $rv ne $i;
-						$thread_stat[$i]=0;				
+						$thread_stat[$i]=0;							
 					}
 				}
 				sleep(1);
@@ -511,4 +511,4 @@ sub netFilter{
 	my $cmd = "gunzip -c $Species[0].$Species[1].result/all.rbest.net.gz | netFilter -minAli=$filter_ali /dev/stdin | gzip -c >$Species[0].$Species[1].result/$out_netfile";
 	print $cmd,"...\n";
 	system($cmd);
-}
+}		

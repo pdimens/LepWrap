@@ -5,7 +5,7 @@ rule chain_1:
   message: "Running Lastz via HaploMerger2"
   threads: 30
   params:
-    os = {os}
+    os = os_name
   shell:
     """
     OS=$(echo {params.os} | tr '[:upper:]' '[:lower:]')
