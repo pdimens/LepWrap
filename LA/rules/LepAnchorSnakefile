@@ -11,7 +11,7 @@ rule all:
 
 rule repeatmask:
   input: assembly
-  output: "repeatmask/repeatmasked.fa.gz"
+  output: "8_Repeatmask/repeatmasked.fa.gz"
   message: "Using Red to repeat-mask the genome assembly {input}"
   threads: 30
   shell:
@@ -27,14 +27,14 @@ rule repeatmask:
       echo "Assembly file extension must end in .fa for Red, creating a symlink with the corrected name"
       ln -sr $file ${{file}}.fa
     fi
-    deps/Red -gnm . -msk repeatmask -sco repeatmask -cnd repeatmask
+    LA/deps/Red -gnm . -msk repeatmask -sco repeatmask -cnd repeatmask
     firstletters=$(echo $file | cut -c1-5 )
     mv repeatmask/${{firstletters}}*msk.fa.gz {output}
     """
 
 rule chain_1:
   input:
-  output:
+  output: "9_Chain/"
   message: "Running Lastz via HaploMerger2"
   threads: 30
   params:
@@ -45,23 +45,23 @@ rule chain_1:
     echo "Trying to use the {params.os} chainNet binaries"
     if [ $OS == "ubuntu" ]
     then
-      export PATH="$PATH:deps/chainNet_ubuntu"
+      export PATH="$PATH:LA/deps/chainNet_ubuntu"
     elif [ $OS == "centos5" ]
     then
-      export PATH="$PATH:deps/chainNet_centOS5"
+      export PATH="$PATH:LA/deps/chainNet_centOS5"
     elif [ $OS == "centos6" ]
     then
-      export PATH="$PATH:deps/chainNet_centOS6"
+      export PATH="$PATH:LA/deps/chainNet_centOS6"
     else
       echo "{params.os} is not recognized as one of Ubuntu, CentOS5, or CentOS6, defaulting to Ubuntu"
-      export PATH="$PATH:deps/chainNet_ubuntu"
+      export PATH="$PATH:LA/deps/chainNet_ubuntu"
     fi
     deps/step1.HM2
     """
 
 rule chain_2:
   input:
-  output:
+  output: "9_Chain"
   message: "Running HaploMerger2 to generate the chain file"
   threads: 30
   shell:
@@ -70,39 +70,39 @@ rule chain_2:
     echo "Trying to use the {params.os} chainNet binaries"
     if [ $OS == "ubuntu" ]
     then
-      export PATH="$PATH:deps/chainNet_ubuntu"
+      export PATH="$PATH:LA/deps/chainNet_ubuntu"
     elif [ $OS == "centos5" ]
     then
-      export PATH="$PATH:deps/chainNet_centOS5"
+      export PATH="$PATH:LA/deps/chainNet_centOS5"
     elif [ $OS == "centos6" ]
     then
-      export PATH="$PATH:deps/chainNet_centOS6"
+      export PATH="$PATH:LA/deps/chainNet_centOS6"
     else
       echo "{params.os} is not recognized as one of Ubuntu, CentOS5, or CentOS6, defaulting to Ubuntu"
-      export PATH="$PATH:deps/chainNet_ubuntu"
+      export PATH="$PATH:LA/deps/chainNet_ubuntu"
     fi
     deps/step2.HM2
     """
 
 rule extract_markers:
-  input: "../2_Filtering/data_f.call.gz"
+  input: "2_Filtering/data_f.call.gz"
   output: "snps.txt"
   message: "Extracting marker information from Lep-Map3 data file {input}"
-  shell: "../scripts/extract_markers.sh {input}"
+  shell: "scripts/extract_markers.sh {input}"
 
 rule generate_intervals:
   input:
     markers = "snps.txt",
-    intervals = expand("../7_Intervals/ordered.{x}.intervals", x = range(1,exp_lg + 1))
+    intervals = expand("7_Intervals/ordered.{x}.intervals", x = range(1,exp_lg + 1))
   output: 
-    intervals = "lepmap3_intervals.la"
+    intervals = "8_Anchoring/lepmap3_intervals.la"
   message: "Combining Lep-Map3 intervals files into LepAnchor input"
   params:
     lg = exp_lg
   shell: 
     """
     for i in $(seq 1 {params.lg}); do
-      awk -vn=$i '(NR==FNR){{map[NR-1]=$0}}(NR!=FNR){{$1=map[$1] "\t" n;print}}' {input.markers} ../7_Intervals/ordered.$i.intervals >> {output.intervals}
+      awk -vn=$i '(NR==FNR){{map[NR-1]=$0}}(NR!=FNR){{$1=map[$1] "\t" n;print}}' {input.markers} 7_Intervals/ordered.$i.intervals >> {output.intervals}
     done
     """
 
@@ -111,9 +111,9 @@ rule lepanchor:
     genome = assembly,
     paf_file = paf,
     chain = ,
-    intervals = "lepmap3_intervals.la"
+    intervals = "10_Anchoring/lepmap3_intervals.la"
   output:
-  log: "LepAnchor.log"
+  log: "10_Anchoring/LepAnchor.log"
   message: "Running LepAnchor"
   threads: 30
   shell: 
