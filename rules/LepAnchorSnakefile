@@ -13,7 +13,8 @@ rule all:
 
 
 rule repeatmask:
-  input: "{geno}"
+  input: 
+    assm = geno
   output: "8_Repeatmask/repeatmasked.fa.gz"
   message: "Using Red to repeat-mask the genome assembly {input}"
   threads: 30
