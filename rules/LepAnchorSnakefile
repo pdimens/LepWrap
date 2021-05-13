@@ -119,10 +119,10 @@ rule lepanchor:
   message: "Running LepAnchor"
   threads: 30
   shell: 
-  """
-  if [ {input.paf_file} == "none" ]; then
-    lepanchor_wrapper.sh -t {threads} -f {input.genome} -n {lg} -c {input.chain} -m {input.intervals} 2> {log}
-  else
-    lepanchor_wrapper.sh -t {threads} -f {input.genome} -n {lg} -c {input.chain} -m {input.intervals} -p {input.paf} 2> {log}
-  fi
-  """
+    """
+    if [ {input.paf_file} == "none" ]; then
+      lepanchor_wrapper.sh -t {threads} -f {input.genome} -n {lg} -c {input.chain} -m {input.intervals} 2> {log}
+    else
+      lepanchor_wrapper.sh -t {threads} -f {input.genome} -n {lg} -c {input.chain} -m {input.intervals} -p {input.paf} 2> {log}
+    fi
+    """
