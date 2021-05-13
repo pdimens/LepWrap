@@ -1,7 +1,10 @@
 #! /usr/bin/env bash
 
+## The script below is from HaploMerger2, modified slightly for clarity and
+## specific use in Lep-Wrap
+###################################################################################################
+
 #### hm.batchA1.initiation_and_lastz v1.50
-#### this has been taken and modified from HaploMerger2
 
 #### This shell script does two tasks:
 #### 1) to create an environment that contains all the files and directories required for later use,
@@ -18,40 +21,18 @@ targetSize=50000000   # split target fasta file by size N bp (default=50000000)
 querySize=1600000000  # split query fasta file by size N bp (default=1600000000)
 
 ###################################################################################################
-#### running
-if [ $# -eq 0 ]
-	then
-		echo
-		echo "Species name or the prefix of your genome file name is required !"
-		echo ""
-		echo "USAGE: $0 species_name num_threads"
-		echo
-		echo "Note that your genome sequence file should be"
-		echo "gzip compressed fasta file called assembly_name.fa.gz ."
-		echo 
-		exit 1
-	elif [ ! -f $1.fa.gz ]
-	then
-		echo
-		echo "$1.fa.gz is not found !"
-		echo 
-		exit 1	
-fi
-
-#### print out output file names
-echo
-echo "These files/directories are going to be output :"
-echo "  ${name}x.fa.gz - a copy of the genome sequence file $name.fa(.gz)"
-echo "  $name.sizes - the size of each scaffold sequences"
-echo "  ${name}x.sizes - the size of each scaffold sequences"
-echo "  $name.seq/*.fa and *.nib - fasta files and nib files for scaffold sequences"
-echo "  ${name}x.seq/*.fa and *.nib - fasta files and nib files for scaffold sequences"
-echo "  *** $name.${name}x.result/raw.axt/*.axt, *.axt.*, and *.log - raw lastz result files and their log files"
-echo "log files:"
-echo "  HM.initiation.log - log file"
-echo "  HM.all_lastz.log - log file"
-echo 
-
+#### output file names
+# These files/directories are going to be output :
+#   ${name}x.fa.gz - a copy of the genome sequence file $name.fa(.gz)
+#   $name.sizes - the size of each scaffold sequences
+#   ${name}x.sizes - the size of each scaffold sequences
+#   $name.seq/*.fa and *.nib - fasta files and nib files for scaffold sequences
+#   ${name}x.seq/*.fa and *.nib - fasta files and nib files for scaffold sequences
+#   *** $name.${name}x.result/raw.axt/*.axt, *.axt.*, and *.log - raw lastz result files and their log files
+# log files:
+#   HM.initiation.log - log file
+#   HM.all_lastz.log - log file
+# 
 #### ===========================================================
 #### create the project environment
 #### ===========================================================
