@@ -16,12 +16,6 @@
 #
 ##########################################################
 
-#if [ "$#" -ne 3 ]; then
-#    echo "At least three input parameters must be provided"
-#    exit 1
-#fi
-
-
 #parse parameters
 
 function print_usage()

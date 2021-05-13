@@ -12,17 +12,17 @@ EOF
   exit 1
 fi
 
-LG=$(ls intervals/*.intervals | wc -l)
+LG=$(ls 7_Intervals/*.intervals | wc -l)
 
 if [ ! -f $1 ]; then
     echo "Error: marker file $(echo $1) not found. It may be generated using scripts/extract_markers.sh"
     exit 1
 fi
 
-echo "Identified $LG interval files in intervals/ directory"
+echo "Identified $LG interval files in 7_Intervals/ directory"
 
 for i in $(seq 1 $LG); do
-    awk -vn=$i '(NR==FNR){map[NR-1]=$0}(NR!=FNR){$1=map[$1] "\t" n;print}' $1 intervals/ordered.$i.intervals >> lepmap3_intervals.la
+    awk -vn=$i '(NR==FNR){map[NR-1]=$0}(NR!=FNR){$1=map[$1] "\t" n;print}' $1 7_Intervals/ordered.$i.intervals >> lepmap3_intervals.la
 done
 
 echo "Created Lep-Anchor input file lepmap3_intervals.la"
