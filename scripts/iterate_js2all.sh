@@ -39,5 +39,5 @@ done
 echo "The generated maps are named map.LODlim.LODdiff.js2all"
 
 # generate a summary of the results
-scripts/map_summary.r JoinSingles2All_iter
+scripts/MapSummary.r JoinSingles2All_iter
 
