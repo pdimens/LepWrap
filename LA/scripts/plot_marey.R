@@ -10,8 +10,8 @@ MM <- unique(map$V4)
 cl <- rainbow(length(MM))
 
 for (lg in NN) {
-    print(lg)
-    png(paste0("marey", lg, ".png"), width = 1024, height = 1024)
+    #print(lg)
+    png(paste0("mareymap.", lg, ".png"), width = 1024, height = 1024)
     ymax <- 0
     for (m in MM) {
         map_tmp <- map[map$V3 == lg & map$V4 == m, ]
