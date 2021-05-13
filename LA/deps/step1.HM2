@@ -1,3 +1,5 @@
+#! /usr/bin/env bash
+
 #### hm.batchA1.initiation_and_lastz v1.50
 #### this has been taken and modified from HaploMerger2
 
@@ -38,11 +40,6 @@ fi
 
 #### print out output file names
 echo
-echo ">>> Running command : $0 $1"
-echo 
-echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-echo
 echo "These files/directories are going to be output :"
 echo "  ${name}x.fa.gz - a copy of the genome sequence file $name.fa(.gz)"
 echo "  $name.sizes - the size of each scaffold sequences"
@@ -60,7 +57,7 @@ echo
 #### ===========================================================
 
 rm -f -r $name.seq ${name}x.seq $name.sizes ${name}x.sizes ${name}x.fa.gz
-perl ../bin/initiation.pl \
+perl LA/deps/initiation.pl \
   --faSplit \
   --faToNib \
   --faSize \
@@ -80,7 +77,7 @@ ln -s $name.seq ${name}x.seq
 
 rm -f -r $name.${name}x.result/raw.axt
 
-perl ../bin/HM_all_lastz_mThreads.pl \
+perl LA/deps/HM_all_lastz_mThreads.pl \
   --Species $name ${name}x \
   --noself \
   --threads=$threads \
