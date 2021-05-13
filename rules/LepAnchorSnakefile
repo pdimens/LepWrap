@@ -3,7 +3,7 @@ import glob
 
 configfile: "config.yaml"
 
-assembly = config["assembly"]
+geno = config["assembly"]
 paf = config["PAF_file"]
 lg = config["lg_count"]
 os = config["OS_info"]
@@ -13,7 +13,7 @@ rule all:
 
 
 rule repeatmask:
-  input: "{assembly}"
+  input: "{geno}"
   output: "8_Repeatmask/repeatmasked.fa.gz"
   message: "Using Red to repeat-mask the genome assembly {input}"
   threads: 30
