@@ -6,6 +6,7 @@ configfile: "config.yaml"
 geno = config["assembly"]
 paf = config["PAF_file"]
 lg = config["lg_count"]
+lg_range = list(range(1,lg+1))
 os_name = config["OS_info"]
 
 rule all:
@@ -117,7 +118,7 @@ rule generate_intervals:
     markers = "snps.txt",
     intervals = expand("7_Intervals/ordered.{x}.intervals", x = range(1, exp_lg + 1))
   output: 
-    intervals = "8_Anchoring/lepmap3_intervals.la"
+    intervals = "10_Anchoring/lepmap3_intervals.la"
   message: "Combining {params} Lep-Map3 interval files into single LepAnchor input {output}"
   params:
     lg = exp_lg
