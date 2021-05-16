@@ -1,4 +1,5 @@
 /.snakemake
+.vscode
 /1_ParentCall
 /2_Filtering
 /3_SeparateChromosomes
