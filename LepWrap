@@ -10,9 +10,18 @@ fi
 if [[ -z "$1" ]]; then
   echo "Perform the modules of Lep-Map3. Make sure config.yaml is properly configured for how you intend to run things."
   echo ""
-  echo "[usage] LepMWrap <number of threads to use>"
+  echo "[usage] LepWrap <number of threads to use>"
   echo "[example] LepWrap 16" 
   exit 1
 fi
 
+echo "Running Lep-Map3"
+sleep 3s
 snakemake --cores $1 --snakefile ./rules/Snakefile --directory .
+
+LA=$(grep "run_lepanchor" config.yaml | cut -d":" -f2 | xargs | tr '[:upper:]' '[:lower:]')
+if [ LA == "true" ]; then
+echo -e "\nRunning Lep-Anchor"
+sleep 3s
+snakemake --cores $1 --snakefile ./rules/LepAnchor.smk --directory .
+fi
