@@ -14,7 +14,8 @@ rule all:
   input:
     fasta = "10_Anchoring/Anchored.contigs.fa.gz",
     scaff = "10_Anchoring/Anchored.scaffolds.fa.gz",
-    mareydata = "11_MareyMaps/marey.data.gz"
+    mareydata = "11_MareyMaps/marey.data.gz",
+    mareymaps = expand("11_MareyMaps/LG.{lgs}.mareymap.png", lgs = lg_range)
   message: "Lep-Anchor has finished. Good luck with the rest of your analyses!"
 
 rule repeatmask:
@@ -147,7 +148,7 @@ rule find_haplotypes:
   shell: 
     """
     gunzip -fc {input} | awk -f LA/scripts/findFullHaplotypes.awk > {output}
-    echo "Detected $(wc -l {output}) potential chimeric contigs"
+    echo "Detected $(wc -l {output}) potentially chimeric contigs"
     """
 
 rule liftover:
@@ -318,36 +319,52 @@ rule unused:
     """
 
 
-rule build_fasta:
+rule build_contig_fasta:
   input:
     assembly = geno,
-    agp = "10_Anchoring/REF_LA.agp",
-    scaff_agp = "10_Anchoring/REF_LA_scaffolds.agp"
+    agp = "10_Anchoring/REF_LA.agp"
   output:
     fasta = "10_Anchoring/Anchored.contigs.fa.gz",
-    scaff = "10_Anchoring/Anchored.scaffolds.fa.gz"
-  message: "Constructing final fasta files"
+  message: "Constructing final contig fasta file {input.agp}"
   shell:
     """
     gunzip -fc {input.assembly} | awk -f LA/scripts/makefasta.awk - {input.agp} | gzip > {output.fasta}
+    """
+
+rule build_scaffold_fasta:
+  input:
+    assembly = geno,
+    scaff_agp = "10_Anchoring/REF_LA_scaffolds.agp"
+  output:
+    scaff = "10_Anchoring/Anchored.scaffolds.fa.gz"
+  message: "Constructing final scaffold fasta file {input.scaff_agp}"
+  shell:
+    """
     gunzip -fc {input.assembly} | awk -f LA/scripts/makefasta.awk - {input.scaff_agp} | gzip > {output.scaff}
     """
 
-rule mareymaps:
+rule mareymap_data:
   input:
     lift = "10_Anchoring/liftover.la",
     agp = expand("10_Anchoring/agp/chr.{lgs}.agp", lgs = lg_range)
   output: 
-    mareydata = "11_MareyMaps/marey.data.gz",
-    plots = expand("11_MareyMaps/LG.{lgs}.mareymap.png", lgs = lg_range)
-  message: "Creating Marey map plots"
+    mareydata = "11_MareyMaps/marey.data.gz"
+  log: "11_MareyMaps/missing_scaffolds.txt"
+  message: "Creating Marey map interval data"
   params:
     chrom = lg
   shell:
     """
-    for c in $(seq {params.chrom})
+    for c in $(seq 1 {params.chrom})
     do
-      awk -vn=$c '($3==n)' {input.lift} | awk -f LA/scripts/liftover.awk 10_Anchoring/agp/chr.$c.agp - | awk -vm=$j '(/LG/ && NF>=4){{if (NF==4) $5=$4;print $1"\t"$2"\t"$3"\t"m"\t"$4"\t"$5}}' | gzip > {output.mareydata}
-    done
-    Rscript LA/scripts/plot_marey.R {output.mareydata} 10_Anchoring/agp
+      awk -vn=$c '($3==n)' {input.lift} | awk -f LA/scripts/liftover.awk 10_Anchoring/agp/chr.$c.agp - 2>> {log} | awk -vm=1 '(/LG/ && NF>=4){{if (NF==4) $5=$4;print $1"\t"$2"\t"$3"\t"m"\t"$4"\t"$5}}' | gzip
+    done > {output.mareydata}
     """
+
+rule mareymaps:
+  input:
+    data = "11_MareyMaps/marey.data.gz",
+    agp = expand("10_Anchoring/agp/chr.{lgs}.agp", lgs = lg_range)
+  output: expand("11_MareyMaps/LG.{lgs}.mareymap.png", lgs = lg_range)
+  message: "Creating Marey Maps"
+  shell: "Rscript LA/scripts/plot_marey.R {input.data} 10_Anchoring/agp"
