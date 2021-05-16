@@ -12,10 +12,10 @@ EOF
   exit 1
 fi
 
-mkdir -p refine_map
+mkdir -p RefineMap
 
 echo "# The maps in this folder were refined based on the map below" > refine_map/source.map
-echo $1 >> refine_map/source.map
+echo $1 >> RefineMap/source.map
 
 # the map you want to refine
 #TARGETMAP=map.31
@@ -34,8 +34,8 @@ LODMAX=$4
 SIZELIM=$5
 
 for i in $(seq $LODMIN $LODMAX); do
-    zcat 2_Filtering/data_f.call.gz | java -cp LM3 SeparateChromosomes2 data=- map=$TARGETMAP lg=$TARGETLG sizeLimit=$SIZELIM lodLimit=$i distortionLod=1 numThreads=10 > refine_map/map.$i
+    zcat 2_Filtering/data_f.call.gz | java -cp LM3 SeparateChromosomes2 data=- map=$TARGETMAP lg=$TARGETLG sizeLimit=$SIZELIM lodLimit=$i distortionLod=1 numThreads=10 > RefineMap/map.$i
 done
 
 # generate a summary of the results
-scripts/MapSummary.r refine_map
+scripts/MapSummary.r RefineMap
