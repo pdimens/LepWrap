@@ -328,25 +328,25 @@ rule unused:
     """
 
 
-rule build_contig_fasta:
+rule build_scaffold_fasta:
   input:
     assembly = geno,
     agp = "10_Anchoring/REF_LA.agp"
   output:
-    fasta = "10_Anchoring/Anchored.contigs.fa.gz",
-  message: "Constructing final contig fasta file {input.agp}"
+    fasta = "10_Anchoring/Anchored.scaffolds.fa.gz",
+  message: "Constructing final scaffold fasta file {output.fasta}"
   shell:
     """
     gunzip -fc {input.assembly} | awk -f LA/scripts/makefasta.awk - {input.agp} | gzip > {output.fasta}
     """
 
-rule build_scaffold_fasta:
+rule build_contig_fasta:
   input:
     assembly = geno,
     scaff_agp = "10_Anchoring/REF_LA_scaffolds.agp"
   output:
-    scaff = "10_Anchoring/Anchored.scaffolds.fa.gz"
-  message: "Constructing final scaffold fasta file {input.scaff_agp}"
+    fasta = "10_Anchoring/Anchored.contigs.fa.gz"
+  message: "Constructing final contig fasta file {output.fasta}"
   shell:
     """
     gunzip -fc {input.assembly} | awk -f LA/scripts/makefasta.awk - {input.scaff_agp} | gzip > {output.scaff}
@@ -363,8 +363,8 @@ rule mareymap_data:
   message: 
     """
     Creating Marey map interval data
-    {output.mareydata}   first points in uncertainty intervals
-    {output.midpoints}   midpoints in uncertainty intervals  
+    first points in uncertainty intervals  | {output.mareydata}
+    midpoints in uncertainty intervals     | {output.midpoints}  
     """
   params:
     chrom = lg

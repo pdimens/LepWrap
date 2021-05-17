@@ -1,11 +1,11 @@
 #! /usr/bin/env Rscript
 
-library(tidyverse)
+suppressMessages(library(tidyverse, warn.conflicts = FALSE, quietly = TRUE))
 
 args <- commandArgs(trailingOnly = TRUE)
 # args[1] = mareydata file
 
-allmaps <- read_tsv(gzfile(args[1]), col_names = FALSE) %>%
+allmaps <- suppressMessages(read_tsv(gzfile(args[1]), col_names = FALSE)) %>%
   select(X3, X2, X5, X6) %>%
   rename(lg = X3, Mb = X2, male = X5, female = X6) %>%
   mutate(Mb = Mb/1000000) %>%
