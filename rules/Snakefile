@@ -34,5 +34,10 @@ rule all:
         "5_Trim/trim.summary"
     message:
         """
-        LepWrap is finished! Good luck with the rest of your analyses!
+        Lep-Map3 has finished. Good luck with the rest of your analyses!
+        Output Files:
+        =============
+        final linkage maps  | 7_Distances/ordered.*.distances
+        sex-averaged maps   | 7_DistancesSexAverage/ordered.*.sexavg
+        map-intervals       | 7_Intervals/ordered.*.intervals
         """

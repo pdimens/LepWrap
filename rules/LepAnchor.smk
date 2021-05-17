@@ -20,10 +20,11 @@ rule all:
     """
     Lep-Anchor has finished. Good luck with the rest of your analyses!
     Output Files:
-    10_Anchoring/Anchored.contigs.fa.gz  contig fasta file
-    10_Anchoring/Anchored.scaffolds.fa.gz   scaffold fasta file
-    11_MareyMaps/marey.data.gz   marker data converted to new assembly coordinates
-    11_MareyMaps/LepAnchor.mareymaps.pdf   summary MareyMaps
+    =============
+    contig fasta file       | 10_Anchoring/Anchored.contigs.fa.gz
+    scaffold fasta file     | 10_Anchoring/Anchored.scaffolds.fa.gz
+    converted linakge maps  | 11_MareyMaps/marey.data.gz
+    summary MareyMaps       | 11_MareyMaps/LepAnchor.mareymaps.pdf
     """
 
 rule repeatmask:
