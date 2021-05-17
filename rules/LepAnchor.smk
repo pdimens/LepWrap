@@ -118,7 +118,7 @@ rule chain_2:
     
     cd 9_Chain
     ../LA/deps/step2.HM2 repeatmasked {threads} && rm -r repeatmasked.repeatmaskedx.result/raw.axt
-    ln -sr {output.original} {output.slink}
+    ln -sr ../{output.original} ../{output.slink}
     """
 
 rule extract_markers:
