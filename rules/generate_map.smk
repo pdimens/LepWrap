@@ -28,7 +28,7 @@ rule join_singles:
     output:
         "map.master"
     log: "3_SeparateChromosomes/chosen.map"
-    threads: sepchrom_threads
+    threads: 30
     message: "Joining singles"
     params:
         lod_limit = lod_lim,

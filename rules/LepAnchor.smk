@@ -15,8 +15,16 @@ rule all:
     fasta = "10_Anchoring/Anchored.contigs.fa.gz",
     scaff = "10_Anchoring/Anchored.scaffolds.fa.gz",
     mareydata = "11_MareyMaps/marey.data.gz",
-    mareymaps = expand("11_MareyMaps/LG.{lgs}.mareymap.png", lgs = lg_range)
-  message: "Lep-Anchor has finished. Good luck with the rest of your analyses!"
+    mareymaps = "11_MareyMaps/LepAnchor.mareymaps.pdf"
+  message: 
+    """
+    Lep-Anchor has finished. Good luck with the rest of your analyses!
+    Output Files:
+    10_Anchoring/Anchored.contigs.fa.gz  contig fasta file
+    10_Anchoring/Anchored.scaffolds.fa.gz   scaffold fasta file
+    11_MareyMaps/marey.data.gz   marker data converted to new assembly coordinates
+    11_MareyMaps/LepAnchor.mareymaps.pdf   summary MareyMaps
+    """
 
 rule repeatmask:
   input: geno
@@ -91,7 +99,7 @@ rule chain_2:
     os = os_name
   shell:
     """
-    OS=$(echo {params} | tr '[:upper:]' '[:lower:]')    echo "Using the $OS lastz/ chainNet binaries"
+    OS=$(echo {params} | tr '[:upper:]' '[:lower:]')    
     echo "Using the $OS lastz/chainNet binaries"
     if [ $OS == "ubuntu" ]
     then
@@ -348,23 +356,41 @@ rule mareymap_data:
     lift = "10_Anchoring/liftover.la",
     agp = expand("10_Anchoring/agp/chr.{lgs}.agp", lgs = lg_range)
   output: 
-    mareydata = "11_MareyMaps/marey.data.gz"
+    mareydata = "11_MareyMaps/marey.data.gz",
+    midpoints = "11_MareyMaps/marey.midpoints_data.gz"
   log: "11_MareyMaps/missing_scaffolds.txt"
-  message: "Creating Marey map interval data"
+  message: 
+    """
+    Creating Marey map interval data
+    {output.mareydata}   first points in uncertainty intervals
+    {output.midpoints}   midpoints in uncertainty intervals  
+    """
   params:
     chrom = lg
   shell:
     """
     for c in $(seq 1 {params.chrom})
     do
-      awk -vn=$c '($3==n)' {input.lift} | awk -f LA/scripts/liftover.awk 10_Anchoring/agp/chr.$c.agp - 2>> {log} | awk -vm=1 '(/LG/ && NF>=4){{if (NF==4) $5=$4;print $1"\t"$2"\t"$3"\t"m"\t"$4"\t"$5}}' | gzip
-    done > {output.mareydata}
+      awk -vn=$c '($3==n)' {input.lift} | awk -f LA/scripts/liftover.awk 10_Anchoring/agp/chr.$c.agp - | awk -vm=1 '(/LG/ && NF>=4){{if (NF==4) $5=$4;print $1"\t"$2"\t"$3"\t"m"\t"$4"\t"$5}}' | gzip
+    done > {output.mareydata} 2> {log}
+   
+    for c in $(seq 1 {params.chrom})
+    do
+      awk -vn=$c '($3==n)' {input.lift} | awk -f LA/scripts/liftover.awk 10_Anchoring/agp/chr.$c.agp - | awk -vm=1 '(/LG/ && NR>=4){{if (NF>4) s=0.5; else s=1;print $1"\t"$2"\t"$3"\t"m"\t"s*($4+$5)}}' | gzip
+    done > {output.midpoints} 2> /dev/null
     """
 
 rule mareymaps:
   input:
     data = "11_MareyMaps/marey.data.gz",
     agp = expand("10_Anchoring/agp/chr.{lgs}.agp", lgs = lg_range)
-  output: expand("11_MareyMaps/LG.{lgs}.mareymap.png", lgs = lg_range)
+  output: 
+    indiv_plots = expand("11_MareyMaps/LG.{lgs}.mareymap.png", lgs = lg_range),
+    summary = "11_MareyMaps/LepAnchor.mareymaps.pdf",
+    sequential = "11_MareyMaps/LepAnchor.sequentialmaps.pdf"
   message: "Creating Marey Maps"
-  shell: "Rscript LA/scripts/plot_marey.R {input.data} 10_Anchoring/agp"
+  shell: 
+    """
+    Rscript LA/scripts/plot_marey.R {input.data} 10_Anchoring/agp
+    Rscript scripts/LA_summary.r {input.data}
+    """
