@@ -64,5 +64,5 @@ allmaps %>%
         ) +
   facet_wrap(lg ~ sex, ncol = 2, scales = "free_x")
 
-outfile2 <- paste0(dirname(args[1]), "/LepAnchor.sequentialmaps.svg")
+outfile2 <- paste0(dirname(args[1]), "/LepAnchor.sequentialmaps.pdf")
 ggsave(outfile2,  width = 8.5, height = savedims, units = "in", limitsize = FALSE)
