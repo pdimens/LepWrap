@@ -4,6 +4,7 @@ suppressMessages(library(tidyverse, warn.conflicts = FALSE, quietly = TRUE))
 
 args <- commandArgs(trailingOnly = TRUE)
 # args[1] = mareydata file
+# args[2] = marey midpoint data (optional)
 
 allmaps <- suppressMessages(read_tsv(gzfile(args[1]), col_names = FALSE)) %>%
   select(X3, X2, X5, X6) %>%

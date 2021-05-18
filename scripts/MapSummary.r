@@ -1,11 +1,27 @@
 #! /usr/bin/env Rscript
 
-library(stringr)
-
 args <- commandArgs(trailingOnly = TRUE)
 
-# args[1] is the target directory
+if (length(args) == 0) {
+  cat("## Print the summary of a map to stdout ##")
+  cat("\n[usage]: MapSummary.r <map.file>")
+  cat("\n\n## Print summary of all map.* files in a directory to file ##")
+  cat("\n[usage]: MapSummary.r <map.directory>")
+  cat("\n")
+  q()
+}
 
+# if args[1] is the target mapfile
+if (file_test("-f", args[1])) {
+  .dat <- read.table(args[1], header = FALSE, skip = 1)
+  # make a table of counts
+  .counts <- as.data.frame(table(.dat$V1))
+  names(.counts) <- c("lg", "count")
+  print(.counts, row.names = FALSE)
+
+# if args[1] is the target directory
+} else if (file_test("-d", args[1])) {
+library(stringr)
 targetdir <- args[1]
 
 # pattern match to find the map files
@@ -47,14 +63,7 @@ cmd <- paste("column -t", out_tmp, ">", out_file, "&& rm", out_tmp)
 system(cmd)
 
 cat(paste0("Examine the map summary (", out_file, ") and decide on the best map before proceeding"))
-cat("\nIf using a screen/tmux environment, detach this session and return to it with the appropriate command when ready\n")
 
-### these plots are completely unnecessary, but I'll leave them here anyway
-#plot_table <- summtable %>% 
-#              pivot_longer(cols = !LG, names_to = "LOD", values_to = "n_markers") %>% 
-#              filter(n_markers > 0) %>%
-#              mutate(LOD = as.numeric(LOD))
-
-#plot_table %>% ggplot(aes(LOD, LG,  label = n_markers)) +
-#               geom_text() +
-#               scale_x_continuous("LOD", labels = as.character(plot_table$LOD), breaks = plot_table$LOD)
+} else {
+  cat("Error: the argument must be either a mapfile or a directory of mapfiles")
+}
