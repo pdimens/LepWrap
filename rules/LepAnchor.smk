@@ -349,7 +349,7 @@ rule build_contig_fasta:
   message: "Constructing final contig fasta file {output.fasta}"
   shell:
     """
-    gunzip -fc {input.assembly} | awk -f LA/scripts/makefasta.awk - {input.scaff_agp} | gzip > {output.scaff}
+    gunzip -fc {input.assembly} | awk -f LA/scripts/makefasta.awk - {input.scaff_agp} | gzip > {output.fasta}
     """
 
 rule mareymap_data:

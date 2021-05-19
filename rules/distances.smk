@@ -1,7 +1,7 @@
 rule calculate_distances:
     input:
         data_call = "2_Filtering/data_f.call.gz",
-        lg = "6_OrderMarkers/best.likelihoods"
+        lg = "6_OrderMarkers/ordered.{lg_range}"
     output:
         distance = "7_Distances/ordered.{lg_range}.distances",
         sex_averaged = "7_DistancesSexAverage/ordered.{lg_range}.sexavg",
@@ -16,7 +16,7 @@ rule calculate_distances:
     threads: threads_per
     shell:
         """
-        LG=$(grep -F "6_OrderMarkers/iterations/ordered.{params.lg}." {input.lg})
+        LG=$(grep -F "6_OrderMarkers/ordered.{params.lg}." {input.lg})
         cp $LG {output.distance}
         
         zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder=$LG {params.dist_method} numThreads={threads} improveOrder=0 sexAveraged=1 &> {log.sex_averaged}.tmp

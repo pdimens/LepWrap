@@ -1,18 +1,18 @@
 rule trim_edge_clusters:
     input:
-        "4_OrderMarkers/best.likelihoods"
+        expand("4_OrderMarkers/ordered.{lg}", lg = lg_range)
     output:
-        "5_Trim/ordered.{lg_range}.trimmed"
+        expand("5_Trim/ordered.{lg}.trimmed", lg = lg_range)
     log:
-        "5_Trim/logs/ordered.{lg_range}.removed",
-        "5_Trim/logs/ordered.{lg_range}.trim.pdf"
+        expand("5_Trim/logs/ordered.{lg}.removed", lg = lg_range),
+        expand("5_Trim/logs/ordered.{lg}.trim.pdf", lg = lg_range)
     params:
-        grep_lg = "4_OrderMarkers/iterations/ordered.{lg_range}.",
+        grep_lg = "4_OrderMarkers/ordered.{lg_range}.",
         trim_threshold = trim_thresh,
         edge_length = edge_len
     message:
         """
-        Removing edge clusters >{params.trim_threshold}cM apart from the other markers in first+last 15% of {params.grep_lg}.
+        Removing edge clusters >{params.trim_threshold}cM apart from the other markers at the ends of {params.grep_lg}.
         """
     shell:
         """

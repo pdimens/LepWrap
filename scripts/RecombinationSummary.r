@@ -1,50 +1,38 @@
 #! /usr/bin/env Rscript
-# This script will parse all the recombination logs of LepMap3/LepMak3r
-# and output a table of summary statistics of recombination of samples
-suppressMessages(if (!require("dplyr")) install.packages("dplyr"))
-suppressMessages(library("dplyr"))
-
+# This script will parse all the recombination logs of LepWrap
+suppressMessages(if (!require("stringr")) install.packages("stringr"))
+suppressMessages(library("stringr"))
 ## setup outfile
 # format trailing arguments for script
 args = commandArgs(trailingOnly = TRUE)
-# path = ordermarkers or reordermarkers (for reusability)
+
 path = args[1]
-original_wd <- getwd()
-# working dir = project_folder/[re]ordermarkers/logs/recombinations
-setwd(paste(getwd(),path, "logs/recombination", sep = "/"))
 
 # generate list of recombination files
-files <- list.files(getwd())
+files <- str_sort(list.files(args[1], pattern = "^order", full.name = TRUE), numeric = TRUE)
 
 # instantiate empty dataframe that will hold all the recombination info
-recomb_df <- data.frame()
 
 ## read in recombination logs, add LG info, and append to recomb_df
-for(i in files){
-  # pull out linkage group number from filename
-  LG <- unlist(strsplit(i, "\\."))[2]
-  # read in file and keep only family|sample|recombinations
-  recomb <- read.csv(i, skip = 1, header = FALSE, sep="")[,c(2,3,5)]
-  # add column identifying the linkage group
-  recomb$LG <- LG
-  # append the formatted dataframe to the total dataframe
-  recomb_df <- rbind(recomb_df, recomb)
+recomb_df <- read.csv(files[1], skip = 1, header = FALSE, sep="")[,c(2,3,5)]
+names(recomb_df) <- c("family", "sample", "LG1")
+
+lg <- 2
+for (i in files[2:length(files)]){
+  # load in file and pull out recomb info
+  .recomb <- read.csv(i, skip = 1, header = FALSE, sep="")[,c(2,3,5)]
+  names(.recomb) <- c("family", "sample", paste0("LG",lg))
+
+  # add that as a column to the dataframe
+  recomb_df <- merge(recomb_df, .recomb, on = c("family", "sample"), all = TRUE)
+  # advance column number iterator
+  lg <- lg + 1
 }
 
-## summary information
-# calculate min, max, mean, and sd across iterations for each individual in each LG
-# the format + round stuff is for more legible printing. 
-recomb_summary <- recomb_df %>% group_by(V2,V3) %>% summarise(min(V5), max(V5), format(round(mean(V5), digits = 4), nsmall = 4), format(round(sd(V5), digits = 4), nsmall = 4))
+outfile <- paste(args[1], "recombination.summary", sep = "/")
 
-# rename columns for clarity
-names(recomb_summary) <- c("family", "sample", "minimum", "maximum", "mean", "standard_deviation")
-
-# generate output file's name based on whether it's re/ordermarkers
-outfile <- paste(original_wd, path, "recombination.summary", sep = "/")
-
-## write summary to file
 write.table(
-  recomb_summary,
+  recomb_df,
   file=outfile,
   append=FALSE, 
   sep = "\t", 
