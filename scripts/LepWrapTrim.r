@@ -109,7 +109,7 @@ plot_df %>%
   geom_vline(xintercept = back_edge, linetype = "dashed", size = 0.2) +
   labs(
     title = paste("Edge Cluster Trimming Results for Linkage Group", lg),
-    subtitle = paste("Markers Failing QC:", rm_female, "female,", rm_male, "male,", rm_both, "both" ),
+    subtitle = paste0("Markers Failing QC: ", rm_female, " female, ", rm_male, " male, ", rm_both, " both (", rm_female+rm_male+rm_both, " total)" ),
     caption = paste0("edge length: ", edge_length*100, "% of markers, cM threshold: ", dist_thresh),
     x = "Marker Number", 
     y = "Position (cM)", 
