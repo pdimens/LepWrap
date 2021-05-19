@@ -20,7 +20,7 @@ sleep 3s
 snakemake --cores $1 --snakefile ./rules/Snakefile --directory .
 
 LA=$(grep "run_lepanchor" config.yaml | cut -d":" -f2 | xargs | tr '[:upper:]' '[:lower:]')
-if [ LA == "true" ]; then
+if [ $LA == "true" ]; then
 echo -e "\nRunning Lep-Anchor"
 sleep 3s
 snakemake --cores $1 --snakefile ./rules/LepAnchor.smk --directory .
