@@ -39,7 +39,7 @@ rule trim_summary:
         echo "n_removed map" > {output.summary}.tmp
         cut -d" " -f1 {output.detailed} | uniq -c  >> {output.summary}.tmp
         column -t {output.summary}.tmp > {output.summary} && rm {output.summary}.tmp
+        scripts/TrimSummaryPlot.r {output.summary} {params.lg}
         echo "Merging QC plots for all linkage groups"
         convert -density 300 {input.plots} {output.mergeplots}
-        scripts/TrimSummaryPlot.r {output.summary} {params.lg}
         """
