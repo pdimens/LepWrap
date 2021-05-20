@@ -1,0 +1,53 @@
+from os import path
+import glob
+
+configfile: "config.yaml"
+
+# load in parameters set in config.yaml
+# data #
+vcf = config["vcf"]
+pedigree = config["pedigree"]
+# filtering #
+data_tol=config["data_tol"]
+# separate chromosomes #
+lod_max = str(config["lod_max"])
+lod_range = list(range(config["lod_min"], config["lod_max"]+1))
+informative = config["informative"]
+# join singles #
+joinsingles = config["run_joinsingles2all"]
+lod_lim = config["lod_limit"]
+lod_diff = config["lod_difference"]
+# ordering #
+lg_range = list(range(1, config["exp_lg"]+1))
+threads_per = config["threads_per"]
+dist_method = config["dist_method"]
+ITER = config["iterations"]
+phasenum = config["phase_iterations"]
+# trimming #
+edge_len = str(config["edge_length"])
+trim_thresh = str(config["trim_cutoff"])
+
+include: "prepare_data.smk"
+include: "generate_map.smk"
+include: "order.smk"
+include: "trim.smk"
+include: "reorder.smk"
+include: "distances.smk"
+
+rule all:
+    input:
+        expand("7_Distances/ordered.{lg}.distances", lg = lg_range),
+        expand("7_DistancesSexAverage/ordered.{lg}.sexavg", lg = lg_range),
+        expand("7_Intervals/ordered.{lg}.intervals", lg = lg_range),
+        "4_OrderMarkers/recombination/recombination.summary",
+        "5_Trim/trim.summary",
+        "6_OrderMarkers/recombination/recombination.summary",
+    message:
+        """
+        Lep-Map3 has finished. Good luck with the rest of your analyses!
+        Output Files:
+        =============
+        final linkage maps  | 7_Distances/ordered.*.distances
+        sex-averaged maps   | 7_DistancesSexAverage/ordered.*.sexavg
+        map-intervals       | 7_Intervals/ordered.*.intervals
+        """

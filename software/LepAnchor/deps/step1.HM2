@@ -1,0 +1,70 @@
+#! /usr/bin/env bash
+
+## The script below is from HaploMerger2, modified slightly for clarity and
+## specific use in Lep-Wrap
+###################################################################################################
+
+#### hm.batchA1.initiation_and_lastz v1.50
+
+#### This shell script does two tasks:
+#### 1) to create an environment that contains all the files and directories required for later use,
+#### 2) and to perform whole genome pairwise self alignments by using lastz (all against all).
+
+#### setting variables
+name=$1								# the species_name or the prefix of the genome file name
+threads=$2						# the number of cpu cores to use (default=1)
+identity=80						# output only lastz alignments >= $identity (default=80)
+                      # normally, you do not need to change identity because the program will optimize it 
+targetSize=50000000   # split target fasta file by size N bp (default=50000000)
+                      # NOTE: if you use 8 or 16 CPUs, you may need to choose a proper value to
+                      # divide the target sequence file in order to exploit the benifit of multiple CPUs 
+querySize=1600000000  # split query fasta file by size N bp (default=1600000000)
+
+###################################################################################################
+#### output file names
+# These files/directories are going to be output :
+#   ${name}x.fa.gz - a copy of the genome sequence file $name.fa(.gz)
+#   $name.sizes - the size of each scaffold sequences
+#   ${name}x.sizes - the size of each scaffold sequences
+#   $name.seq/*.fa and *.nib - fasta files and nib files for scaffold sequences
+#   ${name}x.seq/*.fa and *.nib - fasta files and nib files for scaffold sequences
+#   *** $name.${name}x.result/raw.axt/*.axt, *.axt.*, and *.log - raw lastz result files and their log files
+# log files:
+#   HM.initiation.log - log file
+#   HM.all_lastz.log - log file
+# 
+#### ===========================================================
+#### create the project environment
+#### ===========================================================
+
+rm -f -r $name.seq ${name}x.seq $name.sizes ${name}x.sizes ${name}x.fa.gz
+perl ../software/LepAnchor/deps/initiation.pl \
+  --faSplit \
+  --faToNib \
+  --faSize \
+  --Species $name \
+  --Force \
+  --Delete \
+	1> HM.initiation.log 2>> HM.initiation.log
+ln -s $name.fa.gz ${name}x.fa.gz
+ln -s $name.sizes ${name}x.sizes
+ln -s $name.seq ${name}x.seq
+
+#### ===========================================================
+#### run lastz all against all
+#### ===========================================================
+
+## require two control files: 1) all_lastz.ctl|$name.{name}x.ctl, and 2) scoreMatrix.q|$name.${name}x.q
+
+rm -f -r $name.${name}x.result/raw.axt
+
+perl ../software/LepAnchor/deps/HM_all_lastz_mThreads.pl \
+  --Species $name ${name}x \
+  --noself \
+  --threads=$threads \
+  --identity=$identity \
+  --targetSize=$targetSize \
+  --querySize=$querySize \
+  --Force \
+  --Delete \
+  1> HM.all_lastz.log 2>> HM2.all_lastz.log

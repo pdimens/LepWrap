@@ -1,0 +1,50 @@
+#! /usr/bin/env bash
+
+## The script below is from HaploMerger2, modified slightly for clarity and
+## specific use in Lep-Wrap
+###################################################################################################
+
+#### hm.batchA2.chainNet_and_netToMaf v1.50
+
+#### This shell script does two things:
+#### 1) to create chain and net files.
+#### 2) to creates an alignment file (in gzip-compressed maf format) based on the net file.
+
+#### setting variables
+name=$1								# the species_name or the prefix of the genome file name
+threads=$2						# the number of cpu cores to use (default=1)
+
+###################################################################################################
+#### output file names
+# These files/directories are going to be output :
+#   $name.${name}x.result/all.chain.gz - raw chain file, gzip compressed
+#   $name.${name}x.result/all.tbest.chain.gz - target-best chain file
+#   $name.${name}x.result/all.tbest.net - target-best net file
+#   *** $name.${name}x.result/all.rbest.chain.gz - reciprocal best chain file, gzip compressed
+#   *** $name.${name}x.result/all.rbest.net.gz - reciprocal best net file, gzip compressed
+#   *** $name.${name}x.result/zeroMinSpace.rbest.net.gz - the zeroMinSpace net file
+# log files:
+#   $name.${name}x.result/*.log - log files for HM_axtChainRecipBestNet.pl
+#   HM.axtChainRecipBestNet.log - log file
+# *** NOTE THAT you may delete the directory
+# *** $name.${name}x.result/raw.axt after having sucessfully finished this script!
+#
+#### ===========================================================
+#### run axtChainRecipBestNet
+#### ===========================================================
+
+perl ../software/LepAnchor/deps/HM_axtChainRecipBestNet.pl \
+  --rbestNet \
+  --axtChain \
+  --tbest \
+  --zeroMinSpaceNet \
+  --threads=$threads \
+	--axtSuffix=axt.noself \
+  --linearGap=medium \
+  --minScore=5000 \
+  --minSpace=100 \
+  --minScore2=10000 \
+	--Species $name ${name}x \
+  --Force \
+  --Delete \
+	1> HM.axtChainRecipBestNet.log 2>> HM.axtChainRecipBestNet.log
