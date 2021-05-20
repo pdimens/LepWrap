@@ -3,23 +3,15 @@ rule parent_call:
         vcf = vcf,
         pedigree = pedigree
     output:
-        "1_ParentCall/data.call.gz"
-    message:
-        """
-        Creating Lep-Map3 data file from VCF and pedigree files
-        """
+        "1_ParentCall/data.lepmap3.gz"
+    message: "Creating Lep-Map3 data file from {input.vcf} and {input.pedigree}"
     shell:
         "java -cp LM3 ParentCall2 data={input.pedigree} vcfFile={input.vcf} removeNonInformative=1 | gzip > {output}"
 
 rule filtering:
-    input:
-        "1_ParentCall/data.call.gz"
-    output:
-        "2_Filtering/data_f.call.gz"
-    message:
-        """
-        Filtering the data
-        """
+    input: "1_ParentCall/data.lepmap3.gz"
+    output: "2_Filtering/data.filtered.lepmap3.gz"
+    message: "Filtering {input}"
     params:
         data_tolerance = data_tol
     shell:

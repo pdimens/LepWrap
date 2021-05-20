@@ -1,9 +1,8 @@
 rule order_markers:
     input:
-        datacall = "2_Filtering/data_f.call.gz",
+        datacall = "2_Filtering/data.filtered.lepmap3.gz",
         filt_map = "map.master"
-    output:
-        "4_OrderMarkers/ordered.{lg_range}"
+    output: "4_OrderMarkers/ordered.{lg_range}"
     log:
         run = "4_OrderMarkers/logs/ordered.{lg_range}.log",
         recomb = "4_OrderMarkers/recombination/ordered.{lg_range}.recombinations"
@@ -26,7 +25,7 @@ rule recomb_summary:
     input:
         expand("4_OrderMarkers/ordered.{lg}", lg = lg_range)
     output:
-        recomb = "4_OrderMarkers/recombination.summary"
+        recomb = "4_OrderMarkers/recombination/recombination.summary"
     message: "Recombination summary: {output.recomb}"
     shell:
         """

@@ -18,7 +18,7 @@ pedigree: "pedigree.txt"
 #   Filtering2  #
 #---------------#
 # set this to 0 if you want to skip the Filtering2 module
-data_tol: 0.01
+data_tol: 0
 
 #------------------------#
 #  SeperateChromosomes2  #
@@ -27,7 +27,7 @@ data_tol: 0.01
 # LOD score in the range of lod_min to lod_max
 
 # The minimum LOD for SeperateChromosomes2
-lod_min: 1
+lod_min: 20
 
 # The maximum LOD for SeperateChromosomes2
 lod_max: 40
@@ -38,6 +38,9 @@ informative: "informativeMask=123"
 #-------------------#
 #  JoinSingles2ALL  #
 #-------------------#
+# set this to false if you want to skip joining singles (0) to linkage groups
+run_joinsingles2all: true
+
 # these are the parameters for JoinSingles2ALL, and are highly data-dependent
 # start with lower values for lod_limit and increase as necessary
 lod_limit: "lodLimit=2"
@@ -53,15 +56,19 @@ lod_difference: "lodDifference=2"
 # Set exp_lg to your expected number of chromosomes
 exp_lg: 24
 
-# Set iter to the number of iterations you want per chromosome (more is better). Recommend 30 or more
-iter: 100
+# Set iterations to the number of iterations you want per chromosome (more is better). Recommend 30 or more
+iterations: 5
 
 # Set threads_per to the number of threads you would like to use per iteration
-threads_per: 2
+threads_per: 5
 
 # Choose your distance method by commenting the line you dont want
 dist_method: "useKosambi=1"
 #dist_method: "useMorgan=1"
+
+# number of iterations to use of OrderMarkers2 phasing.
+# this number is typically 1-2
+phase_iterations: 2
 
 #-----------------#
 #  Edge Trimming  #
@@ -86,13 +93,13 @@ run_lepanchor: false
 
 # the path to the genome assembly you are trying to anchor
 # ideally it *is not* gzipped and ends in .fa, but there are built-in workarounds if it is. 
-assembly: "some.genome.fasta"
+assembly: "YFT.genome.latest.fasta"
 
 # the number of linkage groups you have
 lg_count: 24
 
 # if you have a PAF file of long reads mapped to your genome, add it here, otherwise leave the text as "/dev/null"
-PAF_file: "/dev/null"
+PAF_file: "alnPB.paf"
 
 # if you have a proximity file add it here, otherwise leave the text as "/dev/null".
 # This isn't yet implemented in the official Lep-Anchor wrapper, so don't change this.

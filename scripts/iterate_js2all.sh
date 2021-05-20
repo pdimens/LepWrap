@@ -32,7 +32,7 @@ else
 fi
 
 for i in $(seq $LODMIN $LODMAX); do
-    zcat 2_Filtering/data_f.call.gz | java -cp LM3 JoinSingles2All map=$TARGETMAP data=- lodLimit=$i lodDifference=4 iterate=1 distortionLod=1 numThreads=10 informativeMask=$INFMASK > JoinSingles2All_iter/logs/map.$i.$4.js2all
+    zcat 2_Filtering/data.filtered.lepmap3.gz | java -cp LM3 JoinSingles2All map=$TARGETMAP data=- lodLimit=$i lodDifference=4 iterate=1 distortionLod=1 numThreads=10 informativeMask=$INFMASK > JoinSingles2All_iter/logs/map.$i.$4.js2all
     cut -f1 JoinSingles2All_iter/logs/map.$i.$4.js2all > JoinSingles2All_iter/map.$i.$4.js2all
 done
 

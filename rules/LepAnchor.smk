@@ -122,7 +122,7 @@ rule chain_2:
     """
 
 rule extract_markers:
-    input: "2_Filtering/data_f.call.gz"
+    input: "2_Filtering/data.filtered.lepmap3.gz"
     output: "snps.txt"
     message: "Extracting marker information from Lep-Map3 data file {input}"
     shell: "scripts/extract_markers.sh {input}"

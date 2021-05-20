@@ -4,14 +4,10 @@ suppressMessages(if (!require("stringr")) install.packages("stringr"))
 suppressMessages(library("stringr"))
 ## setup outfile
 # format trailing arguments for script
-args = commandArgs(trailingOnly = TRUE)
-
-path = args[1]
+args <- commandArgs(trailingOnly = TRUE)
 
 # generate list of recombination files
 files <- str_sort(list.files(args[1], pattern = "^order", full.name = TRUE), numeric = TRUE)
-
-# instantiate empty dataframe that will hold all the recombination info
 
 ## read in recombination logs, add LG info, and append to recomb_df
 recomb_df <- read.csv(files[1], skip = 1, header = FALSE, sep="")[,c(2,3,5)]
