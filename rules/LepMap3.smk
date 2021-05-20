@@ -19,6 +19,7 @@ lod_lim = config["lod_limit"]
 lod_diff = config["lod_difference"]
 # ordering #
 lg_range = list(range(1, config["exp_lg"]+1))
+lg_count = config["exp_lg"]
 threads_per = config["threads_per"]
 dist_method = config["dist_method"]
 ITER = config["iterations"]

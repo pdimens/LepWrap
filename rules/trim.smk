@@ -3,7 +3,7 @@ rule trim_edge_clusters:
     output: "5_Trim/ordered.{lg_range}.trimmed"
     log:
         "5_Trim/logs/ordered.{lg_range}.removed",
-        "5_Trim/logs/ordered.{lg_range}.trim.pdf"
+        "5_Trim/plots/ordered.{lg_range}.trim.pdf"
     params:
         trim_threshold = trim_thresh,
         edge_length = edge_len
@@ -14,11 +14,18 @@ rule trim_edge_clusters:
         """
 
 rule trim_summary:
-    input: expand("5_Trim/ordered.{lg}.trimmed", lg = lg_range)
+    input: 
+        lg = expand("5_Trim/ordered.{lg}.trimmed", lg = lg_range),
+        plots = expand("5_Trim/plots/ordered.{lg}.trim.pdf", lg = lg_range)
     output:
         detailed = "5_Trim/trim.details",
-        summary = "5_Trim/trim.summary"
-    message: "Summarizing trim logs to {output}"
+        summary = "5_Trim/trim.summary",
+        summarypdf = "5_Trim/trim.summary.pdf",
+        summarysvg = "5_Trim/trim.summary.svg",
+        mergeplots = "5_Trim/plots/all.trimplots.pdf"
+    message: "Summarizing trimming results"
+    params:
+        lg = lg_count
     priority: 1
     shell:
         """
@@ -31,5 +38,8 @@ rule trim_summary:
         sort -V {output.detailed}.tmp > {output.detailed} && rm {output.detailed}.tmp
         echo "n_removed map" > {output.summary}.tmp
         cut -d" " -f1 {output.detailed} | uniq -c  >> {output.summary}.tmp
-        column -t {output.summary}.tmp > {output.summary} && rm {output.summary}.tmp 
+        column -t {output.summary}.tmp > {output.summary} && rm {output.summary}.tmp
+        echo "Merging QC plots for all linkage groups"
+        convert -density 300 {input.plots} {output.mergeplots}
+        scripts/TrimSummaryPlot.r {output.summary} {params.lg}
         """
