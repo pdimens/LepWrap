@@ -17,7 +17,7 @@ fi
 
 echo "Running Lep-Map3"
 sleep 3s
-snakemake --cores $1 --snakefile ./rules/Snakefile --directory .
+snakemake --cores $1 --snakefile ./rules/LepMap3.smk --directory .
 
 LA=$(grep "run_lepanchor" config.yaml | cut -d":" -f2 | xargs | tr '[:upper:]' '[:lower:]')
 if [ $LA == "true" ]; then

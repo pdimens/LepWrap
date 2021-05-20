@@ -15,7 +15,7 @@ rule order_markers:
     threads: threads_per
     shell:
         """
-        zcat {input.datacall} | java -cp LM3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} numMergeIterations={params.iterations} {params.dist_method} chromosome={params.chrom} phasingIterations={params.phase} &> {log.run}.tmp
+        zcat {input.datacall} | java -cp software/LepMap3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} numMergeIterations={params.iterations} {params.dist_method} chromosome={params.chrom} phasingIterations={params.phase} &> {log.run}.tmp
         sed -n '/\*\*\* LG \=/,$p' {log.run}.tmp > {output}
         grep "recombin" {log.run}.tmp > {log.recomb}
         awk '/#java/{{flag=1}} flag; /logL/{{flag=0}}' {log.run}.tmp > {log.run} && rm {log.run}.tmp

@@ -5,5 +5,5 @@ rule validation:
   threads: 30
   shell:
     """
-    awk -f LA/scripts/liftover.awk chr1.agp order1.input | sort -V | grep CHR > order1.liftover
+    awk -f software/LepAnchor/scripts/liftover.awk chr1.agp order1.input | sort -V | grep CHR > order1.liftover
     """

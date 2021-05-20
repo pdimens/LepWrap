@@ -38,7 +38,7 @@ querySize=1600000000  # split query fasta file by size N bp (default=1600000000)
 #### ===========================================================
 
 rm -f -r $name.seq ${name}x.seq $name.sizes ${name}x.sizes ${name}x.fa.gz
-perl ../LA/deps/initiation.pl \
+perl ../software/LepAnchor/deps/initiation.pl \
   --faSplit \
   --faToNib \
   --faSize \
@@ -58,7 +58,7 @@ ln -s $name.seq ${name}x.seq
 
 rm -f -r $name.${name}x.result/raw.axt
 
-perl ../LA/deps/HM_all_lastz_mThreads.pl \
+perl ../software/LepAnchor/deps/HM_all_lastz_mThreads.pl \
   --Species $name ${name}x \
   --noself \
   --threads=$threads \

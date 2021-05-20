@@ -9,7 +9,7 @@ rule separate_chromosomes:
         dist_lod = "distortionLod=1",
     shell:
         """
-        zcat {input} | java -cp LM3 SeparateChromosomes2 data=- sizeLimit=5 {informative} lodLimit={params.lod} {params.dist_lod} numThreads={threads} > {output} 2> {log}
+        zcat {input} | java -cp software/LepMap3 SeparateChromosomes2 data=- sizeLimit=5 {informative} lodLimit={params.lod} {params.dist_lod} numThreads={threads} > {output} 2> {log}
         """
 
 rule map_summary:
@@ -39,7 +39,7 @@ rule join_singles:
         echo "A record of your choice can be found in {log}"
         JS2A=$(echo {params.run_js2all} | tr '[:upper:]' '[:lower:]')
         if [ $JS2A == "true" ]; then
-            zcat {input.datacall} | java -cp LM3 JoinSingles2All map=3_SeparateChromosomes/map.$REPLY data=- {params.lod_limit} {params.lod_diff} {params.iterate} numThreads={threads} > {output}
+            zcat {input.datacall} | java -cp software/LepMap3 JoinSingles2All map=3_SeparateChromosomes/map.$REPLY data=- {params.lod_limit} {params.lod_diff} {params.iterate} numThreads={threads} > {output}
         else
             echo -e "\nSkipping JoinSingles2All and creating a symlink instead"
             ln -sr 3_SeparateChromosomes/map.$REPLY {output}

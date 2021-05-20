@@ -27,7 +27,7 @@ phasenum = config["phase_iterations"]
 edge_len = str(config["edge_length"])
 trim_thresh = str(config["trim_cutoff"])
 
-include: "data_prep.smk"
+include: "prepare_data.smk"
 include: "generate_map.smk"
 include: "order.smk"
 include: "trim.smk"

@@ -6,7 +6,7 @@ rule parent_call:
         "1_ParentCall/data.lepmap3.gz"
     message: "Creating Lep-Map3 data file from {input.vcf} and {input.pedigree}"
     shell:
-        "java -cp LM3 ParentCall2 data={input.pedigree} vcfFile={input.vcf} removeNonInformative=1 | gzip > {output}"
+        "java -cp software/LepMap3 ParentCall2 data={input.pedigree} vcfFile={input.vcf} removeNonInformative=1 | gzip > {output}"
 
 rule filtering:
     input: "1_ParentCall/data.lepmap3.gz"
@@ -19,6 +19,6 @@ rule filtering:
         if [ {params} == 0 ]; then
             ln -sr {input} {output}
         else
-            zcat {input} | java -cp LM3 Filtering2 data=- dataTolerance={params} | gzip > {output}
+            zcat {input} | java -cp software/LepMap3 Filtering2 data=- dataTolerance={params} | gzip > {output}
         fi
         """

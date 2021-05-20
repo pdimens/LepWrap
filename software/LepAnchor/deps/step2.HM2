@@ -33,7 +33,7 @@ threads=$2						# the number of cpu cores to use (default=1)
 #### run axtChainRecipBestNet
 #### ===========================================================
 
-perl ../LA/deps/HM_axtChainRecipBestNet.pl \
+perl ../software/LepAnchor/deps/HM_axtChainRecipBestNet.pl \
   --rbestNet \
   --axtChain \
   --tbest \

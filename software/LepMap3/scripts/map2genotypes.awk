@@ -1,7 +1,7 @@
 #converts phased data to "genotypes"
 #usage: 
-#java ... OrderMarkers2 ... outputPhasedData=1 > order_with_phase_LM3.txt
-#awk [-vchr=X] [-vfullData=1] -f map2genotypes.awk order_with_phase_LM3.txt
+#java ... OrderMarkers2 ... outputPhasedData=1 > order_with_phase_software/LepMap3.txt
+#awk [-vchr=X] [-vfullData=1] -f map2genotypes.awk order_with_phase_software/LepMap3.txt
 #output columns marker name, chr, male postion, female postion, genotypes coded as "1 1", "1 2", "2 2" and 0 as missing
 #providing fullData ouputs parents and pedigree...
 BEGIN{

@@ -18,10 +18,10 @@ rule calculate_distances:
         """
         cp {input.lg} {output.distance}
         
-        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder={input.lg} {params.dist_method} numThreads={threads} improveOrder=0 sexAveraged=1 &> {log.sex_averaged}.tmp
+        zcat {input.data_call} | java -cp software/LepMap3 OrderMarkers2 data=- evaluateOrder={input.lg} {params.dist_method} numThreads={threads} improveOrder=0 sexAveraged=1 &> {log.sex_averaged}.tmp
         sed -i -e 's/LG \= 0/LG \= {params.lg}/g' {log.sex_averaged}.tmp
         sed -n '/\*\*\* LG \=/,$p' {log.sex_averaged}.tmp > {output.sex_averaged} 
         awk '/#java/{{flag=1}} flag; /*** LG =/{{flag=0}}' {log.sex_averaged}.tmp > {log.sex_averaged} && rm {log.sex_averaged}.tmp
 
-        zcat {input.data_call} | java -cp LM3 OrderMarkers2 data=- evaluateOrder={input.lg} {params.dist_method} numThreads={threads} calculateIntervals={output.intervals} > {log.intervals} 2>&1
+        zcat {input.data_call} | java -cp software/LepMap3 OrderMarkers2 data=- evaluateOrder={input.lg} {params.dist_method} numThreads={threads} calculateIntervals={output.intervals} > {log.intervals} 2>&1
         """

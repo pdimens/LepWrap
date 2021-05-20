@@ -31,7 +31,7 @@ rule repeatmask:
   input: geno
   output: "8_Repeatmask/repeatmasked.fa.gz"
   log: "8_Repeatmask/Red.log"
-  message: "Using Red to repeat-mask the genome assembly {input}"
+  message: "Using Red to repeat-mask {input}"
   threads: 30
   shell:
     """
@@ -47,7 +47,7 @@ rule repeatmask:
       ln -srf $file ${{file}}.fa
     fi
     echo "- Running Red"
-    LA/deps/Red -gnm . -msk 8_Repeatmask -sco 8_Repeatmask -cnd 8_Repeatmask -rpt 8_Repeatmask > {log} 2>> {log}
+    software/LepAnchor/deps/Red -gnm . -msk 8_Repeatmask -sco 8_Repeatmask -cnd 8_Repeatmask -rpt 8_Repeatmask > {log} 2>> {log}
     echo "- Compressing repeat-masked genome from Red"
     gzip --stdout 8_Repeatmask/*.msk > {output} && rm 8_Repeatmask/*.msk
     """
@@ -56,8 +56,8 @@ rule repeatmask:
 rule chain_1:
   input: 
     geno = "8_Repeatmask/repeatmasked.fa.gz",
-    ctrl = "LA/deps/all_lastz.ctl",
-    scoremtx = "LA/deps/scoreMatrix.q"
+    ctrl = "software/LepAnchor/deps/all_lastz.ctl",
+    scoremtx = "software/LepAnchor/deps/scoreMatrix.q"
   output: 
     out1 = "9_Chain/repeatmaskedx.sizes",
     out2 = "9_Chain/repeatmasked.sizes"
@@ -71,20 +71,20 @@ rule chain_1:
     echo "Using the $OS lastz/chainNet binaries"
     if [ $OS == "ubuntu" ]
     then
-        export PATH="$PATH:LA/deps/ubuntu"
+        export PATH="$PATH:software/LepAnchor/deps/ubuntu"
     elif [ $OS == "centos5" ]
     then
-        export PATH="$PATH:LA/deps/centOS5"
+        export PATH="$PATH:software/LepAnchor/deps/centOS5"
     elif [ $OS == "centos6" ]
     then
-        export PATH="$PATH:LA/deps/centOS6"
+        export PATH="$PATH:software/LepAnchor/deps/centOS6"
     else
         echo "$OS is not recognized as one of Ubuntu, CentOS5, or CentOS6, defaulting to Ubuntu"
-        export PATH="$PATH:LA/deps/ubuntu"
+        export PATH="$PATH:software/LepAnchor/deps/ubuntu"
     fi
     ln -srf {input} 9_Chain/
     cd 9_Chain
-    ../LA/deps/step1.HM2 repeatmasked {threads}
+    ../software/LepAnchor/deps/step1.HM2 repeatmasked {threads}
     """
 
 rule chain_2:
@@ -104,20 +104,20 @@ rule chain_2:
     echo "Using the $OS lastz/chainNet binaries"
     if [ $OS == "ubuntu" ]
     then
-        export PATH="$PATH:LA/deps/ubuntu"
+        export PATH="$PATH:software/LepAnchor/deps/ubuntu"
     elif [ $OS == "centos5" ]
     then
-        export PATH="$PATH:LA/deps/centOS5"
+        export PATH="$PATH:software/LepAnchor/deps/centOS5"
     elif [ $OS == "centos6" ]
     then
-        export PATH="$PATH:LA/deps/centOS6"
+        export PATH="$PATH:software/LepAnchor/deps/centOS6"
     else
         echo "$OS is not recognized as one of Ubuntu, CentOS5, or CentOS6, defaulting to Ubuntu"
-        export PATH="$PATH:LA/deps/ubuntu"
+        export PATH="$PATH:software/LepAnchor/deps/ubuntu"
     fi
     
     cd 9_Chain
-    ../LA/deps/step2.HM2 repeatmasked {threads} && rm -r repeatmasked.repeatmaskedx.result/raw.axt
+    ../software/LepAnchor/deps/step2.HM2 repeatmasked {threads} && rm -r repeatmasked.repeatmaskedx.result/raw.axt
     ln -sr ../{output.original} ../{output.slink}
     """
 
@@ -148,7 +148,7 @@ rule contiglengths:
   input: geno
   output: "10_Anchoring/contigs.length"
   message: "Getting contig lengths"
-  shell: "gunzip -fc {input} | awk -f LA/scripts/contigLength.awk > {output}"
+  shell: "gunzip -fc {input} | awk -f software/LepAnchor/scripts/contigLength.awk > {output}"
 
 rule find_haplotypes:
   input: "9_Chain/chainfile.gz"
@@ -156,7 +156,7 @@ rule find_haplotypes:
   message: "Finding full haplotypes (potential chimeric contigs)"
   shell: 
     """
-    gunzip -fc {input} | awk -f LA/scripts/findFullHaplotypes.awk > {output}
+    gunzip -fc {input} | awk -f software/LepAnchor/scripts/findFullHaplotypes.awk > {output}
     echo "Detected $(wc -l {output}) potentially chimeric contigs"
     """
 
@@ -171,7 +171,7 @@ rule liftover:
   message: "Running liftoverHaplotypes for the input maps"
   shell: 
     """
-    gunzip -fc {input.chain} | java -cp LA LiftoverHaplotypes map={input.intervals} haplotypes={input.haplos} chain=- > {output.lift}
+    gunzip -fc {input.chain} | java -cp software/LepAnchor LiftoverHaplotypes map={input.intervals} haplotypes={input.haplos} chain=- > {output.lift}
     cat {output.lift} | sort -V -k 1,1 -k 2,2n > {output.sortedlift}
     """
 
@@ -180,7 +180,7 @@ rule cleanmap:
   output: "10_Anchoring/map_all.clean"
   log: "10_Anchoring/cleamap.log"
   message: "Running CleanMap"
-  shell: "java -cp LA CleanMap map={input} > {output} 2> {log}"
+  shell: "java -cp software/LepAnchor CleanMap map={input} > {output} 2> {log}"
 
 rule map2bed:
   input: 
@@ -189,7 +189,7 @@ rule map2bed:
   output: "10_Anchoring/map.bed"
   log: "10_Anchoring/map2bed.log"
   message: "Running Map2Bed"
-  shell: "java -cp LA Map2Bed map={input.cleanmap} contigLength={input.lengths} > {output} 2> {log}"
+  shell: "java -cp software/LepAnchor Map2Bed map={input.cleanmap} contigLength={input.lengths} > {output} 2> {log}"
 
 rule ungrouped:
   input:
@@ -224,7 +224,7 @@ rule place_orient:
   message: "Running PlaceAndOrientContigs for linkage group {params.chrom}"
   shell:
     """
-    gunzip -fc {input.chain} | java -cp LA PlaceAndOrientContigs bed={input.bedfile} chromosome={params.chrom} map={input.lift} chain=- paf={input.paf} proximity={input.prox} keepEmptyIntervals=1 > {output} 2> {log}
+    gunzip -fc {input.chain} | java -cp software/LepAnchor PlaceAndOrientContigs bed={input.bedfile} chromosome={params.chrom} map={input.lift} chain=- paf={input.paf} proximity={input.prox} keepEmptyIntervals=1 > {output} 2> {log}
     """
 
 rule propogate:
@@ -237,12 +237,12 @@ rule propogate:
   message: "Propogating ...something"
   shell:
     """
-    awk -f LA/scripts/propagate.awk {input.placed} > 10_Anchoring/tmp1.la
-    awk -f LA/scripts/propagate.awk 10_Anchoring/tmp1.la > 10_Anchoring/tmp2.la
+    awk -f software/LepAnchor/scripts/propagate.awk {input.placed} > 10_Anchoring/tmp1.la
+    awk -f software/LepAnchor/scripts/propagate.awk 10_Anchoring/tmp1.la > 10_Anchoring/tmp2.la
     i=2
 
     while ! cmp -s "10_Anchoring/tmp$i.la" "10_Anchoring/tmp$(( $i-1 )).la" ;do
-	    awk -f LA/scripts/propagate.awk 10_Anchoring/tmp$i.la > 10_Anchoring/tmp$[$i+1].la
+	    awk -f software/LepAnchor/scripts/propagate.awk 10_Anchoring/tmp$i.la > 10_Anchoring/tmp$[$i+1].la
 	    i=$[$i+1]
     done
     #create prop*.la
@@ -270,7 +270,7 @@ rule place_orient2:
   message: "Running a second iteration of PlaceAndOrientContigs for linkage group {params.chrom}"
   shell:
     """
-    gunzip -fc {input.chain} | java -cp LA PlaceAndOrientContigs bed={input.bedfile} chromosome={params.chrom} map={input.lift} chain=- paf={input.paf} proximity={input.prox} keepEmptyIntervals=1 > {output.chrom} 2> {log.chrom}
+    gunzip -fc {input.chain} | java -cp software/LepAnchor PlaceAndOrientContigs bed={input.bedfile} chromosome={params.chrom} map={input.lift} chain=- paf={input.paf} proximity={input.prox} keepEmptyIntervals=1 > {output.chrom} 2> {log.chrom}
     """
 
 rule prune:
@@ -287,9 +287,9 @@ rule prune:
     """
     for i in $(seq {params.chrom})
     do
-      awk -f LA/scripts/prune.awk 10_Anchoring/orient_2/ichr.$i.la > 10_Anchoring/orient_2/ichr.${{i}}.pruned.la
+      awk -f software/LepAnchor/scripts/prune.awk 10_Anchoring/orient_2/ichr.$i.la > 10_Anchoring/orient_2/ichr.${{i}}.pruned.la
     done 2> {output.pruned}
-    awk -f LA/scripts/removeOverlaps.awk {input.bedfile} 10_Anchoring/orient_2/ichr.*.pruned.la > {output.cleaned}
+    awk -f software/LepAnchor/scripts/removeOverlaps.awk {input.bedfile} 10_Anchoring/orient_2/ichr.*.pruned.la > {output.cleaned}
     """
 
 rule construct_agp:
@@ -303,8 +303,8 @@ rule construct_agp:
     chrom = "{lg_range}"
   shell:
     """
-    awk -vn={params.chrom} '($5==n)' {input.cleaned} | awk -vprefix="LG" -vlg={params.chrom} -f LA/scripts/makeagp_full2.awk - > 10_Anchoring/agp/chr.{params.chrom}.agp
-    awk -vn={params.chrom} '($5==n)' {input.cleaned} | awk -vprefix="LG" -vlg={params.chrom} -f LA/scripts/makeagp2.awk - > 10_Anchoring/agp_scaffolds/chr.{params.chrom}.scaffolds.agp
+    awk -vn={params.chrom} '($5==n)' {input.cleaned} | awk -vprefix="LG" -vlg={params.chrom} -f software/LepAnchor/scripts/makeagp_full2.awk - > 10_Anchoring/agp/chr.{params.chrom}.agp
+    awk -vn={params.chrom} '($5==n)' {input.cleaned} | awk -vprefix="LG" -vlg={params.chrom} -f software/LepAnchor/scripts/makeagp2.awk - > 10_Anchoring/agp_scaffolds/chr.{params.chrom}.scaffolds.agp
     """
 
 rule unused:
@@ -327,7 +327,6 @@ rule unused:
     cat {input.scaff_agp} {output.agp} > {output.scaff_agp}
     """
 
-
 rule build_scaffold_fasta:
   input:
     assembly = geno,
@@ -337,7 +336,7 @@ rule build_scaffold_fasta:
   message: "Constructing final scaffold fasta file {output.fasta}"
   shell:
     """
-    gunzip -fc {input.assembly} | awk -f LA/scripts/makefasta.awk - {input.agp} | gzip > {output.fasta}
+    gunzip -fc {input.assembly} | awk -f software/LepAnchor/scripts/makefasta.awk - {input.agp} | gzip > {output.fasta}
     """
 
 rule build_contig_fasta:
@@ -349,7 +348,7 @@ rule build_contig_fasta:
   message: "Constructing final contig fasta file {output.fasta}"
   shell:
     """
-    gunzip -fc {input.assembly} | awk -f LA/scripts/makefasta.awk - {input.scaff_agp} | gzip > {output.fasta}
+    gunzip -fc {input.assembly} | awk -f software/LepAnchor/scripts/makefasta.awk - {input.scaff_agp} | gzip > {output.fasta}
     """
 
 rule mareymap_data:
@@ -372,12 +371,12 @@ rule mareymap_data:
     """
     for c in $(seq 1 {params.chrom})
     do
-      awk -vn=$c '($3==n)' {input.lift} | awk -f LA/scripts/liftover.awk 10_Anchoring/agp/chr.$c.agp - | awk -vm=1 '(/LG/ && NF>=4){{if (NF==4) $5=$4;print $1"\t"$2"\t"$3"\t"m"\t"$4"\t"$5}}' | gzip
+      awk -vn=$c '($3==n)' {input.lift} | awk -f software/LepAnchor/scripts/liftover.awk 10_Anchoring/agp/chr.$c.agp - | awk -vm=1 '(/LG/ && NF>=4){{if (NF==4) $5=$4;print $1"\t"$2"\t"$3"\t"m"\t"$4"\t"$5}}' | gzip
     done > {output.mareydata} 2> {log}
    
     for c in $(seq 1 {params.chrom})
     do
-      awk -vn=$c '($3==n)' {input.lift} | awk -f LA/scripts/liftover.awk 10_Anchoring/agp/chr.$c.agp - | awk -vm=1 '(/LG/ && NR>=4){{if (NF>4) s=0.5; else s=1;print $1"\t"$2"\t"$3"\t"m"\t"s*($4+$5)}}' | gzip
+      awk -vn=$c '($3==n)' {input.lift} | awk -f software/LepAnchor/scripts/liftover.awk 10_Anchoring/agp/chr.$c.agp - | awk -vm=1 '(/LG/ && NR>=4){{if (NF>4) s=0.5; else s=1;print $1"\t"$2"\t"$3"\t"m"\t"s*($4+$5)}}' | gzip
     done > {output.midpoints} 2> /dev/null
     """
 
@@ -392,6 +391,6 @@ rule mareymaps:
   message: "Creating Marey Maps"
   shell: 
     """
-    Rscript LA/scripts/plot_marey.R {input.data} 10_Anchoring/agp
+    Rscript software/LepAnchor/scripts/plot_marey.R {input.data} 10_Anchoring/agp
     Rscript scripts/LA_summary.r {input.data}
     """
