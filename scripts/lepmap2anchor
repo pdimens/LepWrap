@@ -25,4 +25,5 @@ for i in $(seq 1 $LG); do
     awk -vn=$i '(NR==FNR){map[NR-1]=$0}(NR!=FNR){$1=map[$1] "\t" n;print}' $1 7_Intervals/ordered.$i.intervals
 done > lepmap3_intervals.la
 
+
 echo "Created Lep-Anchor input file lepmap3_intervals.la"
