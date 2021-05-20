@@ -16,12 +16,12 @@ if [[ -z "$1" ]]; then
 fi
 
 echo "Running Lep-Map3"
-sleep 3s
+sleep 2s
 snakemake --cores $1 --snakefile ./rules/LepMap3.smk --directory .
 
 LA=$(grep "run_lepanchor" config.yaml | cut -d":" -f2 | xargs | tr '[:upper:]' '[:lower:]')
 if [ $LA == "true" ]; then
 echo -e "\nRunning Lep-Anchor"
-sleep 3s
+sleep 2s
 snakemake --cores $1 --snakefile ./rules/LepAnchor.smk --directory .
 fi
