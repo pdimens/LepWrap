@@ -21,6 +21,4 @@ awk -v lim=$2 '{if (NR==1 || $1<=lim) print; else print 0}' $1 > $1.cutoff
 echo "Done! See the file $1.cutoff for the results."
 echo "Here is a summary of the outcome:"
 
-sort $1.cutoff | uniq -c | sort -k2n | tail -n +2
-
-
+cat $1.cutoff | tail -n +2 | sort | uniq -c | sort -k2n | tail -n +2

@@ -36,13 +36,13 @@ rule join_singles:
         echo -n -e '\nWhich map would you like to use (e.g. map.15)? map.'
         read -r
         echo -e "# the map chosen to use with OrderMarkers2\nmap.$REPLY" > {log}
+        echo "A record of your choice can be found in {log}"
         JS2A=$(echo {params.run_js2all} | tr '[:upper:]' '[:lower:]')
         if [ $JS2A == "true" ]; then
             zcat {input.datacall} | java -cp LM3 JoinSingles2All map=3_SeparateChromosomes/map.$REPLY data=- {params.lod_limit} {params.lod_diff} {params.iterate} numThreads={threads} > {output}
         else
-            echo "Skipping JoinSingles2All and creating a symlink instead"
+            echo -e "\nSkipping JoinSingles2All and creating a symlink instead"
             ln -sr 3_SeparateChromosomes/map.$REPLY {output}
         fi
-        echo "A record of your choice can be found in {log}"
         sleep 4s
         """
