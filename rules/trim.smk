@@ -29,17 +29,13 @@ rule trim_summary:
     priority: 1
     shell:
         """
-        echo "# this is a summary of which markers were removed from which linkage group via trimming distant edge clusters" >> {output.detailed}
-        echo -e "LG\trm_marker" >> {output.detailed}
         for each in 5_Trim/logs/ordered.*.removed ; do
             BASE=$(basename $each | cut -d "." -f1,2)
-            sed -e "s/^/$BASE /" $each >> {output.detailed}.tmp 
-        done
-        sort -V {output.detailed}.tmp > {output.detailed} && rm {output.detailed}.tmp
-        echo "n_removed map" > {output.summary}.tmp
-        cut -d" " -f1 {output.detailed} | uniq -c  >> {output.summary}.tmp
-        column -t {output.summary}.tmp > {output.summary} && rm {output.summary}.tmp
-        scripts/TrimSummaryPlot.r {output.summary} {params.lg}
+            sed -e "s/^/$BASE /" $each >> {output.detailed}.tmp
+        done | sort -V > {output.detailed}
+        #sort -V {output.detailed}.tmp >> {output.detailed} && rm {output.detailed}.tmp
+        scripts/TrimCounts.r {output.detailed} {params.lg} > {output.summary}
+        scripts/TrimSummaryPlot.r {output.summary}
         echo "Merging QC plots for all linkage groups"
         convert -density 300 {input.plots} {output.mergeplots}
         """

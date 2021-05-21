@@ -323,8 +323,8 @@ rule unused:
     """
     cut -f 1 {input.lengths} | grep -v -w -F -f <(cut -f 2 {input.haplos};awk '($5!="U"){{print $6}}' {input.agp}) > {output.txt}
     grep -F -w -f {output.txt} {input.lengths} | awk '{{print $1,1,$2,1,"W",$1,1,$2,"+"}}' > {output.agp}
-    cat {input.agp} {output.agp} > {output.final_agp}
-    cat {input.scaff_agp} {output.agp} > {output.scaff_agp}
+    cat {input.agp} > {output.final_agp}
+    cat {input.scaff_agp} > {output.scaff_agp}
     """
 
 rule build_scaffold_fasta:
