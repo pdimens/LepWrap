@@ -357,13 +357,13 @@ rule mareymap_data:
     agp = expand("10_Anchoring/agp/chr.{lgs}.agp", lgs = lg_range)
   output: 
     mareydata = "11_MareyMaps/marey.data.gz",
-    midpoints = "11_MareyMaps/marey.midpoints_data.gz"
+    sexavg = "11_MareyMaps/marey.data.sexavg.gz"
   log: "11_MareyMaps/missing_scaffolds.txt"
   message: 
     """
     Creating Marey map interval data
     first points in uncertainty intervals  | {output.mareydata}
-    midpoints in uncertainty intervals     | {output.midpoints}  
+    midpoints in uncertainty intervals     | {output.sexavg}  
     """
   params:
     chrom = lg
@@ -377,20 +377,24 @@ rule mareymap_data:
     for c in $(seq 1 {params.chrom})
     do
       awk -vn=$c '($3==n)' {input.lift} | awk -f software/LepAnchor/scripts/liftover.awk 10_Anchoring/agp/chr.$c.agp - | awk -vm=1 '(/LG/ && NR>=4){{if (NF>4) s=0.5; else s=1;print $1"\t"$2"\t"$3"\t"m"\t"s*($4+$5)}}' | gzip
-    done > {output.midpoints} 2> /dev/null
+    done > {output.sexavg} 2> /dev/null
     """
 
 rule mareymaps:
   input:
     data = "11_MareyMaps/marey.data.gz",
+    sexavg = "11_MareyMaps/marey.data.sexavg.gz",
     agp = expand("10_Anchoring/agp/chr.{lgs}.agp", lgs = lg_range)
   output: 
     indiv_plots = expand("11_MareyMaps/LG.{lgs}.mareymap.png", lgs = lg_range),
     summary = "11_MareyMaps/LepAnchor.mareymaps.pdf",
-    sequential = "11_MareyMaps/LepAnchor.sequentialmaps.pdf"
+    sequential = "11_MareyMaps/LepAnchor.sequentialmaps.pdf",
+    SAsummary = "11_MareyMaps/LepAnchor.sexavg.mareymaps.pdf",
+    SAsequential = "11_MareyMaps/LepAnchor.sexavg.sequentialmaps.pdf"
   message: "Creating Marey Maps"
   shell: 
     """
     Rscript software/LepAnchor/scripts/plot_marey.R {input.data} 10_Anchoring/agp
-    Rscript scripts/LA_summary.r {input.data}
+    Rscript scripts/LASummary.r {input.data}
+    Rscript scripts/LASummarySexAvg.r {input.sexavg}
     """
