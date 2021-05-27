@@ -8,7 +8,7 @@
 #  ParentCall2  #
 #---------------#
 # the filtered VCF file with your genotype likelihoods:
-vcf: "tons_of_snps.vcf"
+vcf: "out.14.missrecode.vcf"
 
 # Instructions to create pedigree file: https://sourceforge.net/p/lep-map3/wiki/software/LepMap3 Home/#parentcall2
 # the pedigree file associated with your data
@@ -39,7 +39,7 @@ informative: "informativeMask=123"
 #  JoinSingles2ALL  #
 #-------------------#
 # set this to false if you want to skip joining singles (0) to linkage groups
-run_joinsingles2all: true
+run_joinsingles2all: false
 
 # these are the parameters for JoinSingles2ALL, and are highly data-dependent
 # start with lower values for lod_limit and increase as necessary
@@ -57,10 +57,10 @@ lod_difference: "lodDifference=2"
 exp_lg: 24
 
 # Set iterations to the number of iterations you want per chromosome (more is better). Recommend 30 or more
-iterations: 5
+iterations: 100
 
 # Set threads_per to the number of threads you would like to use per linkage group for ordering
-threads_per: 5
+threads_per: 2
 
 # Choose your distance method by commenting the line you dont want
 dist_method: "useKosambi=1"
@@ -68,20 +68,22 @@ dist_method: "useKosambi=1"
 
 # number of iterations to use of OrderMarkers2 phasing.
 # this number is typically 1-2
-phase_iterations: 1
+phase_iterations: 2
 
 #-----------------#
 #  Edge Trimming  #
 #-----------------#
 # Edge trimming will examine the first and last X% of markers in a linkage group
 # and remove clusters that are N centimorgans away from the next marker
+# you can "skip" trimming by making edge_length really low (e.g. 1)
+# and trim_cutoff really high (e.g. 50) 
 
 # Set edge_length to the percent number of markers you would like to examine from either end of the linkage group
 # Value can be an integer or decimal, i.e. 15 is the same as 0.15, which both mean "15%"
-edge_length: 15
+edge_length: 1
 
 # Set trim_cuttoff to the centiMorgan distance cutoff (10 is reasonable)
-trim_cutoff: 10 
+trim_cutoff: 40 
 
 
 
@@ -89,11 +91,11 @@ trim_cutoff: 10
 #### Lep-Anchor ####
 ####################
 # change this to true if you also want to run Lep-Anchor
-run_lepanchor: false
+run_lepanchor: true
 
 # the path to the genome assembly you are trying to anchor
 # ideally it *is not* gzipped and ends in .fa, but there are built-in workarounds if it is. 
-assembly: "boa.constrictor.fasta"
+assembly: "YFT.genome.latest.fasta"
 
 # the number of linkage groups you have
 lg_count: 24
@@ -112,3 +114,19 @@ proximity_file: "/dev/null"
 OS_info: "Ubuntu"
 #OS_info: "CentOS5"
 #OS_info: "CentOS6"
+
+
+#-----------------#
+#  Edge Trimming  #
+#-----------------#
+# Edge trimming will examine the first and last X% of markers in a linkage group
+# and remove clusters that are N% centimorgans (of the total cM span) away from 
+# the next marker. You can "skip" trimming by making edge_length really low (e.g. 1)
+# and trim_cutoff really high (e.g. 50) 
+
+# Set edge_length to the percent number of markers you would like to examine from either end of the linkage group
+# Value can be an integer or decimal, i.e. 15 is the same as 0.15, which both mean "15%"
+LA_edge_length: 20
+
+# Set trim_cuttoff to the centiMorgan distance cutoff (5 is reasonable)
+LA_trim_cutoff: 3

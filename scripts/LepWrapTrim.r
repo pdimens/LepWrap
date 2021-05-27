@@ -27,7 +27,8 @@ lg <- unlist(strsplit(filename, "\\."))[2]
 #========= output instantiation ========#
 outfile_base <- paste("5_Trim", filename, sep = "/")
 outfile_log_base <- paste("5_Trim", "logs", filename, sep = "/")
-plotfile <- paste(outfile_log_base, "trim.pdf", sep = ".")
+plotfile_base <- paste("5_Trim", "plots", filename, sep = "/")
+plotfile <- paste(plotfile_base, "trim.pdf", sep = ".")
 
 ##### Pruning the ends #####
 dist_thresh <- as.numeric(args[2])
