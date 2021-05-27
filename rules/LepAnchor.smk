@@ -9,22 +9,32 @@ proximity = config["proximity_file"]
 lg = config["lg_count"]
 lg_range = list(range(1,lg+1))
 os_name = config["OS_info"]
+edgelen = config["LA_edge_length"]
+trimdist = config["LA_trim_cutoff"]
 
 rule all:
   input:
-    fasta = "10_Anchoring/Anchored.contigs.fa.gz",
-    scaff = "10_Anchoring/Anchored.scaffolds.fa.gz",
-    mareydata = "11_MareyMaps/marey.data.gz",
-    mareymaps = "11_MareyMaps/LepAnchor.mareymaps.pdf"
+    fasta = "12_Fasta/Anchored.contigs.fa.gz",
+    scaff = "12_Fasta/Anchored.scaffolds.fa.gz",
+    fastaonly = "12_Fasta/Anchored.contigs.only.fa.gz",
+    scaffonly = "12_Fasta/Anchored.scaffolds.only.fa.gz",
+    mareydata = "13_MareyMaps/data.marey.gz",
+    mareymaps = "13_MareyMaps/LepAnchor.mareymaps.pdf",
+    trimmedmareymaps = "15_TrimNewIntervals/LepAnchor.mareymaps.pdf",
+    trimsummary = "15_TrimNewIntervals/LA.trim.summary.pdf"
   message: 
     """
     Lep-Anchor has finished. Good luck with the rest of your analyses!
     Output Files:
     =============
-    contig fasta file       | 10_Anchoring/Anchored.contigs.fa.gz
-    scaffold fasta file     | 10_Anchoring/Anchored.scaffolds.fa.gz
-    converted linakge maps  | 11_MareyMaps/marey.data.gz
-    summary MareyMaps       | 11_MareyMaps/LepAnchor.mareymaps.pdf
+    contig fasta file         |  {input.fasta}
+    contigs-only fasta        |  {input.fastaonly}
+    scaffold fasta file       |  {input.scaff}
+    scaffolds-only fasta      |  {input.scaffonly}
+    converted linakge maps    |  {input.mareydata}
+    untrimmed marey maps      |  {input.mareymaps}
+    interval trimming summary |  {input.trimsummary}
+    trimmed marey maps        |  {input.trimmedmareymaps}
     """
 
 rule repeatmask:
@@ -123,7 +133,7 @@ rule chain_2:
 
 rule extract_markers:
     input: "2_Filtering/data.filtered.lepmap3.gz"
-    output: "snps.txt"
+    output: report("snps.txt", category = "Data")
     message: "Extracting marker information from Lep-Map3 data file {input}"
     shell: "scripts/extract_markers.sh {input}"
 
@@ -133,7 +143,7 @@ rule generate_intervals:
     markers = "snps.txt",
     intervals = expand("7_Intervals/ordered.{x}.intervals", x = range(1, lg + 1))
   output: 
-    intervals = "10_Anchoring/lepmap3_intervals.la"
+    intervals = report("10_Anchoring/lepmap3_intervals.la", category = "Data")
   message: "Combining {params} Lep-Map3 interval files into single LepAnchor input {output}"
   params:
     lg = lg
@@ -146,13 +156,13 @@ rule generate_intervals:
 
 rule contiglengths:
   input: geno
-  output: "10_Anchoring/contigs.length"
+  output: report("10_Anchoring/contigs.length", category = "Data")
   message: "Getting contig lengths"
   shell: "gunzip -fc {input} | awk -f software/LepAnchor/scripts/contigLength.awk > {output}"
 
 rule find_haplotypes:
   input: "9_Chain/chainfile.gz"
-  output: "10_Anchoring/fullHaplotypes50.txt"
+  output: report("10_Anchoring/fullHaplotypes50.txt", category = "Logs")
   message: "Finding full haplotypes (potential chimeric contigs)"
   shell: 
     """
@@ -166,8 +176,8 @@ rule liftover:
     intervals = "10_Anchoring/lepmap3_intervals.la",
     haplos = "10_Anchoring/fullHaplotypes50.txt"
   output: 
-    lift = "10_Anchoring/liftover.la",
-    sortedlift = "10_Anchoring/liftover.sorted.la"
+    lift = report("10_Anchoring/liftover.la", category = "Lifted Intervals"),
+    sortedlift = report("10_Anchoring/liftover.sorted.la", category = "Lifted Intervals")
   message: "Running liftoverHaplotypes for the input maps"
   shell: 
     """
@@ -178,7 +188,7 @@ rule liftover:
 rule cleanmap:
   input: "10_Anchoring/liftover.sorted.la"
   output: "10_Anchoring/map_all.clean"
-  log: "10_Anchoring/cleamap.log"
+  log: report("10_Anchoring/cleamap.log", category = "Logs")
   message: "Running CleanMap"
   shell: "java -cp software/LepAnchor CleanMap map={input} > {output} 2> {log}"
 
@@ -187,7 +197,7 @@ rule map2bed:
     cleanmap = "10_Anchoring/map_all.clean",
     lengths = "10_Anchoring/contigs.length",
   output: "10_Anchoring/map.bed"
-  log: "10_Anchoring/map2bed.log"
+  log: report("10_Anchoring/map2bed.log", category = "Logs")
   message: "Running Map2Bed"
   shell: "java -cp software/LepAnchor Map2Bed map={input.cleanmap} contigLength={input.lengths} > {output} 2> {log}"
 
@@ -218,7 +228,7 @@ rule place_orient:
   output:
     chrom = "10_Anchoring/orient_1/chr.{lg_range}.la"
   log:
-    chrom = "10_Anchoring/orient_1/logs/chr.{lg_range}.la.err"
+    chrom = report("10_Anchoring/orient_1/logs/chr.{lg_range}.la.err", category = "Anchoring I Logs")
   params:
     chrom = "{lg_range}"
   message: "Running PlaceAndOrientContigs for linkage group {params.chrom}"
@@ -264,7 +274,7 @@ rule place_orient2:
   output:
     chrom = "10_Anchoring/orient_2/ichr.{lg_range}.la"
   log:
-    chrom = "10_Anchoring/orient_2/logs/ichr.{lg_range}.la.err"
+    chrom = report("10_Anchoring/orient_2/logs/ichr.{lg_range}.la.err", category = "Anchoring II Logs")
   params:
     chrom = "{lg_range}"
   message: "Running a second iteration of PlaceAndOrientContigs for linkage group {params.chrom}"
@@ -278,8 +288,8 @@ rule prune:
     oriented = expand("10_Anchoring/orient_2/ichr.{lgs}.la", lgs = lg_range),
     bedfile = "10_Anchoring/map_propogated.bed"
   output: 
-    pruned = "10_Anchoring/orient_2/pruned.la",
-    cleaned = "10_Anchoring/overlaps_rm.la"
+    pruned = report("10_Anchoring/orient_2/pruned.la", category = "Logs"),
+    cleaned = report("10_Anchoring/overlaps_rm.la", category = "Logs")
   message: "Pruning contig blocks without map support and removing overlaps"
   params:
     chrom = lg
@@ -296,55 +306,93 @@ rule construct_agp:
   input:
     cleaned = "10_Anchoring/overlaps_rm.la"
   output:
-    agp = "10_Anchoring/agp/chr.{lg_range}.agp",
-    scaff_agp = "10_Anchoring/agp_scaffolds/chr.{lg_range}.scaffolds.agp"
+    agp = report("11_AGP/contigs/chr.{lg_range}.agp", category = "Contig AGP Files"),
+    scaff_agp = report("11_AGP/scaffolds/chr.{lg_range}.scaffolds.agp", category = "Scaffold AGP Files")
   message: "Creating AGP files for linkage group {params.chrom}"
   params:
     chrom = "{lg_range}"
   shell:
     """
-    awk -vn={params.chrom} '($5==n)' {input.cleaned} | awk -vprefix="LG" -vlg={params.chrom} -f software/LepAnchor/scripts/makeagp_full2.awk - > 10_Anchoring/agp/chr.{params.chrom}.agp
-    awk -vn={params.chrom} '($5==n)' {input.cleaned} | awk -vprefix="LG" -vlg={params.chrom} -f software/LepAnchor/scripts/makeagp2.awk - > 10_Anchoring/agp_scaffolds/chr.{params.chrom}.scaffolds.agp
+    awk -vn={params.chrom} '($5==n)' {input.cleaned} | awk -vprefix="LG" -vlg={params.chrom} -f software/LepAnchor/scripts/makeagp_full2.awk - > {output.agp}
+    awk -vn={params.chrom} '($5==n)' {input.cleaned} | awk -vprefix="LG" -vlg={params.chrom} -f software/LepAnchor/scripts/makeagp2.awk - > {output.scaff_agp}
     """
 
 rule unused:
   input:
     lengths = "10_Anchoring/contigs.length",
     haplos = "10_Anchoring/fullHaplotypes50.txt",
-    agp = expand("10_Anchoring/agp/chr.{lgs}.agp", lgs = lg_range),
-    scaff_agp = expand("10_Anchoring/agp_scaffolds/chr.{lgs}.scaffolds.agp", lgs = lg_range)
+    agp = expand("11_AGP/contigs/chr.{lgs}.agp", lgs = lg_range),
   output: 
-    txt = "10_Anchoring/not_used_final.txt",
-    agp = "10_Anchoring/not_used.agp",
-    final_agp = "10_Anchoring/REF_LA.agp",
-    scaff_agp = "10_Anchoring/REF_LA_scaffolds.agp"
+    txt = "11_AGP/not_used_final.txt",
+    agp = "11_AGP/not_used.agp"
   message: "Finding unused contigs"
   shell:
     """
     cut -f 1 {input.lengths} | grep -v -w -F -f <(cut -f 2 {input.haplos};awk '($5!="U"){{print $6}}' {input.agp}) > {output.txt}
     grep -F -w -f {output.txt} {input.lengths} | awk '{{print $1,1,$2,1,"W",$1,1,$2,"+"}}' > {output.agp}
-    cat {input.agp} > {output.final_agp}
-    cat {input.scaff_agp} > {output.scaff_agp}
     """
 
-rule build_scaffold_fasta:
+rule build_final_agp:
+  input:
+    agp = expand("11_AGP/contigs/chr.{lgs}.agp", lgs = lg_range),
+    scaff_agp = expand("11_AGP/scaffolds/chr.{lgs}.scaffolds.agp", lgs = lg_range),
+    unused = "11_AGP/not_used.agp",
+  output:
+    contig_agp = "11_AGP/lepanchor.contigs.only.agp",
+    scaff_agp = "11_AGP/lepanchor.scaffolds.only.agp",
+    contig_all_agp = "11_AGP/lepanchor.contigs.all.agp",
+    scaff_all_agp = "11_AGP/lepanchor.scaffolds.all.agp"
+  message: "Generating final AGP files"
+  shell:
+    """
+    cat {input.agp} > {output.contig_agp}
+    cat {input.scaff_agp} > {output.scaff_agp}
+    cat {input.agp} {input.unused} > {output.contig_all_agp}
+    cat {input.scaff_agp} {input.unused} > {output.scaff_all_agp}
+    """
+
+rule build_scaffold_only_fasta:
   input:
     assembly = geno,
-    agp = "10_Anchoring/REF_LA.agp"
+    agp = "11_AGP/lepanchor.contigs.only.agp"
   output:
-    fasta = "10_Anchoring/Anchored.scaffolds.fa.gz",
+    fasta = "12_Fasta/Anchored.scaffolds.only.fa.gz",
+  message: "Constructing final scaffold-only fasta file {output.fasta}"
+  shell:
+    """
+    gunzip -fc {input.assembly} | awk -f software/LepAnchor/scripts/makefasta.awk - {input.agp} | gzip > {output.fasta}
+    """
+
+rule build_scaffold_contig_fasta:
+  input:
+    assembly = geno,
+    agp = "11_AGP/lepanchor.contigs.all.agp"
+  output:
+    fasta = "12_Fasta/Anchored.scaffolds.fa.gz",
   message: "Constructing final scaffold fasta file {output.fasta}"
   shell:
     """
     gunzip -fc {input.assembly} | awk -f software/LepAnchor/scripts/makefasta.awk - {input.agp} | gzip > {output.fasta}
     """
 
+rule build_contig_only_fasta:
+  input:
+    assembly = geno,
+    scaff_agp = "11_AGP/lepanchor.scaffolds.only.agp"
+  output:
+    fasta = "12_Fasta/Anchored.contigs.only.fa.gz"
+  message: "Constructing final contig-only fasta file {output.fasta}"
+  shell:
+    """
+    gunzip -fc {input.assembly} | awk -f software/LepAnchor/scripts/makefasta.awk - {input.scaff_agp} | gzip > {output.fasta}
+    """
+
 rule build_contig_fasta:
   input:
     assembly = geno,
-    scaff_agp = "10_Anchoring/REF_LA_scaffolds.agp"
+    scaff_agp = "11_AGP/lepanchor.scaffolds.all.agp"
   output:
-    fasta = "10_Anchoring/Anchored.contigs.fa.gz"
+    fasta = "12_Fasta/Anchored.contigs.fa.gz"
   message: "Constructing final contig fasta file {output.fasta}"
   shell:
     """
@@ -354,11 +402,11 @@ rule build_contig_fasta:
 rule mareymap_data:
   input:
     lift = "10_Anchoring/liftover.la",
-    agp = expand("10_Anchoring/agp/chr.{lgs}.agp", lgs = lg_range)
+    agp = expand("11_AGP/contigs/chr.{lgs}.agp", lgs = lg_range)
   output: 
-    mareydata = "11_MareyMaps/marey.data.gz",
-    sexavg = "11_MareyMaps/marey.data.sexavg.gz"
-  log: "11_MareyMaps/missing_scaffolds.txt"
+    mareydata = "13_MareyMaps/data.marey.gz",
+    sexavg = "13_MareyMaps/data.marey.sexavg.gz"
+  log: report("13_MareyMaps/missing_scaffolds.txt", category = "Logs")
   message: 
     """
     Creating Marey map interval data
@@ -371,30 +419,70 @@ rule mareymap_data:
     """
     for c in $(seq 1 {params.chrom})
     do
-      awk -vn=$c '($3==n)' {input.lift} | awk -f software/LepAnchor/scripts/liftover.awk 10_Anchoring/agp/chr.$c.agp - | awk -vm=1 '(/LG/ && NF>=4){{if (NF==4) $5=$4;print $1"\t"$2"\t"$3"\t"m"\t"$4"\t"$5}}' | gzip
+      awk -vn=$c '($3==n)' {input.lift} | awk -f software/LepAnchor/scripts/liftover.awk 11_AGP/contigs/chr.$c.agp - | awk -vm=1 '(/LG/ && NF>=4){{if (NF==4) $5=$4;print $1"\t"$2"\t"$3"\t"m"\t"$4"\t"$5}}' | gzip
     done > {output.mareydata} 2> {log}
    
     for c in $(seq 1 {params.chrom})
     do
-      awk -vn=$c '($3==n)' {input.lift} | awk -f software/LepAnchor/scripts/liftover.awk 10_Anchoring/agp/chr.$c.agp - | awk -vm=1 '(/LG/ && NR>=4){{if (NF>4) s=0.5; else s=1;print $1"\t"$2"\t"$3"\t"m"\t"s*($4+$5)}}' | gzip
+      awk -vn=$c '($3==n)' {input.lift} | awk -f software/LepAnchor/scripts/liftover.awk 11_AGP/contigs/chr.$c.agp - | awk -vm=1 '(/LG/ && NR>=4){{if (NF>4) s=0.5; else s=1;print $1"\t"$2"\t"$3"\t"m"\t"s*($4+$5)}}' | gzip
     done > {output.sexavg} 2> /dev/null
     """
 
 rule mareymaps:
   input:
-    data = "11_MareyMaps/marey.data.gz",
-    sexavg = "11_MareyMaps/marey.data.sexavg.gz",
-    agp = expand("10_Anchoring/agp/chr.{lgs}.agp", lgs = lg_range)
+    data = "13_MareyMaps/data.marey.gz",
+    sexavg = "13_MareyMaps/data.marey.sexavg.gz",
+    agp = expand("11_AGP/contigs/chr.{lgs}.agp", lgs = lg_range)
   output: 
-    indiv_plots = expand("11_MareyMaps/LG.{lgs}.mareymap.png", lgs = lg_range),
-    summary = "11_MareyMaps/LepAnchor.mareymaps.pdf",
-    sequential = "11_MareyMaps/LepAnchor.sequentialmaps.pdf",
-    SAsummary = "11_MareyMaps/LepAnchor.sexavg.mareymaps.pdf",
-    SAsequential = "11_MareyMaps/LepAnchor.sexavg.sequentialmaps.pdf"
+    indiv_plots = report(expand("13_MareyMaps/LG.{lgs}.mareymap.png", lgs = lg_range), category = "Marey Maps"),
+    summary = report("13_MareyMaps/LepAnchor.mareymaps.pdf", category = "Marey Maps") ,
+    sequential = report("13_MareyMaps/LepAnchor.sequentialmaps.pdf", category = "Sequential Maps"),
+    SAsummary = report("13_MareyMaps/LepAnchor.sexavg.mareymaps.pdf", category = "Marey Maps Sex Avg"),
+    SAsequential = report("13_MareyMaps/LepAnchor.sexavg.sequentialmaps.pdf", category = "Sequential Maps Sex Avg")
   message: "Creating Marey Maps"
   shell: 
     """
-    Rscript software/LepAnchor/scripts/plot_marey.R {input.data} 10_Anchoring/agp
-    Rscript scripts/LASummary.r {input.data}
+    Rscript software/LepAnchor/scripts/plot_marey.R {input.data} 11_AGP/contigs
+    Rscript scripts/LASummary.r {input.data} true
     Rscript scripts/LASummarySexAvg.r {input.sexavg}
     """
+
+rule generate_updated_intervals:
+  input: "13_MareyMaps/data.marey.gz"
+  output: "14_NewIntervals/LA.intervals.{lg_range}"
+  message: "Splitting out LG {params.chrom} from {input}"
+  params:
+    chrom = "{lg_range}"
+  shell:
+    """
+    zgrep "LG{params.chrom}\s" {input} > {output}
+    """
+
+rule trim_newintervals:
+  input: "14_NewIntervals/LA.intervals.{lg_range}"
+  output: 
+    outfile = "15_TrimNewIntervals/LA.intervals.{lg_range}.trimmed",
+    plot = "15_TrimNewIntervals/plots/LA.intervals.{lg_range}.trim.pdf"
+  message: "Trimming edge clusters for {input}"
+  params:
+    edge = edgelen,
+    dist = trimdist
+  shell: "Rscript scripts/LATrim.r {input} {params.dist} {params.edge} 15_TrimNewIntervals"
+
+rule merge_trimplots:
+  input: expand("15_TrimNewIntervals/plots/LA.intervals.{lg}.trim.pdf", lg = lg_range)
+  output: "15_TrimNewIntervals/LA.trim.summary.pdf"
+  message: "Merging trimming plots into {output}"
+  shell: "convert -density 200 {input} {output}"
+
+
+rule merge_trimmedintervals:
+  input: expand("15_TrimNewIntervals/LA.intervals.{lg}.trimmed", lg = lg_range)
+  output: "15_TrimNewIntervals/data.marey.trimmed.gz"
+  message: "Concatenating trimmed intervals to {output}"
+  shell: "cat {input} | gzip -c > {output}"
+
+rule plot_trimmedintervals:
+  input: "15_TrimNewIntervals/data.marey.trimmed.gz"
+  output: report("15_TrimNewIntervals/LepAnchor.mareymaps.pdf", category = "Trimmed Marey Maps")
+  shell: "Rscript scripts/LASummary.r {input}"
