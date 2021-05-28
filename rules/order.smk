@@ -1,7 +1,7 @@
 rule order_markers:
     input:
         datacall = "2_Filtering/data.filtered.lepmap3.gz",
-        filt_map = "map.master"
+        filt_map = "LOD.master"
     output: "4_OrderMarkers/ordered.{lg_range}"
     log:
         run = "4_OrderMarkers/logs/ordered.{lg_range}.log",
@@ -12,7 +12,7 @@ rule order_markers:
         chrom = "{lg_range}",
         iterations = ITER,
         phase = phasenum
-    threads: threads_per
+    threads: 2
     shell:
         """
         zcat {input.datacall} | java -cp software/LepMap3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} numMergeIterations={params.iterations} {params.dist_method} chromosome={params.chrom} phasingIterations={params.phase} &> {log.run}.tmp

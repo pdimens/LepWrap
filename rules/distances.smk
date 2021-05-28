@@ -13,7 +13,7 @@ rule calculate_distances:
     params:
         dist_method = dist_method,
         lg = "{lg_range}"
-    threads: threads_per
+    threads: 2
     shell:
         """
         cp {input.lg} {output.distance}

@@ -15,13 +15,21 @@ if [[ -z "$1" ]]; then
   exit 1
 fi
 
-echo "Running Lep-Map3"
-sleep 2s
-snakemake --cores $1 --snakefile ./rules/LepMap3.smk --directory .
+lepmap(){
+  echo "Running Lep-Map3"
+  sleep 2s
+  snakemake --cores $1 --snakefile ./rules/LepMap3.smk --directory .
+}
 
-LA=$(grep "run_lepanchor" config.yaml | cut -d":" -f2 | xargs | tr '[:upper:]' '[:lower:]')
-if [ $LA == "true" ]; then
-echo -e "\nRunning Lep-Anchor"
-sleep 2s
-snakemake --cores $1 --snakefile ./rules/LepAnchor.smk --directory .
-fi
+lepanchor(){
+  LA=$(grep "run_lepanchor" config.yaml | cut -d":" -f2 | xargs | tr '[:upper:]' '[:lower:]')
+  if [ $LA == "true" ]; then
+    echo -e "\nRunning Lep-Anchor"
+    sleep 2s
+    snakemake --cores $1 --snakefile ./rules/LepAnchor.smk --directory .
+  else
+    exit 1
+  fi
+}
+
+lepmap && lepanchor

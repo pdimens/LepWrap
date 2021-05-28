@@ -1,7 +1,7 @@
 rule reorder_markers:
     input:
         datacall = "2_Filtering/data.filtered.lepmap3.gz",
-        filt_map = "map.master",
+        filt_map = "LOD.master",
         lg_order = "5_Trim/ordered.{lg_range}.trimmed"
     output:
         "6_OrderMarkers/ordered.{lg_range}"
@@ -13,7 +13,7 @@ rule reorder_markers:
         dist_method = dist_method,
         lg = "{lg_range}",
         iterations = ITER
-    threads: threads_per
+    threads: 2
     shell:
         """
         zcat {input.datacall} | java -cp software/LepMap3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} evaluateOrder={input.lg_order} {params.dist_method} numMergeIterations={params.iterations} &> {log.run}.tmp
