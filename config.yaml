@@ -14,11 +14,19 @@ vcf: "out.15.miss95recode.vcf"
 # the pedigree file associated with your data
 pedigree: "pedigree.txt"
 
+# If there are any additional parameters you would like to use for ParentCall2 (e.g. halfSibs=1), add them here
+extra_params_ParentCall: "removeNonInformative=1"
+
+
 #---------------#
 #   Filtering2  #
 #---------------#
 # data tolerance value-- set this to 0 if you want to skip the Filtering2 module
 data_tol: 0
+
+# If there are any additional parameters you would like to use for Filtering2 (e.g. convert2Biallelic=1), add them here
+extra_params_Filtering: ""
+
 
 #------------------------#
 #  SeperateChromosomes2  #
@@ -35,6 +43,10 @@ lod_max: 40
 # Use only markers with informative father (1), mother(2), both parents(3) or neither parent(0)
 informative: "informativeMask=123"
 
+# If there are any additional parameters you would like to use for SeparateChromosomes2 (e.g. distrotionLOD=1), add them here
+extra_params_SeparateChromosomes: "sizeLimit=5 distortionLOD=1"
+
+
 #-------------------#
 #  JoinSingles2ALL  #
 #-------------------#
@@ -47,6 +59,10 @@ lod_limit: "lodLimit=2"
 
 # start with lower values for lod_limit and increase as necessary
 lod_difference: "lodDifference=2"
+
+# If there are any additional parameters you would like to use for JoinSingles2All (e.g. iterate=1), add them here
+extra_params_JoinSingles: "iterate=1 distortionLOD=1"
+ 
 
 #-----------------#
 #  OrderMarkers2  #
