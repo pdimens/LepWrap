@@ -23,7 +23,7 @@ git clone https://github.com/pdimens/LepWrap.git
 Assuming you have `anaconda` or `miniconda` installed:
 ```bash
 cd LepWrap
-conda create -f conda_LepWrap.yml
+conda env create -f conda_setup.yml
 ```
 This will create an environment called `lepwrap` that can be activated with:
 ```bash
