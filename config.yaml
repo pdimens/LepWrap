@@ -8,7 +8,7 @@
 #  ParentCall2  #
 #---------------#
 # the filtered VCF file with your genotype likelihoods:
-vcf: "out.14.missrecode.vcf"
+vcf: "out.15.miss95recode.vcf"
 
 # Instructions to create pedigree file: https://sourceforge.net/p/lep-map3/wiki/software/LepMap3 Home/#parentcall2
 # the pedigree file associated with your data
@@ -18,7 +18,7 @@ pedigree: "pedigree.txt"
 #   Filtering2  #
 #---------------#
 # data tolerance value-- set this to 0 if you want to skip the Filtering2 module
-data_tol: 0.1
+data_tol: 0
 
 #------------------------#
 #  SeperateChromosomes2  #
@@ -27,10 +27,10 @@ data_tol: 0.1
 # LOD score in the range of lod_min to lod_max
 
 # The minimum LOD for SeperateChromosomes2
-lod_min: 5
+lod_min: 20
 
 # The maximum LOD for SeperateChromosomes2
-lod_max: 30
+lod_max: 40
 
 # Use only markers with informative father (1), mother(2), both parents(3) or neither parent(0)
 informative: "informativeMask=123"
@@ -59,8 +59,11 @@ exp_lg: 24
 # Set iterations to the number of iterations you want per chromosome (more is better). Recommend 30 or more
 iterations: 100
 
+## deprecated ##
 # Set threads_per to the number of threads you would like to use per linkage group for ordering
-threads_per: 2
+# OrderMarkers2 uses at most 2 threads per ordering, so this has been deprecated
+#threads_per: 2
+####
 
 # Choose your distance method by commenting the line you dont want
 dist_method: "useKosambi=1"
@@ -75,15 +78,15 @@ phase_iterations: 2
 #-----------------#
 # Edge trimming will examine the first and last X% of markers in a linkage group
 # and remove clusters that are N centimorgans away from the next marker
-# you can "skip" trimming by making edge_length really low (e.g. 1)
+# you can "skip" trimming by making edge_length really high (e.g. 100)
 # and trim_cutoff really high (e.g. 50) 
 
 # Set edge_length to the percent number of markers you would like to examine from either end of the linkage group
 # Value can be an integer or decimal, i.e. 15 is the same as 0.15, which both mean "15%"
 edge_length: 1
 
-# Set trim_cuttoff to the centiMorgan distance cutoff (10 is reasonable)
-trim_cutoff: 40 
+# Set trim_cuttoff to the centiMorgan distance cutoff (5 is reasonable)
+trim_cutoff: 100 
 
 
 
@@ -121,7 +124,7 @@ OS_info: "Ubuntu"
 #-----------------#
 # Edge trimming will examine the first and last X% of markers in a linkage group
 # and remove clusters that are N% centimorgans (of the total cM span) away from 
-# the next marker. You can "skip" trimming by making edge_length really low (e.g. 1)
+# the next marker. You can "skip" trimming by making edge_length really high (e.g. 100)
 # and trim_cutoff really high (e.g. 50) 
 
 # Set edge_length to the percent number of markers you would like to examine from either end of the linkage group
