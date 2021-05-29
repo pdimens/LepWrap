@@ -12,7 +12,9 @@ allmaps <- suppressMessages(read_tsv(gzfile(args[1]), col_names = FALSE)) %>%
   group_by(lg) %>%
   mutate(marker = seq_along(Mb)) %>%
   pivot_longer(c(male, female), names_to = "sex", values_to = "cM" )
-  
+
+pdf(NULL)
+
 allmaps %>%
   ggplot(aes(x = Mb, y = cM, color = sex)) +
   geom_point(size = 0.6)  +

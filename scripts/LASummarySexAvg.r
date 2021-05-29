@@ -12,7 +12,10 @@ allmaps <- suppressMessages(read_tsv(gzfile(args[1]), col_names = FALSE)) %>%
   mutate(Mb = Mb/1000000) %>%
   group_by(lg) %>%
   mutate(marker = seq_along(Mb))
-  
+
+pdf(NULL)
+
+
 allmaps %>%
   ggplot(aes(x = Mb, y = cM)) +
   geom_point(size = 0.6, color = "dodgerblue")  +
