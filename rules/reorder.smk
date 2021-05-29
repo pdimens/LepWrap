@@ -10,13 +10,13 @@ rule reorder_markers:
         recomb = "6_OrderMarkers/recombination/ordered.{lg_range}.recombination"
     message: "Reordering linkage group {params.lg} with {params.iterations} iterations"
     params:
-        dist_method = dist_method,
         lg = "{lg_range}",
-        iterations = ITER
+        iterations = ITER,
+        extra = reorder_extra
     threads: 2
     shell:
         """
-        zcat {input.datacall} | java -cp software/LepMap3 OrderMarkers2 map={input.filt_map} data=- numThreads={threads} evaluateOrder={input.lg_order} {params.dist_method} numMergeIterations={params.iterations} &> {log.run}.tmp
+        zcat {input.datacall} | java -cp software/LepMap3 OrderMarkers2 {params.extra} map={input.filt_map} data=- numThreads={threads} evaluateOrder={input.lg_order} numMergeIterations={params.iterations} &> {log.run}.tmp
         sed -n '/\*\*\* LG \=/,$p' {log.run}.tmp > {output}
         grep "recombin" {log.run}.tmp > {log.recomb}
         awk '/#java/{{flag=1}} flag; /logL/{{flag=0}}' {log.run}.tmp > {log.run} && rm {log.run}.tmp

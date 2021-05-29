@@ -20,9 +20,10 @@ lod_diff = config["lod_difference"]
 # ordering #
 lg_range = list(range(1, config["exp_lg"]+1))
 lg_count = config["exp_lg"]
-dist_method = config["dist_method"]
 ITER = config["iterations"]
 phasenum = config["phase_iterations"]
+order_extra = config["extra_params_OrderMarkers"]
+reorder_extra = config["extra_params_reOrderMarkers"]
 # trimming #
 edge_len = str(config["edge_length"])
 trim_thresh = str(config["trim_cutoff"])

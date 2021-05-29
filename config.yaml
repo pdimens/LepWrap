@@ -23,7 +23,7 @@ data_tol: 0
 #------------------------#
 #  SeperateChromosomes2  #
 #------------------------#
-# LepMak3r will iteratively perform SeperateChromosomes2 for each
+# LepWrap will iteratively perform SeperateChromosomes2 for each
 # LOD score in the range of lod_min to lod_max
 
 # The minimum LOD for SeperateChromosomes2
@@ -59,35 +59,32 @@ exp_lg: 24
 # Set iterations to the number of iterations you want per chromosome (more is better). Recommend 30 or more
 iterations: 100
 
-## deprecated ##
-# Set threads_per to the number of threads you would like to use per linkage group for ordering
-# OrderMarkers2 uses at most 2 threads per ordering, so this has been deprecated
-#threads_per: 2
-####
+# If there are any additional parameters you would like to use for OrderMarkers2 (e.g. hyperPhaser=1), add them here
+extra_params_OrderMarkers: "useKosambi=1 phasingIterations=2"
 
-# Choose your distance method by commenting the line you dont want
-dist_method: "useKosambi=1"
-#dist_method: "useMorgan=1"
-
-# number of iterations to use of OrderMarkers2 phasing.
-# this number is typically 1-2
-phase_iterations: 2
 
 #-----------------#
 #  Edge Trimming  #
 #-----------------#
 # Edge trimming will examine the first and last X% of markers in a linkage group
-# and remove clusters that are N centimorgans away from the next marker
-# you can "skip" trimming by making edge_length really high (e.g. 100)
-# and trim_cutoff really high (e.g. 50) 
+# and remove clusters that are N% centimorgans (of the total cM span) away from 
+# the next marker. You can "skip" trimming by making edge_length really low (e.g. 1)
+# and trim_cutoff really high (e.g. 80-100).
 
 # Set edge_length to the percent number of markers you would like to examine from either end of the linkage group
-# Value can be an integer or decimal, i.e. 15 is the same as 0.15, which both mean "15%"
+# Value can be an integer or decimal, i.e. 15 is the same as 0.15, which both mean "15%" (10-20 is reasonable)
 edge_length: 1
 
 # Set trim_cuttoff to the centiMorgan distance cutoff (5 is reasonable)
 trim_cutoff: 100 
 
+
+#--------------------#
+#  Re-OrderMarkers2  #
+#--------------------#
+# The second round of OrderMarkers will use the same basic parameters as the first round (but not the extra params)
+# If there are additional parameters you would like to use, add them here:
+extra_params_reOrderMarkers: "useKosambi=1"
 
 
 ####################
@@ -107,7 +104,7 @@ lg_count: 24
 PAF_file: "alnPB.paf"
 
 # if you have a proximity file add it here, otherwise leave the text as "/dev/null".
-# This isn't yet implemented in the official Lep-Anchor wrapper, so don't change this.
+# This isn't yet implemented in Lep-Anchor, so don't change this.
 proximity_file: "/dev/null"
 
 # Which system is appropriate for running the HaploMerger2 section? Comment out the one that doesn't apply.
@@ -124,8 +121,8 @@ OS_info: "Ubuntu"
 #-----------------#
 # Edge trimming will examine the first and last X% of markers in a linkage group
 # and remove clusters that are N% centimorgans (of the total cM span) away from 
-# the next marker. You can "skip" trimming by making edge_length really high (e.g. 100)
-# and trim_cutoff really high (e.g. 50) 
+# the next marker. You can "skip" trimming by making edge_length really low (e.g. 1)
+# and trim_cutoff really high (e.g. 80-100) 
 
 # Set edge_length to the percent number of markers you would like to examine from either end of the linkage group
 # Value can be an integer or decimal, i.e. 15 is the same as 0.15, which both mean "15%"
