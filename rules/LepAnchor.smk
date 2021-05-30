@@ -21,6 +21,7 @@ rule all:
     mareydata = "13_MareyMapsUntrimmed/data.marey.gz",
     mareymaps = "13_MareyMapsUntrimmed/LepAnchor.mareymaps.pdf",
     trimmedmareymaps = "16_MareyMapsTrimmed/LepAnchor.mareymaps.pdf",
+    trimmedmareydata= "16_MareyMapsTrimmed/data.marey.trimmed.gz",
     trimsummary = "15_Trim/LA.trim.summary.pdf"
   message: 
     """
@@ -476,7 +477,7 @@ rule merge_trimplots:
 
 rule merge_trimmedintervals:
   input: expand("15_Trim/LA.intervals.{lg}.trimmed", lg = lg_range)
-  output: "15_Trim/data.marey.trimmed.gz"
+  output: "16_MareyMapsTrimmed/data.marey.trimmed.gz"
   message: "Concatenating trimmed intervals to {output}"
   shell: "cat {input} | gzip -c > {output}"
 
