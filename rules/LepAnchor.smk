@@ -9,6 +9,9 @@ proximity = config["proximity_file"]
 lg = config["lg_count"]
 lg_range = list(range(1,lg+1))
 os_name = config["OS_info"]
+map2bed_extra = config["extra_params_Map2Bed"]
+cleanmap_extra = config["extra_params_CleanMap"]
+place_orient_extra = config["extra_params_PlaceOrient"]
 edgelen = config["LA_edge_length"]
 trimdist = config["LA_trim_cutoff"]
 
@@ -189,7 +192,9 @@ rule cleanmap:
   output: "10_Anchoring/map_all.clean"
   log: report("10_Anchoring/cleamap.log", category = "Logs")
   message: "Running CleanMap"
-  shell: "java -cp software/LepAnchor CleanMap map={input} > {output} 2> {log}"
+  params:
+    extras = cleanmap_extra
+  shell: "java -cp software/LepAnchor CleanMap map={input} {params.extras} > {output} 2> {log}"
 
 rule map2bed:
   input: 
@@ -198,7 +203,9 @@ rule map2bed:
   output: "10_Anchoring/map.bed"
   log: report("10_Anchoring/map2bed.log", category = "Logs")
   message: "Running Map2Bed"
-  shell: "java -cp software/LepAnchor Map2Bed map={input.cleanmap} contigLength={input.lengths} > {output} 2> {log}"
+  params:
+    extras = map2bed_extra
+  shell: "java -cp software/LepAnchor Map2Bed map={input.cleanmap} contigLength={input.lengths} {params.extras} > {output} 2> {log}"
 
 rule ungrouped:
   input:
@@ -229,11 +236,13 @@ rule place_orient:
   log:
     chrom = report("10_Anchoring/orient_1/logs/chr.{lg_range}.la.err", category = "Anchoring I Logs")
   params:
-    chrom = "{lg_range}"
+    chrom = "{lg_range}",
+    extras = place_orient_extra
+  threads: 3
   message: "Running PlaceAndOrientContigs for linkage group {params.chrom}"
   shell:
     """
-    gunzip -fc {input.chain} | java -cp software/LepAnchor PlaceAndOrientContigs bed={input.bedfile} chromosome={params.chrom} map={input.lift} chain=- paf={input.paf} proximity={input.prox} keepEmptyIntervals=1 > {output} 2> {log}
+    gunzip -fc {input.chain} | java -cp software/LepAnchor PlaceAndOrientContigs numThreads={threads} bed={input.bedfile} chromosome={params.chrom} map={input.lift} chain=- paf={input.paf} proximity={input.prox} {params.extras} > {output} 2> {log}
     """
 
 rule propogate:
@@ -275,11 +284,12 @@ rule place_orient2:
   log:
     chrom = report("10_Anchoring/orient_2/logs/ichr.{lg_range}.la.err", category = "Anchoring II Logs")
   params:
-    chrom = "{lg_range}"
+    chrom = "{lg_range}",
+    extras = place_orient_extra
   message: "Running a second iteration of PlaceAndOrientContigs for linkage group {params.chrom}"
   shell:
     """
-    gunzip -fc {input.chain} | java -cp software/LepAnchor PlaceAndOrientContigs bed={input.bedfile} chromosome={params.chrom} map={input.lift} chain=- paf={input.paf} proximity={input.prox} keepEmptyIntervals=1 > {output.chrom} 2> {log.chrom}
+    gunzip -fc {input.chain} | java -cp software/LepAnchor PlaceAndOrientContigs bed={input.bedfile} chromosome={params.chrom} map={input.lift} chain=- paf={input.paf} proximity={input.prox} {params.extras} > {output.chrom} 2> {log.chrom}
     """
 
 rule prune:
