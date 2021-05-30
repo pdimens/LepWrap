@@ -6,6 +6,7 @@ args <- commandArgs(trailingOnly = TRUE)
 # args[1] is the OrderMarkers2 output file
 # args[2] is the centimorgan cutoff threshold
 # args[3] is the % of edge markers to scan
+# args[4] is the output directory
 
 lgfile <- read.delim(
   args[1], 
@@ -23,10 +24,17 @@ filename <- filename[length(filename)]
 lg <- unlist(strsplit(filename, "\\."))[2]
 
 #========= output instantiation ========#
-outfile_base <- paste("5_Trim", filename, sep = "/")
-outfile_log_base <- paste("5_Trim", "logs", filename, sep = "/")
-plotfile_base <- paste("5_Trim", "plots", filename, sep = "/")
+dir.create(args[4], showWarnings = FALSE)
+dir.create(paste0(args[4],"/plots"), showWarnings = FALSE)
+dir.create(paste0(args[4],"/logs"), showWarnings = FALSE)
+dir.create(paste0(args[4],"/QC_raw"), showWarnings = FALSE)
+outfile_base <- paste(args[4], filename, sep = "/")
+outfile_log_base <- paste(args[4], "logs", filename, sep = "/")
+plotfile_base <- paste(args[4], "plots", filename, sep = "/")
 plotfile <- paste(plotfile_base, "trim.pdf", sep = ".")
+rawfile_base <- paste(args[4], "QC_raw", filename, sep = "/")
+
+
 
 ##### Pruning the ends #####
 # if the percent threshold is given as an interger, convert it to a decimal
@@ -102,7 +110,8 @@ QAfix <- function (x,y){
   }
 }
   
-  
+pdf(NULL)
+
 plot_df <- lgfile %>%
               rename(Male = V2, Female = V3) %>%
               arrange(Male) %>%
@@ -133,7 +142,6 @@ plot_df %>%
 suppressMessages(ggsave(plotfile, width = 7, height = 4, units = "in"))
 
 # outputting filtered files
-num_rm <- length(removed_markers)
 
 writeLines(readLines(args[1], n=3), con = paste(outfile_base, "trimmed", sep = "."))
 write.table(
@@ -144,6 +152,15 @@ write.table(
   row.names = FALSE,
   col.names = FALSE,
   append=TRUE
+)
+
+write.table(
+  lgfile, 
+  file = paste(rawfile_base, "filtered.raw", sep = "."), 
+  sep = "\t",
+  quote = FALSE, 
+  row.names = FALSE,
+  col.names = FALSE,
 )
 
 write.table(

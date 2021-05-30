@@ -27,6 +27,8 @@ for (i in files[2:length(files)]){
 
 outfile <- paste(args[1], "recombination.summary", sep = "/")
 
+print(recomb_df, row.names = FALSE)
+q()
 write.table(
   recomb_df,
   file=outfile,

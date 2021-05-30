@@ -18,23 +18,21 @@ rule all:
     scaff = "12_Fasta/Anchored.scaffolds.fa.gz",
     fastaonly = "12_Fasta/Anchored.contigs.only.fa.gz",
     scaffonly = "12_Fasta/Anchored.scaffolds.only.fa.gz",
-    mareydata = "13_MareyMaps/data.marey.gz",
-    mareymaps = "13_MareyMaps/LepAnchor.mareymaps.pdf",
-    trimmedmareymaps = "15_TrimNewIntervals/LepAnchor.mareymaps.pdf",
-    trimsummary = "15_TrimNewIntervals/LA.trim.summary.pdf"
+    mareydata = "13_MareyMapsUntrimmed/data.marey.gz",
+    mareymaps = "13_MareyMapsUntrimmed/LepAnchor.mareymaps.pdf",
+    trimmedmareymaps = "16_MareyMapsTrimmed/LepAnchor.mareymaps.pdf",
+    trimsummary = "15_Trim/LA.trim.summary.pdf"
   message: 
     """
     Lep-Anchor has finished. Good luck with the rest of your analyses!
-    Output Files:
-    =============
-    contig fasta file         |  {input.fasta}
-    contigs-only fasta        |  {input.fastaonly}
-    scaffold fasta file       |  {input.scaff}
-    scaffolds-only fasta      |  {input.scaffonly}
-    converted linakge maps    |  {input.mareydata}
-    untrimmed marey maps      |  {input.mareymaps}
-    interval trimming summary |  {input.trimsummary}
-    trimmed marey maps        |  {input.trimmedmareymaps}
+    
+    Output Files                 Location
+    ====================================================
+    anchored assemblies       |  12_Fasta/
+    untrimmed marey maps      |  13_MareyMapsUntrimmed/
+    updated linkage maps      |  14_NewIntervals/
+    trimmed linkage maps      |  15_Trim/
+    trimmed marey maps        |  16_MareyMapsTrimmed/
     """
 
 rule repeatmask:
@@ -404,12 +402,13 @@ rule mareymap_data:
     lift = "10_Anchoring/liftover.la",
     agp = expand("11_AGP/contigs/chr.{lgs}.agp", lgs = lg_range)
   output: 
-    mareydata = "13_MareyMaps/data.marey.gz",
-    sexavg = "13_MareyMaps/data.marey.sexavg.gz"
-  log: report("13_MareyMaps/missing_scaffolds.txt", category = "Logs")
+    mareydata = "13_MareyMapsUntrimmed/data.marey.gz",
+    sexavg = "13_MareyMapsUntrimmed/data.marey.sexavg.gz"
+  log: report("13_MareyMapsUntrimmed/missing_scaffolds.txt", category = "Logs")
   message: 
     """
-    Creating Marey map interval data
+    Creating Marey map interval data:
+
     first points in uncertainty intervals  | {output.mareydata}
     midpoints in uncertainty intervals     | {output.sexavg}  
     """
@@ -430,15 +429,15 @@ rule mareymap_data:
 
 rule mareymaps:
   input:
-    data = "13_MareyMaps/data.marey.gz",
-    sexavg = "13_MareyMaps/data.marey.sexavg.gz",
+    data = "13_MareyMapsUntrimmed/data.marey.gz",
+    sexavg = "13_MareyMapsUntrimmed/data.marey.sexavg.gz",
     agp = expand("11_AGP/contigs/chr.{lgs}.agp", lgs = lg_range)
   output: 
-    indiv_plots = report(expand("13_MareyMaps/LG.{lgs}.mareymap.png", lgs = lg_range), category = "Marey Maps"),
-    summary = report("13_MareyMaps/LepAnchor.mareymaps.pdf", category = "Marey Maps") ,
-    sequential = report("13_MareyMaps/LepAnchor.sequentialmaps.pdf", category = "Sequential Maps"),
-    SAsummary = report("13_MareyMaps/LepAnchor.sexavg.mareymaps.pdf", category = "Marey Maps Sex Avg"),
-    SAsequential = report("13_MareyMaps/LepAnchor.sexavg.sequentialmaps.pdf", category = "Sequential Maps Sex Avg")
+    indiv_plots = report(expand("13_MareyMapsUntrimmed/LG.{lgs}.mareymap.png", lgs = lg_range), category = "Marey Maps"),
+    summary = report("13_MareyMapsUntrimmed/LepAnchor.mareymaps.pdf", category = "Marey Maps") ,
+    sequential = report("13_MareyMapsUntrimmed/LepAnchor.sequentialmaps.pdf", category = "Sequential Maps"),
+    SAsummary = report("13_MareyMapsUntrimmed/LepAnchor.sexavg.mareymaps.pdf", category = "Marey Maps Sex Avg"),
+    SAsequential = report("13_MareyMapsUntrimmed/LepAnchor.sexavg.sequentialmaps.pdf", category = "Sequential Maps Sex Avg")
   message: "Creating Marey Maps"
   shell: 
     """
@@ -448,7 +447,7 @@ rule mareymaps:
     """
 
 rule generate_updated_intervals:
-  input: "13_MareyMaps/data.marey.gz"
+  input: "13_MareyMapsUntrimmed/data.marey.gz"
   output: "14_NewIntervals/LA.intervals.{lg_range}"
   message: "Splitting out LG {params.chrom} from {input}"
   params:
@@ -461,28 +460,27 @@ rule generate_updated_intervals:
 rule trim_newintervals:
   input: "14_NewIntervals/LA.intervals.{lg_range}"
   output: 
-    outfile = "15_TrimNewIntervals/LA.intervals.{lg_range}.trimmed",
-    plot = "15_TrimNewIntervals/plots/LA.intervals.{lg_range}.trim.pdf"
+    outfile = "15_Trim/LA.intervals.{lg_range}.trimmed",
+    plot = "15_Trim/plots/LA.intervals.{lg_range}.trim.pdf"
   message: "Trimming edge clusters for {input}"
   params:
     edge = edgelen,
     dist = trimdist
-  shell: "Rscript scripts/LATrim.r {input} {params.dist} {params.edge} 15_TrimNewIntervals"
+  shell: "Rscript scripts/LATrim.r {input} {params.dist} {params.edge} 15_Trim"
 
 rule merge_trimplots:
-  input: expand("15_TrimNewIntervals/plots/LA.intervals.{lg}.trim.pdf", lg = lg_range)
-  output: "15_TrimNewIntervals/LA.trim.summary.pdf"
+  input: expand("15_Trim/plots/LA.intervals.{lg}.trim.pdf", lg = lg_range)
+  output: "15_Trim/LA.trim.summary.pdf"
   message: "Merging trimming plots into {output}"
   shell: "convert -density 200 {input} {output}"
 
-
 rule merge_trimmedintervals:
-  input: expand("15_TrimNewIntervals/LA.intervals.{lg}.trimmed", lg = lg_range)
-  output: "15_TrimNewIntervals/data.marey.trimmed.gz"
+  input: expand("15_Trim/LA.intervals.{lg}.trimmed", lg = lg_range)
+  output: "15_Trim/data.marey.trimmed.gz"
   message: "Concatenating trimmed intervals to {output}"
   shell: "cat {input} | gzip -c > {output}"
 
 rule plot_trimmedintervals:
-  input: "15_TrimNewIntervals/data.marey.trimmed.gz"
-  output: report("15_TrimNewIntervals/LepAnchor.mareymaps.pdf", category = "Trimmed Marey Maps")
+  input: "16_MareyMapsTrimmed/data.marey.trimmed.gz"
+  output: report("16_MareyMapsTrimmed/LepAnchor.mareymaps.pdf", category = "Trimmed Marey Maps")
   shell: "Rscript scripts/LASummary.r {input}"

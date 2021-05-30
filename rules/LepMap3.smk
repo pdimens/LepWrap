@@ -25,13 +25,14 @@ js2a_extra = config["extra_params_JoinSingles"]
 lg_range = list(range(1, config["exp_lg"]+1))
 lg_count = config["exp_lg"]
 ITER = config["iterations"]
-phasenum = config["phase_iterations"]
 order_extra = config["extra_params_OrderMarkers"]
 # trimming #
 edge_len = str(config["edge_length"])
 trim_thresh = str(config["trim_cutoff"])
 # ordering II #
 reorder_extra = config["extra_params_reOrderMarkers"]
+# distances #
+dist_method = config["distance_method"]
 
 include: "prepare_data.smk"
 include: "generate_map.smk"

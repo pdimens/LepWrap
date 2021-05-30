@@ -84,12 +84,11 @@ extra_params_OrderMarkers: "useKosambi=1 phasingIterations=2"
 #-----------------#
 # Edge trimming will examine the first and last X% of markers in a linkage group
 # and remove clusters that are N% centimorgans (of the total cM span) away from 
-# the next marker. You can "skip" trimming by making edge_length really low (e.g. 1)
-# and trim_cutoff really high (e.g. 80-100).
+# the next marker. You can "skip" trimming by setting trim_cutoff really high (e.g. 80-100).
 
 # Set edge_length to the percent number of markers you would like to examine from either end of the linkage group
 # Value can be an integer or decimal, i.e. 15 is the same as 0.15, which both mean "15%" (10-20 is reasonable)
-edge_length: 1
+edge_length: 20
 
 # Set trim_cuttoff to the centiMorgan distance cutoff (5 is reasonable)
 trim_cutoff: 100 
@@ -101,6 +100,14 @@ trim_cutoff: 100
 # The second round of OrderMarkers will use the same basic parameters as the first round (but not the extra params)
 # If there are additional parameters you would like to use, add them here:
 extra_params_reOrderMarkers: "useKosambi=1"
+
+
+#-----------------------#
+#  Calculate Distances  #
+#-----------------------#
+# If you used useKosambi=1 or useMorgan=1 for Ordering/reOrdering, add that same
+# parameter to distance_method: 
+distance_method: ""
 
 
 ####################
@@ -137,11 +144,10 @@ OS_info: "Ubuntu"
 #-----------------#
 # Edge trimming will examine the first and last X% of markers in a linkage group
 # and remove clusters that are N% centimorgans (of the total cM span) away from 
-# the next marker. You can "skip" trimming by making edge_length really low (e.g. 1)
-# and trim_cutoff really high (e.g. 80-100) 
+# the next marker. You can "skip" trimming by setting  LA_trim_cutoff really high (e.g. 80-100) 
 
 # Set edge_length to the percent number of markers you would like to examine from either end of the linkage group
-# Value can be an integer or decimal, i.e. 15 is the same as 0.15, which both mean "15%"
+# Value can be an integer or decimal, i.e. 15 is the same as 0.15, which both mean "15%" (10-15 is reasonable)
 LA_edge_length: 20
 
 # Set trim_cuttoff to the centiMorgan distance cutoff (5 is reasonable)

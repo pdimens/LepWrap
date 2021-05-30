@@ -7,10 +7,10 @@ rule trim_edge_clusters:
     params:
         trim_threshold = trim_thresh,
         edge_length = edge_len
-    message: "Removing edge clusters >{params.trim_threshold}cM apart from the other markers at the ends of {input}"
+    message: "Removing edge clusters >{params.trim_threshold}%cM apart from the other markers at the ends of {input}"
     shell:
         """
-        Rscript scripts/LepWrapTrim.r {input} {params.trim_threshold} {params.edge_length}
+        Rscript scripts/LepWrapTrim.r {input} {params.trim_threshold} {params.edge_length} 5_Trim
         """
 
 rule trim_summary:
@@ -31,9 +31,8 @@ rule trim_summary:
         """
         for each in 5_Trim/logs/ordered.*.removed ; do
             BASE=$(basename $each | cut -d "." -f1,2)
-            sed -e "s/^/$BASE /" $each >> {output.detailed}.tmp
+            sed -e "s/^/$BASE /" $each
         done | sort -V > {output.detailed}
-        #sort -V {output.detailed}.tmp >> {output.detailed} && rm {output.detailed}.tmp
         scripts/TrimCounts.r {output.detailed} {params.lg} > {output.summary}
         scripts/TrimSummaryPlot.r {output.summary}
         echo "Merging QC plots for all linkage groups"

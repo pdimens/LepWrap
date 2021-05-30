@@ -2,13 +2,11 @@ rule parent_call:
     input:
         vcf = vcf,
         pedigree = pedigree
-    output:
-        "1_ParentCall/data.lepmap3.gz"
+    output: "1_ParentCall/data.lepmap3.gz"
     message: "Creating Lep-Map3 data file from {input.vcf} and {input.pedigree}"
     params:
         extra = parentcall_extra
-    shell:
-        "java -cp software/LepMap3 ParentCall2 data={input.pedigree} vcfFile={input.vcf} {params} | gzip > {output}"
+    shell: "java -cp software/LepMap3 ParentCall2 data={input.pedigree} vcfFile={input.vcf} {params} | gzip > {output}"
 
 rule filtering:
     input: "1_ParentCall/data.lepmap3.gz"
