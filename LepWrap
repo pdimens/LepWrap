@@ -42,4 +42,4 @@ lepanchor(){
   fi
 }
 
-lepmap && lepanchor
+lepmap $1 && lepanchor $1
