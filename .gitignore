@@ -23,6 +23,7 @@
 /pedigree.txt
 LOD.master
 snps.txt
+/*.paf
 /*.vcf
 /*.fasta
 /*.fa
