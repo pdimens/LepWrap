@@ -18,7 +18,7 @@ fi
 lepmap(){
   echo "Running Lep-Map3"
   sleep 2s
-  snakemake --cores $1 --snakefile ./rules/LepMap3.smk --directory .
+  snakemake --cores $1 --snakefile ./rules/LepMap3/LepMap3.smk --directory .
 }
 
 lepanchor(){
@@ -26,7 +26,7 @@ lepanchor(){
   if [ $LA == "true" ]; then
     echo -e "\nRunning Lep-Anchor"
     sleep 2s
-    snakemake --cores $1 --snakefile ./rules/LepAnchor.smk --directory .
+    snakemake --cores $1 --snakefile ./rules/LepAnchor/LepAnchor.smk --directory .
   else
     exit 1
   fi
