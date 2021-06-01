@@ -99,7 +99,7 @@ trim_cutoff: 100
 #--------------------#
 # The second round of OrderMarkers will use the same basic parameters as the first round (but not the extra params)
 # If there are additional parameters you would like to use, add them here:
-extra_params_reOrderMarkers: "randomPhase=1 improveOrder=1 useKosambi=1"
+extra_params_reOrderMarkers: "improveOrder=1 useKosambi=1"
 
 
 #-----------------------#
@@ -156,7 +156,17 @@ extra_params_Map2Bed: ""
 #-------------------------#
 #  PlaceAndOrientContigs  #
 #-------------------------#
+# choose which of the input types you want to generate by uncommenting the other
+# LepAnchor uses intervals by default, but either works.
+#lepanchor_input: "noIntervals=0"  # uses intervals input
+lepanchor_input: "noIntervals=1"  # uses map position input
+
+# The size limit for detecting potential haplotype contigs (default: ~5000)
+# Set this value really high (50000+) to ignore haplotype removal in between PlaceOrient iterations
+haplotype_limit: 5000
+
 # If there are any additional parameters you would like to use for PlaceAndOrientContigs (e.g. randomOrder=1), add them here
+
 extra_params_PlaceOrient: "keepEmptyIntervals=1 numRuns=10"
 
 
