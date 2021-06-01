@@ -7,7 +7,7 @@ rule order_markers:
         runlog = temp("4_OrderMarkers/logs/ordered.{lg_range}.running"),
         run = "4_OrderMarkers/logs/ordered.{lg_range}.log",
         recomb = "4_OrderMarkers/recombination/ordered.{lg_range}.recombinations"
-    message: "Ordering the markers with {params.dist_method} on linkage group {params.chrom}"
+    message: "Ordering linkage group {params.lg} with {params.iterations} iterations"
     params:
         chrom = "{lg_range}",
         iterations = ITER,
