@@ -11,7 +11,7 @@ else
   exit 1
 fi
 
-if [ ! -f config.yaml ]
+if [ ! -f config.yaml ]; then
   echo -e "ERROR:\nThe file 'config.yaml' is required to run LepWrap, but not found in the current directory."
   exit 1
 fi
