@@ -4,11 +4,21 @@ if which snakemake &>/dev/null; then
   foo=1
 else
   echo -e "ERROR:\nSnakemake installation is required to run LepWrap, but not found in the current environment."
+  echo -e "If [ana|mini]conda are installed, created a pre-configred environment with:\n"
+  printf "\033[01;32m"
+  printf "conda env create -f conda_setup.yml\n"
+  printf "\033[0m"
+  exit 1
+fi
+
+if [ ! -f config.yaml ]
+  echo -e "ERROR:\nThe file 'config.yaml' is required to run LepWrap, but not found in the current directory."
   exit 1
 fi
 
 if [[ -z "$1" ]]; then
-  echo "Perform the modules of Lep-Map3. Make sure config.yaml is properly configured for how you intend to run things."
+  echo "Perform the modules of Lep-Map3 and optionally Lep-Anchor" 
+  echo "Make sure config.yaml is properly configured for how you intend to run things."
   echo ""
   echo "[usage] LepWrap <number of threads to use>"
   echo "[example] LepWrap 16" 
