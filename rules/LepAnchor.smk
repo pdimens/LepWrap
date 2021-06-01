@@ -9,11 +9,13 @@ proximity = config["proximity_file"]
 lg = config["lg_count"]
 lg_range = list(range(1,lg+1))
 os_name = config["OS_info"]
+data_type = config["lepanchor_input"]
 map2bed_extra = config["extra_params_Map2Bed"]
 cleanmap_extra = config["extra_params_CleanMap"]
 place_orient_extra = config["extra_params_PlaceOrient"]
 edgelen = config["LA_edge_length"]
 trimdist = config["LA_trim_cutoff"]
+haplo_limit = config["haplotype_limit"]
 
 rule all:
   input:
@@ -38,6 +40,7 @@ rule all:
     trimmed linkage maps      |  15_Trim/
     trimmed marey maps        |  16_MareyMapsTrimmed/
     """
+
 
 rule repeatmask:
   input: geno
@@ -99,6 +102,7 @@ rule chain_1:
     ../software/LepAnchor/deps/step1.HM2 repeatmasked {threads}
     """
 
+
 rule chain_2:
   input: 
     f1 = "9_Chain/repeatmaskedx.sizes",
@@ -133,6 +137,7 @@ rule chain_2:
     ln -sr ../{output.original} ../{output.slink}
     """
 
+
 rule extract_markers:
     input: "2_Filtering/data.filtered.lepmap3.gz"
     output: report("snps.txt", category = "Data")
@@ -140,46 +145,53 @@ rule extract_markers:
     shell: "scripts/extract_markers.sh {input}"
 
 
-rule generate_intervals:
+rule generate_interval_input:
   input:
     markers = "snps.txt",
-    intervals = expand("7_Intervals/ordered.{x}.intervals", x = range(1, lg + 1))
+    data = expand("7_Intervals/ordered.{x}.intervals", x = range(1, lg + 1)) if data_type == "noIntervals=0" else expand("7_Distances/ordered.{x}.distances", x = range(1, lg + 1))
   output: 
-    intervals = report("10_Anchoring/lepmap3_intervals.la", category = "Data")
-  message: "Combining {params} Lep-Map3 interval files into single LepAnchor input {output}"
+    data = report("10_PlaceAndOrientContigs/lepanchor.input", category = "Data")
+  message: "Combining {params} Lep-Map3 files into single LepAnchor input {output}"
   params:
-    lg = lg
+    lg = lg,
+    datatype = data_type
   shell: 
     """
     for i in $(seq 1 {params.lg}); do
-      awk -vn=$i '(NR==FNR){{map[NR-1]=$0}}(NR!=FNR){{$1=map[$1] "\t" n;print}}' {input.markers} 7_Intervals/ordered.$i.intervals >> {output.intervals}
+      if [ {params.datatype} == "noIntervals=0" ]; then
+        awk -vn=$i '(NR==FNR){{map[NR-1]=$0}}(NR!=FNR){{$1=map[$1] "\t" n;print}}' {input.markers} 7_Intervals/ordered.$i.intervals >> {output}
+      else
+        tail -n +3 7_Distances/ordered.$i.distances | awk -vn=$i '(NR==FNR){{map[NR-1]=$0}}(NR!=FNR){{$1=map[$1] "\t" n;print}}' {input.markers} - >> {output}
+    fi
     done
     """
 
+
 rule contiglengths:
   input: geno
-  output: report("10_Anchoring/contigs.length", category = "Data")
+  output: report("10_PlaceAndOrientContigs/contigs.length", category = "Data")
   message: "Getting contig lengths"
   shell: "gunzip -fc {input} | awk -f software/LepAnchor/scripts/contigLength.awk > {output}"
 
+
 rule find_haplotypes:
   input: "9_Chain/chainfile.gz"
-  output: report("10_Anchoring/fullHaplotypes50.txt", category = "Logs")
-  message: "Finding full haplotypes (potential chimeric contigs)"
+  output: report("10_PlaceAndOrientContigs/suspected.haplotypes.before", category = "Logs")
+  message: "Finding non-haplotype contigs not included in map.bed"
   shell: 
     """
     gunzip -fc {input} | awk -f software/LepAnchor/scripts/findFullHaplotypes.awk > {output}
-    echo "Detected $(wc -l {output}) potentially chimeric contigs"
     """
+
 
 rule liftover:
   input: 
     chain = "9_Chain/chainfile.gz",
-    intervals = "10_Anchoring/lepmap3_intervals.la",
-    haplos = "10_Anchoring/fullHaplotypes50.txt"
+    intervals = "10_PlaceAndOrientContigs/lepanchor.input",
+    haplos = "10_PlaceAndOrientContigs/suspected.haplotypes.before"
   output: 
-    lift = report("10_Anchoring/liftover.la", category = "Lifted Intervals"),
-    sortedlift = report("10_Anchoring/liftover.sorted.la", category = "Lifted Intervals")
+    lift = report("10_PlaceAndOrientContigs/liftover.la", category = "Lifted Intervals"),
+    sortedlift = report("10_PlaceAndOrientContigs/liftover.sorted.la", category = "Lifted Intervals")
   message: "Running liftoverHaplotypes for the input maps"
   shell: 
     """
@@ -187,10 +199,43 @@ rule liftover:
     cat {output.lift} | sort -V -k 1,1 -k 2,2n > {output.sortedlift}
     """
 
+
+rule liftover2:
+  input:
+    chain = "9_Chain/chainfile.gz",
+    intervals = "10_PlaceAndOrientContigs/lepanchor.input",
+    haplos = "10_PlaceAndOrientContigs/suspected.haplotypes.before",
+    haplos2 = "10_PlaceAndOrientContigs/suspected.haplotypes.after",
+    lengths = "10_PlaceAndOrientContigs/contigs.length"
+  output:
+    haplos = "10_PlaceAndOrientContigs/suspected.haplotypes.all",
+    lift = report("10_PlaceAndOrientContigs/liftover.nohaplotypes.la", category = "Lifted Intervals"),
+    sortedlift = report("10_PlaceAndOrientContigs/liftover.sorted.nohaplotypes.la", category = "Lifted Intervals"),
+    mapfile = "10_PlaceAndOrientContigs/map.nohaplotypes.clean",
+    bedfile = "10_PlaceAndOrientContigs/map.nohaplotypes.bed",
+    unused = "10_PlaceAndOrientContigs/not_used.nohaplotypes.txt",
+    chr0 = "10_PlaceAndOrientContigs/chr0.nohaplotypes.bed",
+    mapextra = "10_PlaceAndOrientContigs/map.nohaplotypes.extra.bed"
+  message: "Recreating bedfile omitting haplotypes discovered from PlaceAndOrientContigs"
+  params:
+    chrom = lg
+  shell:
+    """
+    cat {input.haplos} {input.haplos2} > {output.haplos}
+    gunzip -fc {input.chain} | java -cp software/LepAnchor LiftoverHaplotypes map={input.intervals} haplotypes={output.haplos} chain=- > {output.lift}
+    cat {output.lift} | sort -V -k 1,1 -k 2,2n > {output.sortedlift}
+    java -cp software/LepAnchor CleanMap map={output.sortedlift} > {output.mapfile}
+    java -cp software/LepAnchor Map2Bed map={output.mapfile} contigLength={input.lengths} > {output.bedfile}
+    cut -f 1 {input.lengths} | grep -v -w -F -f <(cut -f 2 {output.haplos}; cut -f 1 {output.bedfile}) > {output.unused}
+    grep -w -F -f {output.unused} {input.lengths} | awk -vn={params.chrom} '{{s=$1"\t1\t"$2"\t?\t"; for (i=1;i<=n;++i) print s i}}' > {output.chr0}
+    cat {output.bedfile} {output.chr0} > {output.mapextra}
+    """
+
+
 rule cleanmap:
-  input: "10_Anchoring/liftover.sorted.la"
-  output: "10_Anchoring/map_all.clean"
-  log: report("10_Anchoring/cleamap.log", category = "Logs")
+  input: "10_PlaceAndOrientContigs/liftover.sorted.la"
+  output: "10_PlaceAndOrientContigs/map_all.clean"
+  log: report("10_PlaceAndOrientContigs/cleamap.log", category = "Logs")
   message: "Running CleanMap"
   params:
     extras = cleanmap_extra
@@ -198,107 +243,164 @@ rule cleanmap:
 
 rule map2bed:
   input: 
-    cleanmap = "10_Anchoring/map_all.clean",
-    lengths = "10_Anchoring/contigs.length",
-  output: "10_Anchoring/map.bed"
-  log: report("10_Anchoring/map2bed.log", category = "Logs")
+    cleanmap = "10_PlaceAndOrientContigs/map_all.clean",
+    lengths = "10_PlaceAndOrientContigs/contigs.length",
+  output: "10_PlaceAndOrientContigs/map.bed"
+  log: report("10_PlaceAndOrientContigs/map2bed.log", category = "Logs")
   message: "Running Map2Bed"
   params:
     extras = map2bed_extra
   shell: "java -cp software/LepAnchor Map2Bed map={input.cleanmap} contigLength={input.lengths} {params.extras} > {output} 2> {log}"
 
+
 rule ungrouped:
   input:
-    lengths = "10_Anchoring/contigs.length",
-    haplos = "10_Anchoring/fullHaplotypes50.txt",
-    bedfile = "10_Anchoring/map.bed"
+    lengths = "10_PlaceAndOrientContigs/contigs.length",
+    haplos = "10_PlaceAndOrientContigs/suspected.haplotypes.before",
+    bedfile = "10_PlaceAndOrientContigs/map.bed"
   output:
-    bedfile = "10_Anchoring/map_extra.bed"
+    bedfile = "10_PlaceAndOrientContigs/map_extra.bed"
   message: "Finding contigs not put into chromosomes"
   params:
     chrom = lg
   shell:
     """
-    cut -f 1 {input.lengths} | grep -v -w -F -f <(cut -f 2 {input.haplos}; cut -f 1 {input.bedfile}) > 10_Anchoring/unused_contigs.txt
-    grep -w -F -f 10_Anchoring/unused_contigs.txt {input.lengths} | awk -vn={params.chrom} '{{s=$1"\t1\t"$2"\t?\t"; for (i=1;i<=n;++i) print s i}}' > 10_Anchoring/chr0.bed
-    cat {input.bedfile} 10_Anchoring/chr0.bed > {output.bedfile}
+    cut -f 1 {input.lengths} | grep -v -w -F -f <(cut -f 2 {input.haplos}; cut -f 1 {input.bedfile}) > 10_PlaceAndOrientContigs/unused_contigs.txt
+    grep -w -F -f 10_PlaceAndOrientContigs/unused_contigs.txt {input.lengths} | awk -vn={params.chrom} '{{s=$1"\t1\t"$2"\t?\t"; for (i=1;i<=n;++i) print s i}}' > 10_PlaceAndOrientContigs/chr0.bed
+    cat {input.bedfile} 10_PlaceAndOrientContigs/chr0.bed > {output.bedfile}
     """
+
 
 rule place_orient:
   input:
     chain = "9_Chain/chainfile.gz",
-    bedfile = "10_Anchoring/map_extra.bed",
+    bedfile = "10_PlaceAndOrientContigs/map_extra.bed",
     paf = paf,
     prox = proximity,
-    lift = "10_Anchoring/liftover.la"
+    lift = "10_PlaceAndOrientContigs/liftover.la"
   output:
-    chrom = "10_Anchoring/orient_1/chr.{lg_range}.la"
+    chrom = "10_PlaceAndOrientContigs/orient_1/chr.{lg_range}.la",
+    haplos = "10_PlaceAndOrientContigs/orient_1/haplotypes/chr.{lg_range}.haplo.suspected"
   log:
-    chrom = report("10_Anchoring/orient_1/logs/chr.{lg_range}.la.err", category = "Anchoring I Logs")
+    chrom = report("10_PlaceAndOrientContigs/orient_1/logs/chr.{lg_range}.la.log", category = "Anchoring I Logs"),
+    haplos = "10_PlaceAndOrientContigs/orient_1/haplotypes/chr.{lg_range}.haplo.all",
+    errors = "10_PlaceAndOrientContigs/orient_1/errors/chr.{lg_range}.errors"
   params:
     chrom = "{lg_range}",
-    extras = place_orient_extra
+    extras = place_orient_extra,
+    datatype = data_type,
+    haplo = haplo_limit
   threads: 3
-  message: "Running PlaceAndOrientContigs for linkage group {params.chrom}"
+  message: "Running the 1st round of PlaceAndOrientContigs for linkage group {params.chrom}"
   shell:
     """
-    gunzip -fc {input.chain} | java -cp software/LepAnchor PlaceAndOrientContigs numThreads={threads} bed={input.bedfile} chromosome={params.chrom} map={input.lift} chain=- paf={input.paf} proximity={input.prox} {params.extras} > {output} 2> {log}
+    gunzip -fc {input.chain} | java -cp software/LepAnchor PlaceAndOrientContigs numThreads={threads} bed={input.bedfile} chromosome={params.chrom} map={input.lift} chain=- paf={input.paf} proximity={input.prox} {params.datatype} {params.extras} > {output.chrom} 2> {log.chrom}
+    sort -n -r {log.chrom} | awk '($NF=="haplotype" && (!(($5 SUBSEP $6 SUBSEP $7) in h))){{h[$2,$3,$4]; print}}' > {log.haplos}
+    sort -n -r {log.chrom} | awk -vlimit={params.haplo} '($NF=="haplotype" && ($1>=($4-$3+1-limit)/limit) && (!(($5 SUBSEP $6 SUBSEP $7) in h))){{h[$2,$3,$4]; print}}'  > {output.haplos}  
+    grep "error$" {log.chrom} > {log.errors}
     """
 
-rule propogate:
-  input: 
-    placed = expand("10_Anchoring/orient_1/chr.{lgs}.la", lgs = lg_range),
-    bedfile = "10_Anchoring/map.bed"
-  output:
-    propogated = "10_Anchoring/map_propogated.bed",
-    tmp_prop = temp(expand("10_Anchoring/propogate/propogated.{lgs}.la", lgs = range(lg + 1))),
-  message: "Propogating ...something"
-  shell:
-    """
-    awk -f software/LepAnchor/scripts/propagate.awk {input.placed} > 10_Anchoring/tmp1.la
-    awk -f software/LepAnchor/scripts/propagate.awk 10_Anchoring/tmp1.la > 10_Anchoring/tmp2.la
-    i=2
 
-    while ! cmp -s "10_Anchoring/tmp$i.la" "10_Anchoring/tmp$(( $i-1 )).la" ;do
-	    awk -f software/LepAnchor/scripts/propagate.awk 10_Anchoring/tmp$i.la > 10_Anchoring/tmp$[$i+1].la
-	    i=$[$i+1]
-    done
-    #create prop*.la
-    awk '/^[^#]/{{++d[$1 "\t" $7+0 "\t" $8+0]; data[++line]=$0}}END{{for (i = 1; i <= line; ++i) {{$0=data[i];if (d[$1 "\t" $7+0 "\t" $8+0] == 1) fn="10_Anchoring/propogate/propogated."$5".la"; else if ($5==1) fn="10_Anchoring/propogate/propogated.0.la"; else fn=""; if (fn != "") print $0>fn}}}}' 10_Anchoring/tmp$i.la
-    #awk '/^[^#]/{{++d[$1 "\t" $7+0 "\t" $8+0]; data[++line]=$0}}END{{for (i = 1; i <= line; ++i) {{$0=data[i];if (d[$1 "\t" $7+0 "\t" $8+0] == 1) fn="10_Anchoring/propogate/propogated."$5".la"; else if ($5==1) fn="10_Anchoring/propogate/propogated.0.la"; else fn=""; if (fn != "") print $0>fn}}' 10_Anchoring/tmp$i.la
+rule mergehaplos:
+  input: expand("10_PlaceAndOrientContigs/orient_1/haplotypes/chr.{lg}.haplo.suspected", lg = lg_range)
+  output: "10_PlaceAndOrientContigs/suspected.haplotypes.after"
+  message: "Merging suspected haplotype contig information from the linkage groups"
+  shell: "cat {input} | sort | uniq > {output}"
 
-    #create a new bed by combining propogated.[1-9]*.la and map.bed
-    awk '(NR==FNR){{print;c[$1]}}(NR!=FNR && !($1 in c)){{print $1 "\t" $7+0 "\t" $8+0"\t?\t"$5}}' {input.bedfile} {output.tmp_prop} > {output.propogated}
-    rm 10_Anchoring/tmp*.la
-    """
 
 rule place_orient2:
   input:
     chain = "9_Chain/chainfile.gz",
-    bedfile = "10_Anchoring/map_propogated.bed",
+    bedfile = "10_PlaceAndOrientContigs/map.nohaplotypes.extra.bed",
     paf = paf,
     prox = proximity,
-    lift = "10_Anchoring/liftover.la"
+    lift = "10_PlaceAndOrientContigs/liftover.nohaplotypes.la"
   output:
-    chrom = "10_Anchoring/orient_2/ichr.{lg_range}.la"
+    chrom = "10_PlaceAndOrientContigs/orient_2/chr.{lg_range}.la",
+    haplos = "10_PlaceAndOrientContigs/orient_2/haplotypes/chr.{lg_range}.haplo.suspected"
   log:
-    chrom = report("10_Anchoring/orient_2/logs/ichr.{lg_range}.la.err", category = "Anchoring II Logs")
+    chrom = report("10_PlaceAndOrientContigs/orient_2/logs/chr.{lg_range}.la.log", category = "Anchoring II Logs"),
+    haplos = "10_PlaceAndOrientContigs/orient_2/haplotypes/chr.{lg_range}.haplo.all",
+    errors = "10_PlaceAndOrientContigs/orient_2/errors/chr.{lg_range}.errors"
   params:
     chrom = "{lg_range}",
-    extras = place_orient_extra
-  message: "Running a second iteration of PlaceAndOrientContigs for linkage group {params.chrom}"
+    extras = place_orient_extra,
+    datatype = data_type,
+    haplo = haplo_limit
+  threads: 3
+  message: "Running 2nd round of PlaceAndOrientContigs for linkage group {params.chrom}"
   shell:
     """
-    gunzip -fc {input.chain} | java -cp software/LepAnchor PlaceAndOrientContigs bed={input.bedfile} chromosome={params.chrom} map={input.lift} chain=- paf={input.paf} proximity={input.prox} {params.extras} > {output.chrom} 2> {log.chrom}
+    gunzip -fc {input.chain} | java -cp software/LepAnchor PlaceAndOrientContigs numThreads={threads} bed={input.bedfile} chromosome={params.chrom} map={input.lift} chain=- paf={input.paf} proximity={input.prox} {params.datatype} {params.extras} > {output.chrom} 2> {log.chrom}
+    sort -n -r {log.chrom} | awk '($NF=="haplotype" && (!(($5 SUBSEP $6 SUBSEP $7) in h))){{h[$2,$3,$4]; print}}' > {log.haplos}
+    sort -n -r {log.chrom} | awk -vlimit={params.haplo} '($NF=="haplotype" && ($1>=($4-$3+1-limit)/limit) && (!(($5 SUBSEP $6 SUBSEP $7) in h))){{h[$2,$3,$4]; print}}'  > {output.haplos}  
+    grep "error$" {log.chrom} > {log.errors}
     """
+
+
+rule propogate:
+  input: 
+    placed = expand("10_PlaceAndOrientContigs/orient_2/chr.{lgs}.la", lgs = lg_range),
+    bedfile = "10_PlaceAndOrientContigs/map.nohaplotypes.bed"
+  output:
+    propogated = "10_PlaceAndOrientContigs/map.propogated.bed",
+    tmp_prop = temp(expand("10_PlaceAndOrientContigs/propogate/propogated.{lgs}.la", lgs = range(lg + 1))),
+  message: "Propogating ...something"
+  shell:
+    """
+    awk -f software/LepAnchor/scripts/propagate.awk {input.placed} > 10_PlaceAndOrientContigs/tmp1.la
+    awk -f software/LepAnchor/scripts/propagate.awk 10_PlaceAndOrientContigs/tmp1.la > 10_PlaceAndOrientContigs/tmp2.la
+    i=2
+
+    while ! cmp -s "10_PlaceAndOrientContigs/tmp$i.la" "10_PlaceAndOrientContigs/tmp$(( $i-1 )).la" ;do
+	    awk -f software/LepAnchor/scripts/propagate.awk 10_PlaceAndOrientContigs/tmp$i.la > 10_PlaceAndOrientContigs/tmp$[$i+1].la
+	    i=$[$i+1]
+    done
+    #create prop*.la
+    awk '/^[^#]/{{++d[$1 "\t" $7+0 "\t" $8+0]; data[++line]=$0}}END{{for (i = 1; i <= line; ++i) {{$0=data[i];if (d[$1 "\t" $7+0 "\t" $8+0] == 1) fn="10_PlaceAndOrientContigs/propogate/propogated."$5".la"; else if ($5==1) fn="10_PlaceAndOrientContigs/propogate/propogated.0.la"; else fn=""; if (fn != "") print $0>fn}}}}' 10_PlaceAndOrientContigs/tmp$i.la
+
+    #create a new bed by combining propogated.[1-9]*.la and map.nohaplotypes.bed
+    awk '(NR==FNR){{print;c[$1]}}(NR!=FNR && !($1 in c)){{print $1 "\t" $7+0 "\t" $8+0"\t?\t"$5}}' {input.bedfile} {output.tmp_prop} > {output.propogated}
+    rm 10_PlaceAndOrientContigs/tmp*.la
+    """
+
+
+rule place_orient3:
+  input:
+    chain = "9_Chain/chainfile.gz",
+    bedfile = "10_PlaceAndOrientContigs/map.propogated.bed",
+    paf = paf,
+    prox = proximity,
+    lift = "10_PlaceAndOrientContigs/liftover.nohaplotypes.la"
+  output:
+    chrom = "10_PlaceAndOrientContigs/orient_3/ichr.{lg_range}.la",
+    haplos = "10_PlaceAndOrientContigs/orient_3/haplotypes/chr.{lg_range}.haplo.suspected"
+  log:
+    chrom = report("10_PlaceAndOrientContigs/orient_3/logs/ichr.{lg_range}.la.log", category = "Anchoring III Logs"),
+    haplos = "10_PlaceAndOrientContigs/orient_3/haplotypes/chr.{lg_range}.haplo.all",
+    errors = "10_PlaceAndOrientContigs/orient_3/errors/chr.{lg_range}.errors"
+  params:
+    chrom = "{lg_range}",
+    extras = place_orient_extra,
+    datatype = data_type,
+    haplo = haplo_limit
+  message: "Running 3rd round of PlaceAndOrientContigs for linkage group {params.chrom}"
+  shell:
+    """
+    gunzip -fc {input.chain} | java -cp software/LepAnchor PlaceAndOrientContigs bed={input.bedfile} chromosome={params.chrom} map={input.lift} chain=- paf={input.paf} proximity={input.prox} {params.datatype} {params.extras} > {output.chrom} 2> {log.chrom}
+    sort -n -r {log.chrom} | awk '($NF=="haplotype" && (!(($5 SUBSEP $6 SUBSEP $7) in h))){{h[$2,$3,$4]; print}}' > {log.haplos}
+    sort -n -r {log.chrom} | awk -vlimit={params.haplo} '($NF=="haplotype" && ($1>=($4-$3+1-limit)/limit) && (!(($5 SUBSEP $6 SUBSEP $7) in h))){{h[$2,$3,$4]; print}}'  > {output.haplos}  
+    grep "error$" {log.chrom} > {log.errors}
+    """
+
 
 rule prune:
   input: 
-    oriented = expand("10_Anchoring/orient_2/ichr.{lgs}.la", lgs = lg_range),
-    bedfile = "10_Anchoring/map_propogated.bed"
+    oriented = expand("10_PlaceAndOrientContigs/orient_3/ichr.{lgs}.la", lgs = lg_range),
+    bedfile = "10_PlaceAndOrientContigs/map.propogated.bed"
   output: 
-    pruned = report("10_Anchoring/orient_2/pruned.la", category = "Logs"),
-    cleaned = report("10_Anchoring/overlaps_rm.la", category = "Logs")
+    pruned = report("10_PlaceAndOrientContigs/orient_3/pruned.la", category = "Logs"),
+    cleaned = report("10_PlaceAndOrientContigs/overlaps_rm.la", category = "Logs")
   message: "Pruning contig blocks without map support and removing overlaps"
   params:
     chrom = lg
@@ -306,14 +408,15 @@ rule prune:
     """
     for i in $(seq {params.chrom})
     do
-      awk -f software/LepAnchor/scripts/prune.awk 10_Anchoring/orient_2/ichr.$i.la > 10_Anchoring/orient_2/ichr.${{i}}.pruned.la
+      awk -f software/LepAnchor/scripts/prune.awk 10_PlaceAndOrientContigs/orient_3/ichr.$i.la > 10_PlaceAndOrientContigs/orient_3/ichr.${{i}}.pruned.la
     done 2> {output.pruned}
-    awk -f software/LepAnchor/scripts/removeOverlaps.awk {input.bedfile} 10_Anchoring/orient_2/ichr.*.pruned.la > {output.cleaned}
+    awk -f software/LepAnchor/scripts/removeOverlaps.awk {input.bedfile} 10_PlaceAndOrientContigs/orient_3/ichr.*.pruned.la > {output.cleaned}
     """
+
 
 rule construct_agp:
   input:
-    cleaned = "10_Anchoring/overlaps_rm.la"
+    cleaned = "10_PlaceAndOrientContigs/overlaps_rm.la"
   output:
     agp = report("11_AGP/contigs/chr.{lg_range}.agp", category = "Contig AGP Files"),
     scaff_agp = report("11_AGP/scaffolds/chr.{lg_range}.scaffolds.agp", category = "Scaffold AGP Files")
@@ -326,10 +429,11 @@ rule construct_agp:
     awk -vn={params.chrom} '($5==n)' {input.cleaned} | awk -vprefix="LG" -vlg={params.chrom} -f software/LepAnchor/scripts/makeagp2.awk - > {output.scaff_agp}
     """
 
+
 rule unused:
   input:
-    lengths = "10_Anchoring/contigs.length",
-    haplos = "10_Anchoring/fullHaplotypes50.txt",
+    lengths = "10_PlaceAndOrientContigs/contigs.length",
+    haplos = "10_PlaceAndOrientContigs/suspected.haplotypes.before",
     agp = expand("11_AGP/contigs/chr.{lgs}.agp", lgs = lg_range),
   output: 
     txt = "11_AGP/not_used_final.txt",
@@ -340,6 +444,7 @@ rule unused:
     cut -f 1 {input.lengths} | grep -v -w -F -f <(cut -f 2 {input.haplos};awk '($5!="U"){{print $6}}' {input.agp}) > {output.txt}
     grep -F -w -f {output.txt} {input.lengths} | awk '{{print $1,1,$2,1,"W",$1,1,$2,"+"}}' > {output.agp}
     """
+
 
 rule build_final_agp:
   input:
@@ -360,6 +465,7 @@ rule build_final_agp:
     cat {input.scaff_agp} {input.unused} > {output.scaff_all_agp}
     """
 
+
 rule build_scaffold_only_fasta:
   input:
     assembly = geno,
@@ -371,6 +477,7 @@ rule build_scaffold_only_fasta:
     """
     gunzip -fc {input.assembly} | awk -f software/LepAnchor/scripts/makefasta.awk - {input.agp} | gzip > {output.fasta}
     """
+
 
 rule build_scaffold_contig_fasta:
   input:
@@ -384,6 +491,7 @@ rule build_scaffold_contig_fasta:
     gunzip -fc {input.assembly} | awk -f software/LepAnchor/scripts/makefasta.awk - {input.agp} | gzip > {output.fasta}
     """
 
+
 rule build_contig_only_fasta:
   input:
     assembly = geno,
@@ -395,6 +503,7 @@ rule build_contig_only_fasta:
     """
     gunzip -fc {input.assembly} | awk -f software/LepAnchor/scripts/makefasta.awk - {input.scaff_agp} | gzip > {output.fasta}
     """
+
 
 rule build_contig_fasta:
   input:
@@ -408,9 +517,10 @@ rule build_contig_fasta:
     gunzip -fc {input.assembly} | awk -f software/LepAnchor/scripts/makefasta.awk - {input.scaff_agp} | gzip > {output.fasta}
     """
 
+
 rule mareymap_data:
   input:
-    lift = "10_Anchoring/liftover.la",
+    lift = "10_PlaceAndOrientContigs/liftover.la",
     agp = expand("11_AGP/contigs/chr.{lgs}.agp", lgs = lg_range)
   output: 
     mareydata = "13_MareyMapsUntrimmed/data.marey.gz",
@@ -418,8 +528,8 @@ rule mareymap_data:
   log: report("13_MareyMapsUntrimmed/missing_scaffolds.txt", category = "Logs")
   message: 
     """
-    Creating Marey map interval data:
-
+    Marey map interval data
+    ===========================================================
     first points in uncertainty intervals  | {output.mareydata}
     midpoints in uncertainty intervals     | {output.sexavg}  
     """
@@ -437,6 +547,7 @@ rule mareymap_data:
       awk -vn=$c '($3==n)' {input.lift} | awk -f software/LepAnchor/scripts/liftover.awk 11_AGP/contigs/chr.$c.agp - | awk -vm=1 '(/LG/ && NR>=4){{if (NF>4) s=0.5; else s=1;print $1"\t"$2"\t"$3"\t"m"\t"s*($4+$5)}}' | gzip
     done > {output.sexavg} 2> /dev/null
     """
+
 
 rule mareymaps:
   input:
@@ -457,6 +568,7 @@ rule mareymaps:
     Rscript scripts/LASummarySexAvg.r {input.sexavg}
     """
 
+
 rule generate_updated_intervals:
   input: "13_MareyMapsUntrimmed/data.marey.gz"
   output: "14_NewIntervals/LA.intervals.{lg_range}"
@@ -467,6 +579,7 @@ rule generate_updated_intervals:
     """
     zgrep "LG{params.chrom}\s" {input} > {output}
     """
+
 
 rule trim_newintervals:
   input: "14_NewIntervals/LA.intervals.{lg_range}"
@@ -479,17 +592,20 @@ rule trim_newintervals:
     dist = trimdist
   shell: "Rscript scripts/LATrim.r {input} {params.dist} {params.edge} 15_Trim"
 
+
 rule merge_trimplots:
   input: expand("15_Trim/plots/LA.intervals.{lg}.trim.pdf", lg = lg_range)
   output: "15_Trim/LA.trim.summary.pdf"
   message: "Merging trimming plots into {output}"
   shell: "convert -density 200 {input} {output}"
 
+
 rule merge_trimmedintervals:
   input: expand("15_Trim/LA.intervals.{lg}.trimmed", lg = lg_range)
   output: "16_MareyMapsTrimmed/data.marey.trimmed.gz"
   message: "Concatenating trimmed intervals to {output}"
   shell: "cat {input} | gzip -c > {output}"
+
 
 rule plot_trimmedintervals:
   input: "16_MareyMapsTrimmed/data.marey.trimmed.gz"
