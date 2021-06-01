@@ -83,6 +83,9 @@ for (j in 5:6){   # iterate over male (5) and female (6)
 
 # create new table of markers passing QC
 cleaned_markers <- (lgfile %>% filter(Mpass == "PASS" & Fpass == "PASS"))[,1:6]
+# re-scale cleaned markers to 0 by subtracting the minimum genetic position
+cleaned_markers <- cleaned_markers %>%
+                    mutate(V5 = V5 - min(V5), V6 = V6 - min(V6))
 
 # isolate bad markers
 removed_markers <- (lgfile %>% filter(Mpass == "FAIL" | Fpass == "FAIL"))[,1:6]
