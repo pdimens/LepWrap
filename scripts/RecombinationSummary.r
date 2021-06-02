@@ -1,6 +1,6 @@
 #! /usr/bin/env Rscript
 # This script will parse all the recombination logs of LepWrap
-suppressMessages(if (!require("stringr")) install.packages("stringr"))
+suppressMessages(library(tidyverse))
 suppressMessages(library("stringr"))
 ## setup outfile
 # format trailing arguments for script
@@ -25,9 +25,19 @@ for (i in files[2:length(files)]){
   lg <- lg + 1
 }
 
+.recomb_df <- recomb_df %>% select(-family, -sample) 
+cnames <- names(.recomb_df)
+cnames <- c(c("family", "sample", "mean", "max"), cnames)
+.recomb_df <- .recomb_df %>%
+  mutate(mean = round(rowMeans(., na.rm = TRUE), digits = 2), max = pmap(., max, na.rm = TRUE))
+
+recomb_df$mean <- .recomb_df$mean
+recomb_df$max <- .recomb_df$max
+recomb_df <- recomb_df[, cnames]
+
 outfile <- paste(args[1], "recombination.summary", sep = "/")
 
-print(recomb_df, row.names = FALSE)
+print(recomb_df, row.names = FALSE, width = 10000)
 q()
 write.table(
   recomb_df,
