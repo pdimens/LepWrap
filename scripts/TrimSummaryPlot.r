@@ -7,6 +7,7 @@ args <- commandArgs(trailingOnly = TRUE)
 
 # read in the summary table and pop out the LG number
 tbl <- read_table(args[1]) %>% suppressMessages()
+pdf(NULL)
 
 tbl %>%
   ggplot(aes(lg, n_removed)) +

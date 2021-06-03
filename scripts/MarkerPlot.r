@@ -4,6 +4,8 @@ suppressMessages(library(tidyverse, quietly = TRUE, warn.conflicts = FALSE))
 
 args <- commandArgs(trailingOnly = TRUE)
 
+pdf(NULL)
+
 lgfile <- read.delim(
   args[1], 
   header = FALSE, 

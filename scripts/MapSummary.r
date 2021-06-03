@@ -25,7 +25,7 @@ library(stringr)
 targetdir <- args[1]
 
 # pattern match to find the map files
-flist <- list.files(targetdir, full.names = TRUE, pattern = "^map.")
+flist <- list.files(targetdir, full.names = TRUE, pattern = "^LOD.")
 # natural language sort
 flist <- str_sort(flist, numeric = TRUE)
 
@@ -54,8 +54,8 @@ summtable[is.na(summtable)] <- 0
 summtable <- summtable[order(summtable$LG),]
 
 # generate output filenames
-out_tmp <-paste0(targetdir, "/all.map.summary")
-out_file <- paste0(targetdir, "/all.maps.summary")
+out_tmp <-paste0(targetdir, "/.all.LOD.summary")
+out_file <- paste0(targetdir, "/all.LOD.summary")
 
 write.table(summtable, file = out_tmp, quote = FALSE, row.names = FALSE, col.names = TRUE)
 # use GNU column command to make the table fixed-width and remove the tmp file

@@ -3,11 +3,10 @@
 suppressMessages(if (!require("tidyverse")) install.packages("tidyverse"))
 suppressMessages(library("tidyverse"))
 args <- commandArgs(trailingOnly = TRUE)
-#args <- c("~/ordered.1", 10, 15)
-
 # args[1] is the OrderMarkers2 output file
-# args[2] is the centimorgan cutoff distance
+# args[2] is the centimorgan cutoff threshold
 # args[3] is the % of edge markers to scan
+# args[4] is the output directory
 
 lgfile <- read.delim(
   args[1], 
@@ -15,7 +14,7 @@ lgfile <- read.delim(
   sep = "\t", 
   comment.char="#"
 ) %>%
-  mutate(Mpass = TRUE, Fpass = TRUE)
+  mutate(Mpass = "PASS", Fpass = "PASS")
 
 ## setup output file names ##
 # split the filename by path
@@ -25,55 +24,80 @@ filename <- filename[length(filename)]
 lg <- unlist(strsplit(filename, "\\."))[2]
 
 #========= output instantiation ========#
-outfile_base <- paste("5_Trim", filename, sep = "/")
-outfile_log_base <- paste("5_Trim", "logs", filename, sep = "/")
-plotfile_base <- paste("5_Trim", "plots", filename, sep = "/")
+dir.create(args[4], showWarnings = FALSE)
+dir.create(paste0(args[4],"/plots"), showWarnings = FALSE)
+dir.create(paste0(args[4],"/logs"), showWarnings = FALSE)
+dir.create(paste0(args[4],"/QC_raw"), showWarnings = FALSE)
+outfile_base <- paste(args[4], filename, sep = "/")
+outfile_log_base <- paste(args[4], "logs", filename, sep = "/")
+plotfile_base <- paste(args[4], "plots", filename, sep = "/")
 plotfile <- paste(plotfile_base, "trim.pdf", sep = ".")
+rawfile_base <- paste(args[4], "QC_raw", filename, sep = "/")
+
+
 
 ##### Pruning the ends #####
-dist_thresh <- as.numeric(args[2])
 # if the percent threshold is given as an interger, convert it to a decimal
+dist_thresh <- as.numeric(args[2])
+if(dist_thresh >= 1){
+  dist_thresh <- dist_thresh * .01
+}
+dist_thresh_m <- abs(max(lgfile$V2) - min(lgfile$V2)) * dist_thresh
+dist_thresh_f <- abs(max(lgfile$V3) - min(lgfile$V3)) * dist_thresh
+
 edge_length <- as.numeric(args[3])
 if(edge_length >= 1){
   edge_length <- edge_length * .01
 }
 
+n_markers <- length(lgfile$V1)
+front_edge <- round(n_markers * edge_length, digits = 0)
+back_edge <- round(n_markers - front_edge, digits = 0)
+
 for (j in 2:3){   # iterate over male (2) and female (3)
+  # sort on column
+  if (j == 2){
+    lgfile <- arrange(lgfile, V2)
+    dist_thresh <- dist_thresh_m
+  } else {
+    lgfile <- arrange(lgfile, V3)
+    dist_thresh <- dist_thresh_f
+  }
   # trim beginning
-  n_markers <- length(lgfile$V1) * edge_length
-  for(a in 1:n_markers){ #first n% of total markers from the beginning
-    diff <- abs(lgfile[a+1,j]-lgfile[a,j]) # difference between two points
+  for(a in front_edge:2){ #first n% of total markers from the beginning
+    diff <- abs(lgfile[a,j]-lgfile[a-1,j]) # difference between two points
     if( diff > dist_thresh ){ # is the difference between the two points > distance argument?
-      lgfile[1:a, j+4] <- FALSE # mark that marker and all markers BEFORE it as FALSE
+      lgfile[(a-1):1, j+4] <- "FAIL" # mark that marker and all markers BEFORE it as FAIL
+      break()
     }
   }
   # trim end
-  filelen<-length(lgfile$V1)  # get new file lengths for each time we remove NA's
-  for(z in filelen:(filelen-n_markers)){  #iterate n% total markers in starting from the end
-    diff <- abs(lgfile[z,j]-lgfile[z-1,j]) # difference between two points
+  for(z in back_edge:(n_markers-1)){ #last n% total markers starting from the back edge going out
+    diff <- abs(lgfile[z+1,j]-lgfile[z,j]) # difference between two points
     if( diff > dist_thresh ){ # is the difference between the two points > distance argument?
-      lgfile[filelen:z,j+4] <- FALSE # mark that marker and all markers AFTER it as FALSE
+      lgfile[(z+1):n_markers,j+4] <- "FAIL" # mark that marker and all markers AFTER it as FAIL
+      break()
     }
   }
-  
-  # create new table of markers passing QC
-  cleaned_markers <- lgfile %>% filter(Mpass == TRUE & Fpass == TRUE)
+
 } ###
 
+# create new table of markers passing QC
+cleaned_markers <- lgfile %>% filter(Mpass == "PASS" & Fpass == "PASS")
 
 # isolate bad markers
-removed_markers <- (lgfile %>% filter(Mpass == FALSE | Fpass == FALSE))$V1 
+removed_markers <- (lgfile %>% filter(Mpass == "FAIL" | Fpass == "FAIL"))$V1 
 
 # get simple counts
-rm_male <- (lgfile %>% filter(Mpass == FALSE & Fpass == TRUE))$V1 %>% length()
-rm_female <- (lgfile %>% filter(Fpass == FALSE & Mpass == TRUE))$V1 %>% length()
-rm_both <- (lgfile %>% filter(Mpass == FALSE & Fpass == FALSE))$V1 %>% length()
+rm_male <- (lgfile %>% filter(Mpass == "FAIL" & Fpass == "PASS"))$V1 %>% length()
+rm_female <- (lgfile %>% filter(Fpass == "FAIL" & Mpass == "PASS"))$V1 %>% length()
+rm_both <- (lgfile %>% filter(Mpass == "FAIL" & Fpass == "FAIL"))$V1 %>% length()
 
 QA <- function(x,y){
-  if(x & y) return("pass")
-  if(!x & !y) return("both")
-  if(!x & y) return("male")
-  if(x & !y) return("female")
+  if(x == "PASS" & y == "PASS") return("pass")
+  if(x != "PASS" & y != "PASS") return("both")
+  if(x == "FAIL" & y == "PASS") return("male")
+  if(x == "PASS" & y == "FAIL") return("female")
 }
 
 QAfix <- function (x,y){
@@ -86,9 +110,11 @@ QAfix <- function (x,y){
   }
 }
   
-  
+pdf(NULL)
+
 plot_df <- lgfile %>%
               rename(Male = V2, Female = V3) %>%
+              arrange(Male) %>%
               mutate(Marker = seq_along(Mpass)) %>%
               rowwise() %>%
               mutate(Fail = QA(Mpass, Fpass)) %>%
@@ -96,11 +122,6 @@ plot_df <- lgfile %>%
               pivot_longer(c(Male, Female), names_to = "Sex", values_to = "Position") %>%
               rowwise() %>%
               mutate(Fail = QAfix(Fail, Sex))
-
-# locations for vertical lines
-n_markers <- length(lgfile$V1) 
-front_edge <- round(n_markers * edge_length, digits = 0)
-back_edge <- round(n_markers - (front_edge), digits = 0)
 
 plot_df %>%
   ggplot(aes(Marker, Position)) +
@@ -111,7 +132,7 @@ plot_df %>%
   labs(
     title = paste("Edge Cluster Trimming Results for Linkage Group", lg),
     subtitle = paste0("Markers Failing QC: ", rm_female, " female, ", rm_male, " male, ", rm_both, " both (", rm_female+rm_male+rm_both, " total)" ),
-    caption = paste0("edge length: ", edge_length*100, "% of markers, cM threshold: ", dist_thresh),
+    caption = paste0(edge_length*100, "% of edge markers, ", args[2], "% cM threshold: ", dist_thresh_m, "(M) & ", dist_thresh_f, "(F)"),
     x = "Marker Number", 
     y = "Position (cM)", 
     color = "QA Status"
@@ -121,7 +142,6 @@ plot_df %>%
 suppressMessages(ggsave(plotfile, width = 7, height = 4, units = "in"))
 
 # outputting filtered files
-num_rm <- length(removed_markers)
 
 writeLines(readLines(args[1], n=3), con = paste(outfile_base, "trimmed", sep = "."))
 write.table(
@@ -132,6 +152,15 @@ write.table(
   row.names = FALSE,
   col.names = FALSE,
   append=TRUE
+)
+
+write.table(
+  lgfile, 
+  file = paste(rawfile_base, "filtered.raw", sep = "."), 
+  sep = "\t",
+  quote = FALSE, 
+  row.names = FALSE,
+  col.names = FALSE,
 )
 
 write.table(

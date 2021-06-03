@@ -5,6 +5,7 @@ rule calculate_distances:
     output:
         distance = "7_Distances/ordered.{lg_range}.distances",
         sex_averaged = "7_DistancesSexAverage/ordered.{lg_range}.sexavg",
+        sex_averagedtmp = temp("7_DistancesSexAverage/logs/.ordered.{lg_range}.sexavg"),
         intervals = "7_Intervals/ordered.{lg_range}.intervals"
     message: "Calculating marker distances and intervals for linkage group: {params.lg}"
     log:
@@ -13,15 +14,15 @@ rule calculate_distances:
     params:
         dist_method = dist_method,
         lg = "{lg_range}"
-    threads: threads_per
+    threads: 2
     shell:
         """
         cp {input.lg} {output.distance}
         
-        zcat {input.data_call} | java -cp software/LepMap3 OrderMarkers2 data=- evaluateOrder={input.lg} {params.dist_method} numThreads={threads} improveOrder=0 sexAveraged=1 &> {log.sex_averaged}.tmp
-        sed -i -e 's/LG \= 0/LG \= {params.lg}/g' {log.sex_averaged}.tmp
-        sed -n '/\*\*\* LG \=/,$p' {log.sex_averaged}.tmp > {output.sex_averaged} 
-        awk '/#java/{{flag=1}} flag; /*** LG =/{{flag=0}}' {log.sex_averaged}.tmp > {log.sex_averaged} && rm {log.sex_averaged}.tmp
+        zcat {input.data_call} | java -cp software/LepMap3 OrderMarkers2 data=- evaluateOrder={input.lg} {params.dist_method} numThreads={threads} improveOrder=0 sexAveraged=1 &> {output.sex_averagedtmp}
+        sed -i -e 's/LG \= 0/LG \= {params.lg}/g' {output.sex_averagedtmp}
+        sed -n '/\*\*\* LG \=/,$p' {output.sex_averagedtmp} > {output.sex_averaged} 
+        awk '/#java/{{flag=1}} flag; /*** LG =/{{flag=0}}' {output.sex_averagedtmp} > {log.sex_averaged}
 
         zcat {input.data_call} | java -cp software/LepMap3 OrderMarkers2 data=- evaluateOrder={input.lg} {params.dist_method} numThreads={threads} calculateIntervals={output.intervals} > {log.intervals} 2>&1
         """

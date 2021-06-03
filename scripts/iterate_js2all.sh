@@ -33,10 +33,10 @@ fi
 
 for i in $(seq $LODMIN $LODMAX); do
     zcat 2_Filtering/data.filtered.lepmap3.gz | java -cp software/LepMap3 JoinSingles2All map=$TARGETMAP data=- lodLimit=$i lodDifference=4 iterate=1 distortionLod=1 numThreads=10 informativeMask=$INFMASK > JoinSingles2All_iter/logs/map.$i.$4.js2all
-    cut -f1 JoinSingles2All_iter/logs/map.$i.$4.js2all > JoinSingles2All_iter/map.$i.$4.js2all
+    cut -f1 JoinSingles2All_iter/logs/map.$i.$4.js2all > JoinSingles2All_iter/LOD.$i.$4.js2all
 done
 
-echo "The generated maps are named map.LODlim.LODdiff.js2all"
+echo "The generated maps are named LOD.LODlim.LODdiff.js2all"
 
 # generate a summary of the results
 scripts/MapSummary.r JoinSingles2All_iter

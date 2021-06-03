@@ -43,14 +43,17 @@ dist_thresh <- as.numeric(args[2])
 if(dist_thresh >= 1){
   dist_thresh <- dist_thresh * .01
 }
-dist_thresh <- abs(max(lgfile$V5) - min(lgfile$V5)) * dist_thresh
+.dist_thresh <- dist_thresh * 100
+dist_thresh_m <- round(abs(max(lgfile$V5) - min(lgfile$V5)) * dist_thresh, digits = 2)
+dist_thresh_f <- round(abs(max(lgfile$V6) - min(lgfile$V6)) * dist_thresh, digits = 2)
+
 
 # if the percent threshold is given as an integer, convert it to a decimal
 edge_length <- as.numeric(args[3])
 if(edge_length >= 1){
   edge_length <- edge_length * .01
 }
-
+.edge_length <- edge_length * 100
 n_markers <- length(lgfile$V1)
 
 front_edge <- round(n_markers * edge_length, digits = 0)
@@ -60,8 +63,10 @@ for (j in 5:6){   # iterate over male (5) and female (6)
   # sort on column
   if (j == 5){
     lgfile <- arrange(lgfile, V5)
+    dist_thresh <- dist_thresh_m
   } else {
     lgfile <- arrange(lgfile, V6)
+    dist_thresh <- dist_thresh_f
   }
   # trim beginning
   for(a in front_edge:2){ #first n% of total markers starting from the front edge, going out
@@ -83,6 +88,9 @@ for (j in 5:6){   # iterate over male (5) and female (6)
 
 # create new table of markers passing QC
 cleaned_markers <- (lgfile %>% filter(Mpass == "PASS" & Fpass == "PASS"))[,1:6]
+# re-scale cleaned markers to 0 by subtracting the minimum genetic position
+cleaned_markers <- cleaned_markers %>%
+                    mutate(V5 = V5 - min(V5), V6 = V6 - min(V6))
 
 # isolate bad markers
 removed_markers <- (lgfile %>% filter(Mpass == "FAIL" | Fpass == "FAIL"))[,1:6]
@@ -101,8 +109,8 @@ plot_male <- lgfile %>% arrange(V5) %>%
   geom_vline(xintercept = back_edge, linetype = "dashed", size = 0.2) +
   labs(
     title = "",
-    subtitle = paste0("Male markers trimmed: ", rm_male),
-    caption = paste0(edge_length*100, "% of edge markers, ", args[2], "% cM threshold= ", dist_thresh),
+    subtitle = paste0(rm_male, " male markers >", dist_thresh_m, "cM trimmed"),
+    caption = paste0(.edge_length, "% edge markers, ", .dist_thresh, "% cM"),
     x = "Marker Number", 
     y = "Position (cM)", 
     color = "Pass Filtering"
@@ -115,7 +123,7 @@ plot_female <- lgfile %>% arrange(V6) %>%
   geom_vline(xintercept = back_edge, linetype = "dashed", size = 0.2) +
   labs(
     title = paste("Edge Cluster Trimming for LG:", lg),
-    subtitle = paste0("Female markers trimmed: ", rm_female),
+    subtitle = paste0(rm_female, " female markers >", dist_thresh_f, "cM trimmed"),
     caption = paste0("Markers failing both M+F: ", rm_both),
     x = "Marker Number", 
     y = "Position (cM)", 
