@@ -38,13 +38,3 @@ recomb_df <- recomb_df[, cnames]
 outfile <- paste(args[1], "recombination.summary", sep = "/")
 
 print(recomb_df, row.names = FALSE, width = 10000)
-q()
-write.table(
-  recomb_df,
-  file=outfile,
-  append=FALSE, 
-  sep = "\t", 
-  quote = FALSE, 
-  row.names = FALSE, 
-  col.names = TRUE
-)
