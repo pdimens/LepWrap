@@ -1,13 +1,12 @@
 ![logo](.misc/logo.png)
 
-
-_It's Lep-Map3, but with snakes_ 🐍🐍
+_It's Lep-Map3, but with snakes 🐍🐍_
 
 [![alt text](https://img.shields.io/badge/docs-wiki-75ae6c?style=for-the-badge&logo=Read%20The%20Docs)](https://github.com/pdimens/LepWrap/wiki) 
 
 # LepWrap
 
-LepWrap is a reusable pipeline to use the linkage map software [Lep-Map3](https://sourceforge.net/projects/lep-map3/) and [Lep-Anchor](https://sourceforge.net/projects/lep-anchor/). It is the Snakemake-based successor to [LepMapp3r](https://github.com/pdimens/LepMapp3r). Check out [the wiki](https://github.com/pdimens/LepWrap/wiki) for detailed installation, usage, and workflow information.
+LepWrap is a reusable pipeline to use the linkage map software [Lep-Map3](https://sourceforge.net/projects/lep-map3/). It is the Snakemake-based successor to [LepMapp3r](https://github.com/pdimens/LepMapp3r). Check out [the wiki](https://github.com/pdimens/LepWrap/wiki) for detailed installation, usage, and workflow information.
 
 
 
@@ -24,9 +23,7 @@ git clone https://github.com/pdimens/LepWrap.git
 Assuming you have `anaconda` or `miniconda` installed:
 ```bash
 cd LepWrap
-
 conda env create -f conda_setup.yml
-
 ```
 This will create an environment called `lepwrap` that can be activated with:
 ```bash
@@ -42,7 +39,6 @@ where `<number_of_cores>` is an integer of the maximum number of cores/threads y
 
 ### Something to keep in mind
 LepWrap does things a certain way, employing the most common/reasonable way of using Lep-Map3 (and LepAnchor more or less). Version `3.2+` is **a lot** more flexible that its predecessors, but might still lack something you're looking for. Your study is unique, and I encourage youto clone/fork this repository and adapt LepWrap to your needs! All of the code in LepWrap is written in human-readable bash or aggressively annotated R, so give it a shot and adapt it to your workflow. PR's always welcome!
-
 
 
 ## Citation
