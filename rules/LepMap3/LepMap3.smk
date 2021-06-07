@@ -13,7 +13,7 @@ data_tol=config["data_tol"]
 filtering_extra = config["extra_params_Filtering"]
 # separate chromosomes #
 lod_max = str(config["lod_max"])
-lod_range = list(range(config["lod_min"], config["lod_max"]+1))
+lod_range = list(range(config["lod_min"], lod_max+1))
 informative = config["informative"]
 sepchrom_extra = config["extra_params_SeparateChromosomes"]
 # join singles #
@@ -22,16 +22,14 @@ lod_lim = config["lod_limit"]
 lod_diff = config["lod_difference"]
 js2a_extra = config["extra_params_JoinSingles"]
 # ordering #
-lg_range = list(range(1, config["exp_lg"]+1))
 lg_count = config["exp_lg"]
-ITER = config["iterations"]
+lg_range = list(range(1, lg_count+1))
 order_extra = config["extra_params_OrderMarkers"]
 # trimming #
 edge_len = str(config["edge_length"])
 trim_thresh = str(config["trim_cutoff"])
 # ordering II #
 reorder_extra = config["extra_params_reOrderMarkers"]
-ITER2 = round(ITER/2)
 # distances #
 dist_method = config["distance_method"]
 
