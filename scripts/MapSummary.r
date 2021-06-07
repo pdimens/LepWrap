@@ -62,8 +62,6 @@ write.table(summtable, file = out_tmp, quote = FALSE, row.names = FALSE, col.nam
 cmd <- paste("column -t", out_tmp, ">", out_file, "&& rm", out_tmp)
 system(cmd)
 
-cat(paste0("Examine the map summary (", out_file, ") and decide on the best map before proceeding\n\n"))
-
 } else {
   cat("Error: the argument must be either a mapfile or a directory of mapfiles")
 }
