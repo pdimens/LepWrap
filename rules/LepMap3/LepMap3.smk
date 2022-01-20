@@ -13,7 +13,7 @@ data_tol=config["data_tol"]
 filtering_extra = config["extra_params_Filtering"]
 # separate chromosomes #
 lod_max = str(config["lod_max"])
-lod_range = list(range(config["lod_min"], lod_max+1))
+lod_range = list(range(config["lod_min"], config["lod_max"]+1))
 informative = config["informative"]
 sepchrom_extra = config["extra_params_SeparateChromosomes"]
 # join singles #
