@@ -8,7 +8,7 @@ rule order_markers:
     log:
         run = "4_OrderMarkers/logs/ordered.{lg_range}.log",
         recomb = "4_OrderMarkers/recombination/ordered.{lg_range}.recombinations"
-    message: "Ordering linkage group {params.chrom} with {params.iterations} iterations"
+    message: "Ordering linkage group {params.chrom}"
     params:
         chrom = "{lg_range}",
         extra = order_extra
