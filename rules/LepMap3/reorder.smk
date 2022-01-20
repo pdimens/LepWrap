@@ -9,7 +9,7 @@ rule reorder_markers:
     log:
         run = "6_OrderMarkers/logs/ordered.{lg_range}.log",
         recomb = "6_OrderMarkers/recombination/ordered.{lg_range}.recombination"
-    message: "Reordering linkage group {params.lg} with {params.iterations} iterations"
+    message: "Reordering linkage group {params.lg}"
     params:
         lg = "{lg_range}",
         extra = reorder_extra
