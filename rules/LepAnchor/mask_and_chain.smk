@@ -23,7 +23,8 @@ rule repeatmask:
     gzip --stdout 8_Repeatmask/*.msk > {output} && rm 8_Repeatmask/*.msk
     """
     
-  
+
+
 rule chain_1:
   input: 
     geno = "8_Repeatmask/repeatmasked.fa.gz",
@@ -38,21 +39,8 @@ rule chain_1:
     os = os_name
   shell:
     """
-    OS=$(echo {params} | tr '[:upper:]' '[:lower:]')
-    echo "Using the $OS lastz/chainNet binaries"
-    if [ $OS == "ubuntu" ]
-    then
-        export PATH="$PATH:software/LepAnchor/deps/ubuntu"
-    elif [ $OS == "centos5" ]
-    then
-        export PATH="$PATH:software/LepAnchor/deps/centOS5"
-    elif [ $OS == "centos6" ]
-    then
-        export PATH="$PATH:software/LepAnchor/deps/centOS6"
-    else
-        echo "$OS is not recognized as one of Ubuntu, CentOS5, or CentOS6, defaulting to Ubuntu"
-        export PATH="$PATH:software/LepAnchor/deps/ubuntu"
-    fi
+    # copy the binaries to the conda PATH
+    cp -n software/LepAnchor/deps/ubuntu/* $(echo $PATH | cut -f1 -d":")
     ln -srf {input} 9_Chain/
     cd 9_Chain
     ../software/LepAnchor/deps/step1.HM2 repeatmasked {threads}
