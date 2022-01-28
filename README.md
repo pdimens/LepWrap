@@ -6,7 +6,7 @@ _It's Lep-Map3 (and Lep-Anchor), but with snakes 🐍🐍_
 
 # LepWrap
 
-LepWrap is a reusable pipeline to use the linkage map software [Lep-Map3](https://sourceforge.net/projects/lep-map3/). It is the Snakemake-based successor to [LepMapp3r](https://github.com/pdimens/LepMapp3r). Check out [the wiki](https://github.com/pdimens/LepWrap/wiki) for detailed installation, usage, and workflow information.
+LepWrap is a reusable pipeline to use the linkage map software [Lep-Map3](https://sourceforge.net/projects/lep-map3/) and the genome assembly map-based anchoring and orienting software [Lep-Anchor](https://sourceforge.net/p/lep-anchor/wiki/Home/). It is the Snakemake-based successor to [LepMapp3r](https://github.com/pdimens/LepMapp3r). Check out [the wiki](https://github.com/pdimens/LepWrap/wiki) for detailed installation, usage, and workflow information.
 
 
 
