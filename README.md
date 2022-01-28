@@ -11,7 +11,7 @@ LepWrap is a reusable pipeline to use the linkage map software [Lep-Map3](https:
 
 
 ### How to install
-You will need a `conda` installation ([Anaconda](https://docs.anaconda.com/anaconda/install/) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html)), along with cloning this repository locally. I recommend Miniconda.
+You will need a `conda` installation ([Anaconda](https://docs.anaconda.com/anaconda/install/) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html), I recommend Miniconda), along with downloading the latest release or cloning this repository locally. Using the latest release is a more stable solution.
 
 #### 1. Cloning LepWrap
 Download a zip of this repository using the "Code" button on the top-right and unzip it on your machine or:
