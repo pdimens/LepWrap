@@ -31,14 +31,19 @@ conda activate lepwrap
 ```
 
 ### How to run
-You will need to modify `config.yaml` to suit your needs, then you can simply run the pipeline with the wrapper:
+You will need to modify `config.yml` to suit your needs, then you can simply run the pipeline with the wrapper:
 ```bash
-./LepWrap <number_of_cores>
+./LepWrap <number_of_cores> <config.yml>
 ```
-where `<number_of_cores>` is an integer of the maximum number of cores/threads you want the pipeline to use.
+where `<number_of_cores>` is an integer of the maximum number of cores/threads you want the pipeline to use and `<config.yml>` (optional!) is the name of the config file, if it's different than `config.yml`. 
 
+**Examples**
+```bash
+./LepWrap 15                    # assumes config.yml
+./LepWrap 32 nojoinsingles.yml  # specific config file
+```
 ### Something to keep in mind
-LepWrap does things a certain way, employing the most common/reasonable way of using Lep-Map3 (and LepAnchor more or less). Version `3.2+` is **a lot** more flexible that its predecessors, but might still lack something you're looking for. Your study is unique, and I encourage you to clone/fork this repository and adapt LepWrap to your needs! All of the code in LepWrap is written in human-readable bash or aggressively annotated R, so give it a shot and adapt it to your workflow. PR's always welcome!
+LepWrap does things a certain way, employing the most common/reasonable way of using Lep-Map3 (and LepAnchor more or less). Current versions are **a lot** more flexible that the predecessors, but might still lack something you need. Your study is unique, and I encourage you to clone/fork this repository and adapt LepWrap to it! All of the code in LepWrap is written in human-readable bash or aggressively annotated R, so give it a shot and adapt it to your workflow. PR's always welcome!
 
 
 ## Citation
