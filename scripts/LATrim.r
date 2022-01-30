@@ -63,7 +63,9 @@ for (j in 5:6){   # iterate over male (5) and female (6)
   lgfile <- arrange(lgfile, j)
   dist_thresh <- dist_thresh_all[j-4]
   # trim beginning
-  for(a in forward_start:2){ #first n% of total markers starting from the front edge, going out
+  # the loop goes towards the edges to be effecient with the break() call, removing the
+  # entire cluster once one bad marker is found
+  for(a in forward_start:2){ #first n% of total markers starting from the forward edge, going out
     diff <- abs(lgfile[a,j]-lgfile[a-1,j]) # difference between two points
     if( diff > dist_thresh ){ # is the difference between the two points > distance argument?
       lgfile[(a-1):1, j+2] <- FALSE # mark that marker and all markers BEFORE it as FAIL
@@ -71,7 +73,7 @@ for (j in 5:6){   # iterate over male (5) and female (6)
     }
   }
   # trim end
-  for(z in reverse_start:(n_markers-1)){ #last n% total markers starting from the back edge going out
+  for(z in reverse_start:(n_markers-1)){ #last n% total markers starting from the reverse edge going out
     diff <- abs(lgfile[z+1,j]-lgfile[z,j]) # difference between two points
     if( diff > dist_thresh ){ # is the difference between the two points > distance argument?
       lgfile[(z+1):n_markers,j+2] <- FALSE # mark that marker and all markers AFTER it as FAIL
