@@ -96,9 +96,9 @@ cleaned_markers <- cleaned_markers %>%
 removed_markers <- (lgfile %>% filter(Mpass == "FAIL" | Fpass == "FAIL"))[,1:6]
 
 # get simple counts
-rm_male <- (lgfile %>% filter(Mpass == "FAIL" & Fpass == "PASS"))$V1 %>% length()
-rm_female <- (lgfile %>% filter(Fpass == "FAIL" & Mpass == "PASS"))$V1 %>% length()
-rm_both <- (lgfile %>% filter(Mpass == "FAIL" & Fpass == "FAIL"))$V1 %>% length()
+rm_male <- lgfile %>% filter(Mpass == "FAIL" & Fpass == "PASS") %>% nrow()
+rm_female <- lgfile %>% filter(Fpass == "FAIL" & Mpass == "PASS") %>% nrow()
+rm_both <- lgfile %>% filter(Mpass == "FAIL" & Fpass == "FAIL") %>% nrow()
 
 pdf(NULL)
 
