@@ -9,6 +9,28 @@ args <- commandArgs(trailingOnly = TRUE)
 # args[3] is the % of edge markers to scan
 # args[4] is the output directory
 
+#==== functions to translate QC flags ====#
+QA <- function(x,y){
+  if(x & y) return("pass")
+  if(!x & !y) return("both")
+  if(!x & y) return("male")
+  if(x & !y) return("female")
+}
+
+QAfix <- function (x,y){
+  if(x == "female" & y == "Female") {
+    return(F)
+  } else if (x == "male" & y == "Male") {
+    return(F)
+  } else if(x == "both") {
+    return(F)
+  } else {
+    return(T)
+  }
+}
+
+#==== read in file =====#
+
 lgfile <- read.delim(
   args[1],
   header = FALSE, 
@@ -24,7 +46,7 @@ filename <- unlist(strsplit(args[1], "/"))
 filename <- filename[length(filename)]
 lg <- unlist(strsplit(filename, "\\."))[2]
 
-#========= output instantiation ========#
+#========= instantiate output ========#
 dir.create(args[4], showWarnings = FALSE)
 dir.create(paste0(args[4],"/plots"), showWarnings = FALSE)
 dir.create(paste0(args[4],"/logs"), showWarnings = FALSE)
@@ -34,7 +56,6 @@ outfile_log_base <- paste(args[4], "logs", filename, sep = "/")
 plotfile_base <- paste(args[4], "plots", filename, sep = "/")
 plotfile <- paste(plotfile_base, "trim.pdf", sep = ".")
 rawfile_base <- paste(args[4], "QC_raw", filename, sep = "/")
-
 
 
 #====== Pruning the ends ======#
@@ -58,7 +79,8 @@ n_markers <- nrow(lgfile)
 forward_start <- round(n_markers * edge_length, digits = 0)
 reverse_start <- round(n_markers - forward_start, digits = 0)
 
-for (j in 2:3){   # iterate over male (2) and female (3)
+# iterate over male (2) and female (3)
+for (j in 2:3){
   # sort on column
   lgfile <- arrange(lgfile, j)
   dist_thresh <- dist_thresh_all[j-1]
@@ -88,25 +110,6 @@ rm_male <- lgfile %>% filter(!Mpass & Fpass) %>%  nrow()
 rm_female <- lgfile %>% filter(!Fpass & Mpass) %>% nrow()
 rm_both <- lgfile %>% filter(!Mpass & !Fpass) %>% nrow()
 
-# functions to translate QC flags for plotting and other information
-QA <- function(x,y){
-  if(x & y) return("pass")
-  if(!x & !y) return("both")
-  if(!x & y) return("male")
-  if(x & !y) return("female")
-}
-
-QAfix <- function (x,y){
-  if(x == "female" & y == "Female") {
-    return(F)
-  } else if (x == "male" & y == "Male") {
-    return(F)
-  } else if(x == "both" & (y == "Male" | y == "Female")) {
-    return(F)
-  } else {
-    return(T)
-  }
-}
 
 #====== Plotting ======#
 pdf(NULL)
@@ -131,7 +134,7 @@ plot_df %>%
   labs(
     title = paste("Edge Cluster Trimming Results for Linkage Group", lg),
     subtitle = paste0("Markers Failing QC: ", rm_female, " female, ", rm_male, " male, ", rm_both, " both (", rm_female+rm_male+rm_both, " total)" ),
-    caption = paste0(edge_length*100, "% of edge markers, ", args[2], "% cM threshold: ", dist_thresh_all[1], "(M) & ", dist_thresh_all[2], "(F)"),
+    caption = paste0(edge_length*100, "% of edge markers, ", args[2], "% cM threshold: ", dist_thresh_all[2], "(F)  &  ", dist_thresh_all[1], "(M)"),
     x = "Marker Number", 
     y = "Position (cM)", 
     color = "Pass QA"
@@ -148,11 +151,11 @@ fail_idx <- which(!lgfile$QC)
 # prepend a comment to the flagged markers so LepMap3 ignores them
 lgfile[fail_idx, 1] <- paste0("#", lgfile[fail_idx, 1])
 # re-scale remaining markers to 0 by subtracting the minimum genetic position for each sex
-lgfile[,2] <- lgfile[,2] - (min(lgfile[lgfile$QC,2]))
-lgfile[,3] <- lgfile[,3] - (min(lgfile[lgfile$QC,3]))
+lgfile[,2] <- round(lgfile[,2] - (min(lgfile[lgfile$QC,2])), digits = 3)
+lgfile[,3] <- round(lgfile[,3] - (min(lgfile[lgfile$QC,3])), digits = 3)
 
 # write header to a new file
-writeLines(readLines(args[1], n=3), con = paste(outfile_base, "trimmed", sep = "."))
+writeLines(readLines(args[1], n=2), con = paste(outfile_base, "trimmed", sep = "."))
 # write the remainder to that file
 write.table(
   lgfile[,1:5], 
