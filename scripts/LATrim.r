@@ -24,7 +24,7 @@ lgfile <- read.delim(
 filename <- unlist(strsplit(args[1], "/"))
 # pop out just the filename
 filename <- filename[length(filename)]
-lg <- (strsplit(lgfile$V1[1], "LG") %>% unlist())[2] %>% as.numeric()
+lg <- (strsplit(lgfile[1,1], "LG") %>% unlist())[2] %>% as.numeric()
 
 #========= output instantiation ========#
 
@@ -43,36 +43,30 @@ dist_thresh <- as.numeric(args[2])
 if(dist_thresh >= 1){
   dist_thresh <- dist_thresh * .01
 }
-.dist_thresh <- dist_thresh * 100
-dist_thresh_m <- round(abs(max(lgfile$V5) - min(lgfile$V5)) * dist_thresh, digits = 2)
-dist_thresh_f <- round(abs(max(lgfile$V6) - min(lgfile$V6)) * dist_thresh, digits = 2)
 
+dist_thresh_all <- c(
+  abs(max(lgfile[, 5]) - min(lgfile[, 5])) * dist_thresh,     # male
+  abs(max(lgfile[, 6]) - min(lgfile[, 6])) * dist_thresh      # female
+)
 
 # if the percent threshold is given as an integer, convert it to a decimal
 edge_length <- as.numeric(args[3])
 if(edge_length >= 1){
   edge_length <- edge_length * .01
 }
-.edge_length <- edge_length * 100
-n_markers <- length(lgfile$V1)
-
+n_markers <- nrow(lgfile)
 forward_start <- round(n_markers * edge_length, digits = 0)
 reverse_start <- round(n_markers - forward_start, digits = 0)
 
 for (j in 5:6){   # iterate over male (5) and female (6)
   # sort on column
-  if (j == 5){
-    lgfile <- arrange(lgfile, V5)
-    dist_thresh <- dist_thresh_m
-  } else {
-    lgfile <- arrange(lgfile, V6)
-    dist_thresh <- dist_thresh_f
-  }
+  lgfile <- arrange(lgfile, j)
+  dist_thresh <- dist_thresh_all[j-4]
   # trim beginning
   for(a in forward_start:2){ #first n% of total markers starting from the front edge, going out
     diff <- abs(lgfile[a,j]-lgfile[a-1,j]) # difference between two points
     if( diff > dist_thresh ){ # is the difference between the two points > distance argument?
-      lgfile[(a-1):1, j+2] <- F # mark that marker and all markers BEFORE it as FAIL
+      lgfile[(a-1):1, j+2] <- FALSE # mark that marker and all markers BEFORE it as FAIL
       break()
     }
   }
@@ -80,7 +74,7 @@ for (j in 5:6){   # iterate over male (5) and female (6)
   for(z in reverse_start:(n_markers-1)){ #last n% total markers starting from the back edge going out
     diff <- abs(lgfile[z+1,j]-lgfile[z,j]) # difference between two points
     if( diff > dist_thresh ){ # is the difference between the two points > distance argument?
-      lgfile[(z+1):n_markers,j+2] <- F # mark that marker and all markers AFTER it as FAIL
+      lgfile[(z+1):n_markers,j+2] <- FALSE # mark that marker and all markers AFTER it as FAIL
       break()
     }
   }
@@ -90,7 +84,7 @@ for (j in 5:6){   # iterate over male (5) and female (6)
 cleaned_markers <- (lgfile %>% filter(Mpass & Fpass))[,1:6]
 # re-scale cleaned markers to 0 by subtracting the minimum genetic position
 cleaned_markers <- cleaned_markers %>%
-                    mutate(V5 = V5 - min(V5), V6 = V6 - min(V6))
+    mutate(V5 = V5 - min(V5), V6 = V6 - min(V6))
 
 # isolate bad markers
 removed_markers <- (lgfile %>% filter(!Mpass | !Fpass))[,1:6]
