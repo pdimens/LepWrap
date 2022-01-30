@@ -10,7 +10,7 @@ args <- commandArgs(trailingOnly = TRUE)
 # args[4] is the output directory
 
 lgfile <- read.delim(
-  args[1], 
+  args[1],
   header = FALSE, 
   sep = "\t", 
   comment.char="#"
@@ -54,7 +54,7 @@ if(edge_length >= 1){
   edge_length <- edge_length * .01
 }
 
-n_markers <- length(lgfile$V1)
+n_markers <- nrow(lgfile)
 forward_start <- round(n_markers * edge_length, digits = 0)
 reverse_start <- round(n_markers - forward_start, digits = 0)
 
@@ -144,9 +144,12 @@ suppressMessages(ggsave(plotfile, width = 7, height = 4, units = "in"))
 # get an overall pass/fail for each marker
 lgfile$QC <- lgfile$Mpass & lgfile$Fpass
 # get the indices of the fails
-flag_idx <- which(!lgfile$QC)
+fail_idx <- which(!lgfile$QC)
 # prepend a comment to the flagged markers so LepMap3 ignores them
-lgfile[flag_idx, 1] <- paste0("#", lgfile[flag_idx, 1])
+lgfile[fail_idx, 1] <- paste0("#", lgfile[fail_idx, 1])
+# re-scale remaining markers to 0 by subtracting the minimum genetic position for each sex
+lgfile[,2] <- lgfile[,2] - (min(lgfile[lgfile$QC,2]))
+lgfile[,3] <- lgfile[,3] - (min(lgfile[lgfile$QC,3]))
 
 # write header to a new file
 writeLines(readLines(args[1], n=3), con = paste(outfile_base, "trimmed", sep = "."))
