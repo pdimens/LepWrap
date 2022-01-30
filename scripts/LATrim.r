@@ -17,7 +17,7 @@ lgfile <- read.delim(
   sep = "\t", 
   comment.char="#"
 ) %>%
-  mutate(Mpass = "PASS", Fpass = "PASS")
+  mutate(Mpass = T, Fpass = T)
 
 ## setup output file names ##
 # split the filename by path
@@ -56,8 +56,8 @@ if(edge_length >= 1){
 .edge_length <- edge_length * 100
 n_markers <- length(lgfile$V1)
 
-front_edge <- round(n_markers * edge_length, digits = 0)
-back_edge <- round(n_markers - front_edge, digits = 0)
+forward_start <- round(n_markers * edge_length, digits = 0)
+reverse_start <- round(n_markers - forward_start, digits = 0)
 
 for (j in 5:6){   # iterate over male (5) and female (6)
   # sort on column
@@ -69,44 +69,45 @@ for (j in 5:6){   # iterate over male (5) and female (6)
     dist_thresh <- dist_thresh_f
   }
   # trim beginning
-  for(a in front_edge:2){ #first n% of total markers starting from the front edge, going out
+  for(a in forward_start:2){ #first n% of total markers starting from the front edge, going out
     diff <- abs(lgfile[a,j]-lgfile[a-1,j]) # difference between two points
     if( diff > dist_thresh ){ # is the difference between the two points > distance argument?
-      lgfile[(a-1):1, j+2] <- "FAIL" # mark that marker and all markers BEFORE it as FAIL
+      lgfile[(a-1):1, j+2] <- F # mark that marker and all markers BEFORE it as FAIL
       break()
     }
   }
   # trim end
-  for(z in back_edge:(n_markers-1)){ #last n% total markers starting from the back edge going out
+  for(z in reverse_start:(n_markers-1)){ #last n% total markers starting from the back edge going out
     diff <- abs(lgfile[z+1,j]-lgfile[z,j]) # difference between two points
     if( diff > dist_thresh ){ # is the difference between the two points > distance argument?
-      lgfile[(z+1):n_markers,j+2] <- "FAIL" # mark that marker and all markers AFTER it as FAIL
+      lgfile[(z+1):n_markers,j+2] <- F # mark that marker and all markers AFTER it as FAIL
       break()
     }
   }
 }
 
 # create new table of markers passing QC
-cleaned_markers <- (lgfile %>% filter(Mpass == "PASS" & Fpass == "PASS"))[,1:6]
+cleaned_markers <- (lgfile %>% filter(Mpass & Fpass))[,1:6]
 # re-scale cleaned markers to 0 by subtracting the minimum genetic position
 cleaned_markers <- cleaned_markers %>%
                     mutate(V5 = V5 - min(V5), V6 = V6 - min(V6))
 
 # isolate bad markers
-removed_markers <- (lgfile %>% filter(Mpass == "FAIL" | Fpass == "FAIL"))[,1:6]
+removed_markers <- (lgfile %>% filter(!Mpass | !Fpass))[,1:6]
 
 # get simple counts
-rm_male <- lgfile %>% filter(Mpass == "FAIL" & Fpass == "PASS") %>% nrow()
-rm_female <- lgfile %>% filter(Fpass == "FAIL" & Mpass == "PASS") %>% nrow()
-rm_both <- lgfile %>% filter(Mpass == "FAIL" & Fpass == "FAIL") %>% nrow()
+rm_male <- lgfile %>% filter(!Mpass & Fpass) %>% nrow()
+rm_female <- lgfile %>% filter(!Fpass & Mpass) %>% nrow()
+rm_both <- lgfile %>% filter(!Mpass & !Fpass) %>% nrow()
 
 pdf(NULL)
 
 plot_male <- lgfile %>% arrange(V5) %>%
-  ggplot(aes(x=seq_along(V5), y = V5, color = Mpass)) +
-  geom_point() +
-  geom_vline(xintercept = front_edge, linetype = "dashed", size = 0.2) +
-  geom_vline(xintercept = back_edge, linetype = "dashed", size = 0.2) +
+  ggplot(aes(x = seq_along(V5), y = V5, color = Mpass)) +
+  geom_point(shape = 19) +
+  scale_color_manual(values = c("dodgerblue", "indianred2"), limits = c(T, F)) +
+  geom_vline(xintercept = forward_start, linetype = "dashed", size = 0.2) +
+  geom_vline(xintercept = reverse_start, linetype = "dashed", size = 0.2) +
   labs(
     title = "",
     subtitle = paste0(rm_male, " male markers >", dist_thresh_m, "cM trimmed"),
@@ -117,10 +118,11 @@ plot_male <- lgfile %>% arrange(V5) %>%
   )
 
 plot_female <- lgfile %>% arrange(V6) %>%
-  ggplot(aes(x=seq_along(V6), y = V6, color = Fpass)) +
-  geom_point() +
-  geom_vline(xintercept = front_edge, linetype = "dashed", size = 0.2) +
-  geom_vline(xintercept = back_edge, linetype = "dashed", size = 0.2) +
+  ggplot(aes(x = seq_along(V6), y = V6, color = Fpass)) +
+  geom_point(shape = 19) +
+  scale_color_manual(values = c("dodgerblue", "indianred2"), limits = c(T, F)) +
+  geom_vline(xintercept = forward_start, linetype = "dashed", size = 0.2) +
+  geom_vline(xintercept = reverse_start, linetype = "dashed", size = 0.2) +
   labs(
     title = paste("Edge Cluster Trimming for LG:", lg),
     subtitle = paste0(rm_female, " female markers >", dist_thresh_f, "cM trimmed"),
