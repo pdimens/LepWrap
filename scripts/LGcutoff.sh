@@ -6,9 +6,9 @@ cat <<EOF
 Unassign markers from linkage groups if their LG is greater than a specified value.
 Essentially, set an LG maximum, and markers above it will be assigned to group 0 (singles).
 
-[usage]:	lg_cutoff.sh <map.file> <LG max>
+[usage]:	LGcutoff.sh <map.file> <LG max>
 # unassign all markers in LG's 25+
-[example]: 	scripts/lg_cutoff.sh 3_SeparateChromosomes/map.13 24
+[example]: 	scripts/LGcutoff.sh 3_SeparateChromosomes/map.13 24
 
 EOF
   exit 1

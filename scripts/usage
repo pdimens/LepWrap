@@ -8,7 +8,7 @@ Should be used in main project directory.
 Module names are case-sensitive.
 
 [usage]:  params <module name>
-[example]:  scripts/params OrderMarkers2 
+[example]:  scripts/usage OrderMarkers2
 
 LepMap3 modules:
 - ParentCall2

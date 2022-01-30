@@ -14,6 +14,7 @@ lgfile <- read.delim(
 ) %>%
   select(V2,V3) %>%
   rename(male = V2, female = V3) %>%
+  arrange(male) %>% 
   pivot_longer(c(male, female), names_to = "sex", values_to = "position") %>%
   group_by(sex) %>%
   mutate(marker = seq_along(position))
