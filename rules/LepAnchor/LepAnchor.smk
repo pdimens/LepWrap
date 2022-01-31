@@ -1,7 +1,7 @@
 from os import path
 import glob
 
-configfile: "config.yaml"
+configfile: "config.yml"
 
 # PlaceAndOrientContigs #
 data_type = config["lepanchor_input"]
