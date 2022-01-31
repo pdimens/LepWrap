@@ -1,8 +1,6 @@
 from os import path
 import glob
 
-configfile: "config.yml"
-
 # PlaceAndOrientContigs #
 data_type = config["lepanchor_input"]
 geno = config["assembly"]
