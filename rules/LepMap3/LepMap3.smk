@@ -1,7 +1,7 @@
 from os import path
 import glob
 
-configfile: "config.yaml"
+configfile: "config.yml"
 
 # load in parameters set in config.yaml
 # data #
