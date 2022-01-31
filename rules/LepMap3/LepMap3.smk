@@ -1,9 +1,7 @@
 from os import path
 import glob
 
-configfile: "config.yml"
-
-# load in parameters set in config.yaml
+# load in parameters set in the config file
 # data #
 vcf = config["vcf"]
 pedigree = config["pedigree"]
