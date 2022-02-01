@@ -106,7 +106,7 @@ plot_male <- lgfile %>% arrange(V5) %>%
   geom_vline(xintercept = reverse_start, linetype = "dashed", size = 0.2) +
   labs(
     title = "",
-    subtitle = paste0(rm_male, " male markers >", dist_thresh_m, "cM trimmed"),
+    subtitle = paste0(rm_male, " male markers >", dist_thresh_all[1], "cM trimmed"),
     caption = paste0(.edge_length, "% edge markers, ", .dist_thresh, "% cM"),
     x = "Marker Number", 
     y = "Position (cM)", 
@@ -121,7 +121,7 @@ plot_female <- lgfile %>% arrange(V6) %>%
   geom_vline(xintercept = reverse_start, linetype = "dashed", size = 0.2) +
   labs(
     title = paste("Edge Cluster Trimming for LG:", lg),
-    subtitle = paste0(rm_female, " female markers >", dist_thresh_f, "cM trimmed"),
+    subtitle = paste0(rm_female, " female markers >", dist_thresh_all[2], "cM trimmed"),
     caption = paste0("Markers failing both M+F: ", rm_both),
     x = "Marker Number", 
     y = "Position (cM)", 
