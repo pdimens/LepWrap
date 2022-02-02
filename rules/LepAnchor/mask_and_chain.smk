@@ -7,23 +7,19 @@ rule repeatmask:
   shell:
     """
     file={input}
-    if [ "${{file: -3}}" == ".gz" ]; then
+    mkdir -p 8_Repeatmask/inputgenome
+    if (file {input} | grep -q compressed); then
       echo "- Assembly is compressed, creating decompressed copy"
       file=$(basename $file .gz)
       gunzip --stdout {input} > $file
     fi
-    ext=$(echo $file | rev | cut -d"." -f1 | rev)
-    if [ $ext != "fa" ]; then
-      echo "- Assembly extension must end in .fa for Red, creating a corrected symlink"
-      ln -srf $file ${{file}}.fa
-    fi
+    ln -srf $file 8_Repeatmask/inputgenome/${{file}}.fa
     echo "- Running Red"
-    software/LepAnchor/deps/Red -gnm . -msk 8_Repeatmask -sco 8_Repeatmask -cnd 8_Repeatmask -rpt 8_Repeatmask > {log} 2>> {log}
+    software/LepAnchor/deps/Red -gnm 8_Repeatmask/inputgenome -msk 8_Repeatmask -sco 8_Repeatmask -cnd 8_Repeatmask -rpt 8_Repeatmask > {log} 2>> {log}
     echo "- Compressing repeat-masked genome from Red"
     gzip --stdout 8_Repeatmask/*.msk > {output} && rm 8_Repeatmask/*.msk
     """
     
-
 
 rule chain_1:
   input: 
@@ -35,7 +31,6 @@ rule chain_1:
     out2 = "9_Chain/repeatmasked.sizes"
   message: "Running Lastz via HaploMerger2"
   threads: 30
-  params:
   shell:
     """
     ln -srf {input} 9_Chain/

@@ -21,15 +21,13 @@ if [[ -z "$2" ]]; then
       echo "The file 'config.yml' was created for you, please edit it and run LepWrap again"
     cat <<EOF >config.yml
 # Configuration file for LepWrap
-#########################################################
+#=======================================================#
 #                       Lep-Map 3                       #
-#########################################################
+#=======================================================#
 # change this to false if you want to skip Lep-Map3
 run_lepmap: true
 
-#---------------#
-#  ParentCall2  #
-#---------------#
+  #----- ParentCall2 ------#
 # the filtered VCF file with your genotype likelihoods:
 vcf: "mydata.vcf"
 
@@ -41,9 +39,7 @@ pedigree: "pedigree.txt"
 extra_params_ParentCall: "removeNonInformative=1"
 
 
-#---------------#
-#   Filtering2  #
-#---------------#
+  #----- Filtering2 -----#
 # data tolerance value-- set this to 0 if you want to skip the Filtering2 module
 data_tol: 0
 
@@ -51,9 +47,7 @@ data_tol: 0
 extra_params_Filtering: ""
 
 
-#------------------------#
-#  SeperateChromosomes2  #
-#------------------------#
+  #----- SeperateChromosomes2 -----#
 # LepWrap will iteratively perform SeperateChromosomes2 for each
 # LOD score in the range of lod_min to lod_max
 
@@ -70,9 +64,7 @@ informative: "informativeMask=3"
 extra_params_SeparateChromosomes: "sizeLimit=5 distortionLod=1"
 
 
-#-------------------#
-#  JoinSingles2ALL  #
-#-------------------#
+  #----- JoinSingles2ALL -----#
 # set this to false if you want to skip joining singles (0) to linkage groups
 run_joinsingles2all: false
 
@@ -87,11 +79,8 @@ lod_difference: "lodDifference=2"
 extra_params_JoinSingles: "iterate=1 distortionLod=1"
  
 
-#-----------------#
-#  OrderMarkers2  #
-#-----------------#
+  #----- OrderMarkers2 -----#
 # LepMak3r will iteratively order markers for each of 1:exp_lg number of chromosomes  
-
 # Set exp_lg to your expected number of chromosomes
 exp_lg: 24
 
@@ -100,9 +89,7 @@ exp_lg: 24
 extra_params_OrderMarkers: "hyperPhaser=1 useKosambi=1 phasingIterations=2 numMergeIterations=100"
 
 
-#-----------------#
-#  Edge Trimming  #
-#-----------------#
+  #----- Edge Trimming -----#
 # Edge trimming will examine the first and last X% of markers in a linkage group
 # and remove clusters that are N% centimorgans (of the total cM span) away from 
 # the next marker. You can "skip" trimming by setting trim_cutoff really high (e.g. 80-100).
@@ -115,25 +102,21 @@ edge_length: 20
 trim_cutoff: 100 
 
 
-#--------------------#
-#  Re-OrderMarkers2  #
-#--------------------#
+
+  #----- Re-OrderMarkers2 -----#
 # The second round of OrderMarkers will use the same basic parameters as the first round (but not the extra params)
 # If there are additional parameters you would like to use, add them here:
 extra_params_reOrderMarkers: "improveOrder=1 useKosambi=1 numMergeIterations=75"
 
-#-----------------------#
-#  Calculate Distances  #
-#-----------------------#
+#----- Calculate Distances -----#
 # If you used useKosambi=1 or useMorgan=1 for Ordering/reOrdering, add that same
 # parameter to distance_method: 
 distance_method: "useKosambi=1"
 
 
-#########################################################
+#=======================================================#
 #                       Lep-Anchor                      #
-#########################################################
-
+#=======================================================#
 # change this to false if you want to skip Lep-Anchor
 run_lepanchor: true
 
@@ -151,31 +134,18 @@ PAF_file: "/dev/null"
 # This isn't yet implemented in Lep-Anchor, so don't change this.
 proximity_file: "/dev/null"
 
-# Which system is appropriate for running the HaploMerger2 section? Keep one and comment out the others.
-# This is kinda necessary for the lastz binaries. The ubuntu binaries seem to work on Debian/Ubuntu/Arch/CentOS,
-# but feel free to play it safe and use centOS* for any RedHat/Fedora based systems.
-OS_info: "ubuntu"
-#OS_info: "centOS5"
-#OS_info: "centOS6"
 
-
-#------------#
-#  CleanMap  #
-#------------#
+  #----- CleanMap -----#
 # If there are any additional parameters you would like to use for CleanMap (e.g. chimericDistance=500), add them here
 extra_params_CleanMap: ""
 
 
-#-----------#
-#  Map2Bed  #
-#-----------#
+  #----- Map2Bed -----#
 # If there are any additional parameters you would like to use for Map2Bed (e.g. markerSupport=4), add them here
 extra_params_Map2Bed: ""
 
 
-#-------------------------#
-#  PlaceAndOrientContigs  #
-#-------------------------#
+  #----- PlaceAndOrientContigs -----#
 # choose which of the input types you want to generate by uncommenting the other
 # LepAnchor uses intervals by default, but either works.
 #lepanchor_input: "noIntervals=0"  # uses intervals input
@@ -189,9 +159,7 @@ haplotype_limit: 5000
 extra_params_PlaceOrient: "keepEmptyIntervals=1 numRuns=10"
 
 
-#-----------------#
-#  Edge Trimming  #
-#-----------------#
+  #----- Edge Trimming -----#
 # Edge trimming will examine the first and last X% of markers in a linkage group
 # and remove clusters that are N% centimorgans (of the total cM span) away from 
 # the next marker. You can "skip" trimming by setting  LA_trim_cutoff really high (e.g. 80-100) 
@@ -243,11 +211,10 @@ lepanchor(){
 }
 
 # copy lastz binaries into conda path if they aren't already there
-OSname=$(grep "^OS_info" config.yml | cut -d":" -f2 | xargs | tr '[:upper:]' '[:lower:]')
 if [ -z "$CONDA_PREFIX" ]; then
   echo "No active conda environment detected"
 else
-  cp -n software/LepAnchor/deps/$OSname/* $CONDA_PREFIX/bin
+  cp -n software/LepAnchor/deps/ucsc_binaries/* $CONDA_PREFIX/bin
 fi
 
 LM=$(grep "run_lepmap" config.yml | cut -d":" -f2 | xargs | tr '[:upper:]' '[:lower:]')

@@ -8,8 +8,6 @@ paf = config["PAF_file"]
 proximity = config["proximity_file"]
 haplo_limit = config["haplotype_limit"]
 place_orient_extra = config["extra_params_PlaceOrient"]
-# Repeat-Masking and Chainfile #
-os_name = config["OS_info"]
 # Map2Bed #
 map2bed_extra = config["extra_params_Map2Bed"]
 # CleanMap #
