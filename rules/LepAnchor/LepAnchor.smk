@@ -21,9 +21,9 @@ lg_range = list(range(1,lg+1))
 
 include: "generate_inputs.smk"
 include: "mask_and_chain.smk"
-include: "place_orient.smk"
-include: "place_orient_ii.smk"
-include: "place_orient_iii.smk"
+include: "place_orient1.smk"
+include: "place_orient2.smk"
+include: "place_orient3.smk"
 include: "build_agp.smk"
 include: "build_fasta.smk"
 include: "mareymaps_untrimmed.smk"
