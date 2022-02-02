@@ -58,8 +58,7 @@ extra_params_JoinSingles: "iterate=1 distortionLod=1"
  
 
   #----- OrderMarkers2 -----#
-# LepWrap will iteratively order markers for each of 1:exp_lg number of chromosomes  
-# Set exp_lg to your expected number of chromosomes
+# Set exp_lg to your expected number of chromosomes for iterative ordering
 exp_lg: 24
 
 # Additional parameters for OrderMarkers2 (e.g. hyperPhaser=1), if any
