@@ -1,35 +1,3 @@
-#rule liftover2:
-#  input:
-#    chain = "9_Chain/chainfile.gz",
-#    intervals = "10_PlaceAndOrientContigs/lepanchor.input",
-#    haplos = "10_PlaceAndOrientContigs/suspected.haplotypes.before",
-#    haplos2 = "10_PlaceAndOrientContigs/suspected.haplotypes.after",
-#    lengths = "10_PlaceAndOrientContigs/contigs.length"
-#  output:
-#    haplos = "10_PlaceAndOrientContigs/suspected.haplotypes.all",
-#    lift = report("10_PlaceAndOrientContigs/liftover.nohaplotypes.la", category = "Lifted Intervals"),
-#    sortedlift = report("10_PlaceAndOrientContigs/liftover.sorted.nohaplotypes.la", category = "Lifted Intervals"),
-#    mapfile = "10_PlaceAndOrientContigs/map.nohaplotypes.clean",
-#    bedfile = "10_PlaceAndOrientContigs/map.nohaplotypes.bed",
-#    unused = "10_PlaceAndOrientContigs/not_used.nohaplotypes.txt",
-#    chr0 = "10_PlaceAndOrientContigs/chr0.nohaplotypes.bed",
-#    mapextra = "10_PlaceAndOrientContigs/map.nohaplotypes.extra.bed"
-#  message: "Recreating bedfile omitting haplotypes discovered from PlaceAndOrientContigs"
-#  params:
-#    chrom = lg
-#  shell:
-#    """
-#    cat {input.haplos} {input.haplos2} > {output.haplos}
-#    gunzip -fc {input.chain} | java -cp software/LepAnchor LiftoverHaplotypes map={input.intervals} haplotypes={output.haplos} chain=- > {output.lift}
-#    cat {output.lift} | sort -V -k 1,1 -k 2,2n > {output.sortedlift}
-#    java -cp software/LepAnchor CleanMap map={output.sortedlift} > {output.mapfile}
-#    java -cp software/LepAnchor Map2Bed map={output.mapfile} contigLength={input.lengths} > {output.bedfile}
-#    cut -f 1 {input.lengths} | grep -v -w -F -f <(cut -f 2 {output.haplos}; cut -f 1 {output.bedfile}) > {output.unused}
-#    grep -w -F -f {output.unused} {input.lengths} | awk -vn={params.chrom} '{{s=$1"\t1\t"$2"\t?\t"; for (i=1;i<=n;++i) print s i}}' > {output.chr0}
-#    cat {output.bedfile} {output.chr0} > {output.mapextra}
-#    """
-
-
 rule place_orient2:
   input:
     chain = "9_Chain/chainfile.gz",

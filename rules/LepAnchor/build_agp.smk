@@ -1,6 +1,6 @@
 rule construct_agp:
   input:
-    cleaned = "10_PlaceAndOrientContigs/overlaps_rm.la"
+    cleaned = "10_PlaceAndOrientContigs/overlaps.removed.la"
   output:
     agp = report("11_AGP/contigs/chr.{lg_range}.agp", category = "Contig AGP Files"),
     scaff_agp = report("11_AGP/scaffolds/chr.{lg_range}.scaffolds.agp", category = "Scaffold AGP Files")
@@ -18,14 +18,14 @@ rule unused:
   input:
     lengths = "10_PlaceAndOrientContigs/contigs.length",
     haplos = "10_PlaceAndOrientContigs/suspected.haplotypes.before",
-    agp = expand("11_AGP/contigs/chr.{lgs}.agp", lgs = lg_range),
+    cleaned = "10_PlaceAndOrientContigs/overlaps.removed.la",
   output: 
     txt = "11_AGP/not_used_final.txt",
     agp = "11_AGP/not_used.agp"
   message: "Finding unused contigs"
   shell:
     """
-    cut -f 1 {input.lengths} | grep -v -w -F -f <(cut -f 2 {input.haplos};awk '($5!="U"){{print $6}}' {input.agp}) > {output.txt}
+    cut -f 1 {input.lengths} | grep -v -w -F -f <(cut -f2 {input.haplos}; cut -f1 {input.cleaned}) > {output.txt}
     grep -F -w -f {output.txt} {input.lengths} | awk '{{print $1,1,$2,1,"W",$1,1,$2,"+"}}' > {output.agp}
     """
 

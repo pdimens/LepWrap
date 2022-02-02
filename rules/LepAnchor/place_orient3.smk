@@ -36,7 +36,7 @@ rule prune:
     bedfile = "10_PlaceAndOrientContigs/map.propogated2.bed"
   output: 
     pruned = report("10_PlaceAndOrientContigs/orient_3/pruned.la", category = "Logs"),
-    cleaned = report("10_PlaceAndOrientContigs/overlaps_rm.la", category = "Logs")
+    cleaned = report("10_PlaceAndOrientContigs/overlaps.removed.la", category = "Logs")
   message: "Pruning contig blocks without map support and removing overlaps"
   params:
     chrom = lg
