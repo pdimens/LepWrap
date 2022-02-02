@@ -107,7 +107,7 @@ plot_male <- lgfile %>% arrange(V5) %>%
   labs(
     title = "",
     subtitle = paste0(rm_male, " male markers >", dist_thresh_all[1], "cM trimmed"),
-    caption = paste0(.edge_length, "% edge markers, ", .dist_thresh, "% cM"),
+    caption = paste0(edge_length, "% edge markers, ", dist_thresh, "% cM"),
     x = "Marker Number", 
     y = "Position (cM)", 
     color = "Pass Filtering"
