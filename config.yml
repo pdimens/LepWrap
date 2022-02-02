@@ -13,7 +13,7 @@ vcf: "mydata.vcf"
 # the pedigree file associated with your data
 pedigree: "pedigree.txt"
 
-# If there are any additional parameters you would like to use for ParentCall2 (e.g. halfSibs=1), add them here
+# Additional parameters for ParentCall2 (e.g. halfSibs=1), if any
 extra_params_ParentCall: "removeNonInformative=1"
 
 
@@ -21,7 +21,7 @@ extra_params_ParentCall: "removeNonInformative=1"
 # data tolerance value-- set this to 0 if you want to skip the Filtering2 module
 data_tol: 0
 
-# If there are any additional parameters you would like to use for Filtering2 (e.g. convert2Biallelic=1), add them here
+# Additional parameters for Filtering2 (e.g. convert2Biallelic=1), if any
 extra_params_Filtering: ""
 
 
@@ -38,7 +38,7 @@ lod_max: 50
 # Use only markers with informative father (1), mother(2), both parents(3) or neither parent(0)
 informative: "informativeMask=3"
 
-# If there are any additional parameters you would like to use for SeparateChromosomes2 (e.g. distrotionLOD=1), add them here
+# Additional parameters for SeparateChromosomes2 (e.g. distrotionLOD=1), if any
 extra_params_SeparateChromosomes: "sizeLimit=5 distortionLod=1"
 
 
@@ -53,7 +53,7 @@ lod_limit: "lodLimit=2"
 # start with lower values for lod_limit and increase as necessary
 lod_difference: "lodDifference=2"
 
-# If there are any additional parameters you would like to use for JoinSingles2All (e.g. iterate=1), add them here
+# Additional parameters for JoinSingles2All (e.g. iterate=1), if any
 extra_params_JoinSingles: "iterate=1 distortionLod=1"
  
 
@@ -62,9 +62,9 @@ extra_params_JoinSingles: "iterate=1 distortionLod=1"
 # Set exp_lg to your expected number of chromosomes
 exp_lg: 24
 
-# If there are any additional parameters you would like to use for OrderMarkers2 (e.g. hyperPhaser=1), add them here
+# Additional parameters for OrderMarkers2 (e.g. hyperPhaser=1), if any
 # I recommend setting numMergeIterations to ~100 (Lep-Map3 default is 6)
-extra_params_OrderMarkers: "hyperPhaser=1 useKosambi=1 phasingIterations=2 numMergeIterations=100"
+extra_params_OrderMarkers: "useKosambi=1 phasingIterations=2 numMergeIterations=100"
 
 
   #----- Edge Trimming -----#
@@ -76,9 +76,8 @@ extra_params_OrderMarkers: "hyperPhaser=1 useKosambi=1 phasingIterations=2 numMe
 # Value can be an integer or decimal, i.e. 15 is the same as 0.15, which both mean "15%" (10-20 is reasonable)
 edge_length: 20
 
-# Set trim_cuttoff to the centiMorgan distance cutoff (5 is reasonable)
+# Set trim_cuttoff to the centiMorgan distance cutoff (5-10 is reasonable)
 trim_cutoff: 100 
-
 
 
   #----- Re-OrderMarkers2 -----#
@@ -86,7 +85,7 @@ trim_cutoff: 100
 # If there are additional parameters you would like to use, add them here:
 extra_params_reOrderMarkers: "improveOrder=1 useKosambi=1 numMergeIterations=75"
 
-#----- Calculate Distances -----#
+  #----- Calculate Distances -----#
 # If you used useKosambi=1 or useMorgan=1 for Ordering/reOrdering, add that same
 # parameter to distance_method: 
 distance_method: "useKosambi=1"
@@ -95,11 +94,11 @@ distance_method: "useKosambi=1"
 #=======================================================#
 #                       Lep-Anchor                      #
 #=======================================================#
+  #---- global settings ----#
 # change this to false if you want to skip Lep-Anchor
 run_lepanchor: true
 
-# the path to the genome assembly you are trying to anchor
-# ideally it is *not* gzipped and ends in .fa, but there are built-in workarounds if it is. 
+# the path to the genome assembly you are trying to anchor 
 assembly: "assembly.fasta"
 
 # the number of linkage groups you have
@@ -109,17 +108,17 @@ lg_count: 24
 PAF_file: "/dev/null"
 
 # if you have a proximity file add it here, otherwise leave the text as "/dev/null".
-# This isn't yet implemented in Lep-Anchor, so don't change this.
+# This isn't yet implemented in Lep-Anchor.
 proximity_file: "/dev/null"
 
 
   #----- CleanMap -----#
-# If there are any additional parameters you would like to use for CleanMap (e.g. chimericDistance=500), add them here
+# Additional parameters for CleanMap (e.g. chimericDistance=500), if any
 extra_params_CleanMap: ""
 
 
   #----- Map2Bed -----#
-# If there are any additional parameters you would like to use for Map2Bed (e.g. markerSupport=4), add them here
+# Additional parameters for Map2Bed (e.g. markerSupport=4), if any
 extra_params_Map2Bed: ""
 
 
@@ -133,7 +132,7 @@ lepanchor_input: "noIntervals=1"  # data is distances
 # Set this value really high (50000+) to ignore haplotype removal in between PlaceOrient iterations
 haplotype_limit: 5000
 
-# If there are any additional parameters you would like to use for PlaceAndOrientContigs (e.g. randomOrder=1), add them here
+# Additional parameters you would like to use for PlaceAndOrientContigs, if any (e.g. randomOrder=1)
 extra_params_PlaceOrient: "keepEmptyIntervals=1 numRuns=10"
 
 
