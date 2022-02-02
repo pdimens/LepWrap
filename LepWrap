@@ -1,4 +1,4 @@
-#! /usr/bin/env bash
+LepWrap#! /usr/bin/env bash
 
 if which snakemake &>/dev/null; then
   foo=1
