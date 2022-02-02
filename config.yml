@@ -124,10 +124,10 @@ extra_params_Map2Bed: ""
 
 
   #----- PlaceAndOrientContigs -----#
-# choose which of the input types you want to generate by uncommenting the other
+# choose which of the input types you want to generate by leaving it uncommented
 # LepAnchor uses intervals by default, but either works.
-#lepanchor_input: "noIntervals=0"  # uses intervals input
-lepanchor_input: "noIntervals=1"  # uses map position input
+#lepanchor_input: "noIntervals=0"  # data is intervals
+lepanchor_input: "noIntervals=1"  # data is distances
 
 # The size limit for detecting potential haplotype contigs (default: ~5000)
 # Set this value really high (50000+) to ignore haplotype removal in between PlaceOrient iterations
