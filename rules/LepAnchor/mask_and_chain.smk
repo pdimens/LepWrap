@@ -1,19 +1,28 @@
-rule repeatmask:
+rule prep_geno:
   input: geno
+  output: "8_Repeatmask/inputgenome/lepanchorinput.fa"
+  message: "Preparing genome for repeat masking"
+  shell:
+    """
+    mkdir -p 8_Repeatmask/inputgenome
+    if (file {input} | grep -q compressed); then
+      echo "- Assembly is compressed, creating decompressed copy: {output}"
+      gunzip --stdout {input} > {output}
+    else
+      echo "Symlinking {input} to {output}"
+      ln -srf {input} {output}
+    fi
+    """
+
+
+rule repeatmask:
+  input: "8_Repeatmask/inputgenome/lepanchorinput.fa"
   output: "8_Repeatmask/repeatmasked.fa.gz"
   log: "8_Repeatmask/Red.log"
   message: "Using Red to repeat-mask {input}"
   threads: 30
   shell:
     """
-    file={input}
-    mkdir -p 8_Repeatmask/inputgenome
-    if (file {input} | grep -q compressed); then
-      echo "- Assembly is compressed, creating decompressed copy"
-      file=$(basename $file .gz)
-      gunzip --stdout {input} > $file
-    fi
-    ln -srf $file 8_Repeatmask/inputgenome/${{file}}.fa
     echo "- Running Red"
     software/LepAnchor/deps/Red -gnm 8_Repeatmask/inputgenome -msk 8_Repeatmask -sco 8_Repeatmask -cnd 8_Repeatmask -rpt 8_Repeatmask > {log} 2>> {log}
     echo "- Compressing repeat-masked genome from Red"
