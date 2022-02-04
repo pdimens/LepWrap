@@ -12,9 +12,8 @@ rule place_orient2:
   params:
     chrom = "{lg_range}",
     extras = place_orient_extra,
-    datatype = data_type,
-    haplo = haplo_limit
-  threads: 5
+    datatype = data_type
+  threads: 2
   message: "Running 2nd round of PlaceAndOrientContigs for linkage group {params.chrom}"
   shell:
     """

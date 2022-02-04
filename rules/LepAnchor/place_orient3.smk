@@ -15,7 +15,7 @@ rule place_orient3:
     extras = place_orient_extra,
     datatype = data_type,
   message: "Running 3rd round of PlaceAndOrientContigs for linkage group {params.chrom}"
-  threads: 5
+  threads: 2
   shell:
     """
     gunzip -fc {input.chain} | java -cp software/LepAnchor PlaceAndOrientContigs numThreads={threads} $(awk -f software/LepAnchor/scripts/pickorientation.awk {input.chrom}) bed={input.bedfile} chromosome={params.chrom} map={input.lift} chain=- paf={input.paf} proximity={input.prox} evaluateAnchoring={input.propogated} improveAnchoring=1 {params.datatype} {params.extras} > {output.chrom} 2> {output.errors}
