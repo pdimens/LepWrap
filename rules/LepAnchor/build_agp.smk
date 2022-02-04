@@ -17,7 +17,7 @@ rule construct_agp:
 rule unused:
   input:
     lengths = "10_PlaceAndOrientContigs/contigs.length",
-    haplos = "10_PlaceAndOrientContigs/fullHaplotypes50.txt",
+    haplos = "10_PlaceAndOrientContigs/suspected.haplotypes",
     cleaned = "10_PlaceAndOrientContigs/overlaps.removed.la",
   output: 
     txt = "11_AGP/not_used_final.txt",

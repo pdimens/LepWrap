@@ -21,11 +21,11 @@ rule place_orient3:
     gunzip -fc {input.chain} | java -cp software/LepAnchor PlaceAndOrientContigs numThreads={threads} $(awk -f software/LepAnchor/scripts/pickorientation.awk {input.chrom}) bed={input.bedfile} chromosome={params.chrom} map={input.lift} chain=- paf={input.paf} proximity={input.prox} evaluateAnchoring={input.propogated} improveAnchoring=1 {params.datatype} {params.extras} > {output.chrom} 2> {output.errors}
     """
     
-rule findhaplotypes:
+rule find_haplotypes2:
   input:
     errors = expand("10_PlaceAndOrientContigs/orient_3/errors/chr.{lgs}.err", lgs = lg_range)
   output:
-    haplos = "10_PlaceAndOrientContigs/fullHaplotypes50.txt"
+    haplos = "10_PlaceAndOrientContigs/suspected.haplotypes"
   message: "Finding full haplotypes"
   params:
     haplo = haplo_limit
@@ -40,7 +40,7 @@ rule liftoverHaplotypes:
   input:
     chain = "9_Chain/chainfile.gz",
     chrom = "10_PlaceAndOrientContigs/orient_1/chr.{lg_range}.la",
-    haplos = "10_PlaceAndOrientContigs/fullHaplotypes50.txt"
+    haplos = "10_PlaceAndOrientContigs/suspected.haplotypes"
   output: "10_PlaceAndOrientContigs/liftover/chr.{lg_range}.liftover"
   message: "Running liftoverHaplotypes for {input.chrom}"
   threads: 1
@@ -52,7 +52,7 @@ rule liftoverHaplotypes:
 rule removehaplotypes:
   input:
     mapfile = "10_PlaceAndOrientContigs/map.propogated2.bed", 
-    haplos = "10_PlaceAndOrientContigs/fullHaplotypes50.txt"
+    haplos = "10_PlaceAndOrientContigs/suspected.haplotypes"
   output:
     bedfile = "10_PlaceAndOrientContigs/map.propogated2.nohaplo.bed"
   message: "Removing haplotypes from the map"
