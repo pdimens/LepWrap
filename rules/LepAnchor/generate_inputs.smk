@@ -36,7 +36,7 @@ rule contiglengths:
 
 rule find_haplotypes:
   input: "9_Chain/chainfile.gz"
-  output: report("10_PlaceAndOrientContigs/suspected.haplotypes.before", category = "Logs")
+  output: report("10_PlaceAndOrientContigs/suspected.haplotypes.initial", category = "Logs")
   message: "Finding non-haplotype contigs not included in map.bed"
   shell: 
     """
@@ -48,7 +48,7 @@ rule liftover:
   input: 
     chain = "9_Chain/chainfile.gz",
     intervals = "10_PlaceAndOrientContigs/lepanchor.input",
-    haplos = "10_PlaceAndOrientContigs/suspected.haplotypes.before"
+    haplos = "10_PlaceAndOrientContigs/suspected.haplotypes.initial"
   output: 
     lift = report("10_PlaceAndOrientContigs/liftover.la", category = "Lifted Intervals"),
     sortedlift = report("10_PlaceAndOrientContigs/liftover.sorted.la", category = "Lifted Intervals")
@@ -84,7 +84,7 @@ rule map2bed:
 rule ungrouped:
   input:
     lengths = "10_PlaceAndOrientContigs/contigs.length",
-    haplos = "10_PlaceAndOrientContigs/suspected.haplotypes.before",
+    haplos = "10_PlaceAndOrientContigs/suspected.haplotypes.initial",
     bedfile = "10_PlaceAndOrientContigs/map.bed"
   output:
     bedfile = "10_PlaceAndOrientContigs/map_extra.bed"
