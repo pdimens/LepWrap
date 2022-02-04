@@ -19,7 +19,7 @@ rule place_orient4:
     threads: 2
     shell:
         """
-        gunzip -fc {input.chain} | java -cp software/LepAnchor PlaceAndOrientContigs numThreads={threads} $(awk -f software/LepAnchor/scripts/pickorientation.awk {input.chrom}) bed={input.bedfile} chromosome={params.chrom} map=$MAPL chain=- paf={input.paf} proximity={input.prox} {params.datatype} {params.extras} evaluateAnchoring={input.chromlast} improveAnchoring=1 > {output.chrom} 2> {output.err}
+        gunzip -fc {input.chain} | java -cp software/LepAnchor PlaceAndOrientContigs chromosome={params.chrom} numThreads={threads} $(awk -f software/LepAnchor/scripts/pickorientation.awk {input.chrom}) bed={input.bedfile} map=$MAPL chain=- paf={input.paf} proximity={input.prox} {params.datatype} {params.extras} evaluateAnchoring={input.chromlast} improveAnchoring=1 > {output.chrom} 2> {output.err}
         """
 
 rule prune_contigblocks:
