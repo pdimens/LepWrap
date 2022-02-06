@@ -6,8 +6,7 @@ rule place_orient4:
         prox = proximity,
         lift = "10_PlaceAndOrientContigs/liftover.la",
         chrom = "10_PlaceAndOrientContigs/orient_1/chr.{lg_range}.la",
-        chromlast = "10_PlaceAndOrientContigs/orient_3/chr.{lg_range}.la",
-        liftover = expand("10_PlaceAndOrientContigs/liftover/chr.{lgs}.liftover", lgs = lg_range)
+        chromlast = "10_PlaceAndOrientContigs/orient_3/chr.{lg_range}.la"
     output:
         chrom = "10_PlaceAndOrientContigs/orient_4/chr.{lg_range}.la",
         err = "10_PlaceAndOrientContigs/orient_4/errors/chr.{lg_range}.errors"
@@ -15,11 +14,11 @@ rule place_orient4:
     params:
         chrom = "{lg_range}",
         extras = place_orient_extra,
-        datatype = data_type,
+        datatype = data_type
     threads: 2
     shell:
         """
-        gunzip -fc {input.chain} | java -cp software/LepAnchor PlaceAndOrientContigs chromosome={params.chrom} numThreads={threads} $(awk -f software/LepAnchor/scripts/pickorientation.awk {input.chrom}) bed={input.bedfile} map=$MAPL chain=- paf={input.paf} proximity={input.prox} {params.datatype} {params.extras} evaluateAnchoring={input.chromlast} improveAnchoring=1 > {output.chrom} 2> {output.err}
+        gunzip -fc {input.chain} | java -cp software/LepAnchor PlaceAndOrientContigs chromosome={params.chrom} numThreads={threads} $(awk -f software/LepAnchor/scripts/pickorientation.awk {input.chrom}) bed={input.bedfile} map={input.lift} chain=- paf={input.paf} proximity={input.prox} {params.datatype} {params.extras} evaluateAnchoring={input.chromlast} improveAnchoring=1 > {output.chrom} 2> {output.err}
         """
 
 rule prune_contigblocks:

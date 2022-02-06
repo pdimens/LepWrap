@@ -22,18 +22,20 @@ rule place_orient2:
 
 rule propogate2:
   input:
-    placed = expand("10_PlaceAndOrientContigs/orient_2/logs/chr.{lgs}.err", lgs = lg_range),
+    placed = expand("10_PlaceAndOrientContigs/orient_2/chr.{lgs}.la", lgs = lg_range),
+    #placed = expand("10_PlaceAndOrientContigs/orient_2/logs/chr.{lgs}.err", lgs = lg_range),
     bedfile = "10_PlaceAndOrientContigs/map.propogated.bed"
   output:
-    prop = expand("10_PlaceAndOrientContigs/propogate/propogated.{lgs}.la", lgs = range(lg + 1)),
+    prop = expand("10_PlaceAndOrientContigs/propogate/propogated.{lgs}.la", lgs = lg_range),
     propogated = "10_PlaceAndOrientContigs/map.propogated2.bed",
     iter1 = temp("10_PlaceAndOrientContigs/tmp1.la"),
-    iter2 = temp("10_PlaceAndOrientContigs/tmp2.la")
+    iter2 = temp("10_PlaceAndOrientContigs/tmp2.la"),
+    iter3 = temp("10_PlaceAndOrientContigs/tmp3.la")
   message: "Second round of propogation"
   shell:
     """
-    awk -f software/LepAnchor/scripts/propagate.awk {input.placed} > 10_PlaceAndOrientContigs/tmp1.la
-    awk -f software/LepAnchor/scripts/propagate.awk 10_PlaceAndOrientContigs/tmp1.la > 10_PlaceAndOrientContigs/tmp2.la
+    awk -f software/LepAnchor/scripts/propagate.awk {input.placed} > {output.iter1}
+    awk -f software/LepAnchor/scripts/propagate.awk {output.iter1} > {output.iter2}
     i=2
 
     while ! cmp -s "10_PlaceAndOrientContigs/tmp$i.la" "10_PlaceAndOrientContigs/tmp$(( $i-1 )).la" ;do
@@ -42,6 +44,6 @@ rule propogate2:
     done
 
     #create prop*.la
-    awk -f software/LepAnchor/scripts/propagate2.awk tmp$i.la | awk '(/^[^#]/ && NF>=8){{++d[$1"\t"($7+0)"\t"($8+0)]; data[++line]=$0}}END{{for (i=1; i<=line; ++i) {{$0=data[i];if (d[$1"\t"($7+0)"\t"($8+0)] == 1) {{fn="10_PlaceAndOrientContigs/propogate/propogated."$5".la";print $0>fn}}}}}}'
+    awk -f software/LepAnchor/scripts/propagate2.awk 10_PlaceAndOrientContigs/tmp$i.la | awk '(/^[^#]/ && NF>=8){{++d[$1"\t"($7+0)"\t"($8+0)]; data[++line]=$0}}END{{for (i=1; i<=line; ++i) {{$0=data[i];if (d[$1"\t"($7+0)"\t"($8+0)] == 1) {{fn="10_PlaceAndOrientContigs/propogate/propogated."$5".la";print $0>fn}}}}}}'
     awk '{{print $1"\t"($7+0)"\t"($8+0)"\t?\t"$5}}' {output.prop} | awk -f software/LepAnchor/scripts/pickbed.awk - {input.bedfile} > {output.propogated}
     """

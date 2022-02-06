@@ -13,7 +13,7 @@ rule place_orient3:
   params:
     chrom = "{lg_range}",
     extras = place_orient_extra,
-    datatype = data_type,
+    datatype = data_type
   message: "Running 3rd round of PlaceAndOrientContigs for linkage group {params.chrom}"
   threads: 2
   shell:
@@ -46,7 +46,7 @@ rule liftoverHaplotypes:
   threads: 1
   shell:
     """
-    gunzip -fc {input.chain} | java -cp software/LepAnchor LiftoverHaplotypes map={input.chrom} haplotypes={input.haplos} chain=- > $i.liftover
+    gunzip -fc {input.chain} | java -cp software/LepAnchor LiftoverHaplotypes map={input.chrom} haplotypes={input.haplos} chain=- > {output}
     """
 
 rule removehaplotypes:
