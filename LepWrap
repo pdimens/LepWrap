@@ -4,8 +4,7 @@
 if [[ -z "$1" ]]; then
   echo "Perform the modules of Lep-Map3 and/or Lep-Anchor" 
   echo "The config file (default: config.yml) must be configured"
-  echo "The second positional argument is optional if your config file is named config.yml"
-  echo ""
+  echo -e "The second positional argument is optional if your config file is named config.yml\n"
   printf "\033[01;32m"
   printf "[usage]"
   printf "\033[0m"
@@ -17,7 +16,7 @@ if [[ -z "$1" ]]; then
   printf "\033[01;32m"
   printf "[example]"
   printf "\033[0m"
-  echo " LepWrap 30 kosambi.20iterations.yml"
+  echo -e " LepWrap 30 kosambi.20iterations.yml"
   exit 1
 fi
 
