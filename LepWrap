@@ -216,13 +216,17 @@ else
 fi
 
 lepmap(){
-  echo "Running Lep-Map3"
+  printf "\033[01;32m"
+  printf "Running Lep-Map3\n"
+  printf "\033[0m"
   sleep 2s
   snakemake --cores $1 --snakefile ./rules/LepMap3/LepMap3.smk --configfile $CONF --directory .
 }
 
 lepanchor(){
-  echo -e "\nRunning Lep-Anchor"
+  printf "\033[01;32m"
+  printf "Running Lep-Anchor\n"
+  printf "\033[0m"
   sleep 2s
   snakemake --cores $1 --snakefile ./rules/LepAnchor/LepAnchor.smk --configfile $CONF --directory .
 }
@@ -241,9 +245,7 @@ if [ $LM == "true" ]; then
   lepmap $1 $CONF
 else
   echo "Skipping Lep-Map3"
-fi
-
-if [ $LA == "true" ]; then
+fi && if [ $LA == "true" ]; then
   lepanchor $1 $CONF
 else
   echo "Skipping LepAnchor"
