@@ -1,55 +1,57 @@
+#! /usr/bin/env Rscript
+# Written by Pasi Rastas (2021)
+# modified by Pavel Dimens for Lep-Wrap (2021)
+
 library(scales)
 
-map=read.table(gzfile("marey.data.gz")) 
+args <- commandArgs(trailingOnly = TRUE)
 
-NN=unique(map$V3)
-MM=unique(map$V4)
+# args[1] = path/to/marey.data.gz
+# args[2] = directory/of/chrom AGP files
 
-cl=rainbow(length(MM))
+map <- read.table(gzfile(args[1]))
 
+basedir <- dirname(args[1])
 
-for(lg in NN) {
-	print(lg)
-	png(paste0("marey", lg, ".png"),width=1024,height=1024)
-	ymax = 0
-	xmax = 0
-	for (m in MM) {
-		map_tmp = map[map$V1==paste0("LG",lg) & map$V3==lg & map$V4==m,]
-		if (nrow(map_tmp) > 0) {
-			ymax = max(ymax, max(map_tmp$V5))
-			xmax = max(xmax, max(map_tmp$V2))
-		}
-	}
+NN <- unique(map$V3)
+MM <- unique(map$V4)
 
-	index = 1
-	for (m in MM) {
-		map_tmp = map[map$V1==paste0("LG",lg) & map$V3==lg & map$V4==m,]
-		if (nrow(map_tmp) > 0) {
-			orientation=glm(map_tmp$V2 ~ map_tmp$V5)$coefficients[2] 
-			if (!is.na(orientation) && orientation < 0) {
-				map_tmp$V5 = max(map_tmp$V6) - map_tmp$V5
-				map_tmp$V6 = max(map_tmp$V6) - map_tmp$V6
-			}
-		}
-		if (index == 1) {
-			plot(map_tmp$V2, map_tmp$V5, xlab="Position (Mb)",ylab="Recombination Distance",xaxt="n", main=paste0("LG", lg), col=alpha(cl[index],0.3), pch=20, cex=1.0, ylim=c(0,ymax), xlim=c(0,xmax))
-			points(map_tmp$V2, map_tmp$V6, col=alpha(cl[index],0.3), pch=20, cex=1.0)
-        		arrows(map_tmp$V2, map_tmp$V5, map_tmp$V2, map_tmp$V6, length=0.0, col=alpha(cl[index],0.5),lwd=1.5)
-		}
-		else {
-			points(map_tmp$V2, map_tmp$V5, col=alpha(cl[index],0.3), pch=20, cex=1.0)
-			points(map_tmp$V2, map_tmp$V6, col=alpha(cl[index],0.3), pch=20, cex=1.0)
-        		arrows(map_tmp$V2, map_tmp$V5, map_tmp$V2, map_tmp$V6, length=0.0, col=alpha(cl[index],0.5),lwd=1.5)
-		}
-		index = index + 1
-	}
+cl <- rainbow(length(MM))
 
-	agp <- read.table(paste0("chr", lg, ".agp"))
-	agp=agp[agp$V1==paste0("LG",lg) & agp$V5=="W",c(1:3)]
+for (lg in NN) {
+    #print(lg)
+    png(paste0(basedir, "/LG.", lg ,".mareymap", ".png"), width = 1024, height = 1024)
+    ymax <- 0
+    for (m in MM) {
+        map_tmp <- map[map$V3 == lg & map$V4 == m, ]
+        ymax <- max(ymax, max(map_tmp$V5))
+    }
 
-	segments(agp$V2,2*c(1:2),agp$V3,2*c(1:2),col=c("red","blue"),lwd=2,lend=1)
-	axis(1,seq(0,500000000,5000000),seq(0,500,5))
-	segments(agp$V2,0,agp$V2,ymax,lwd=0.5,col=rgb(0.5,0.5,0.5,0.2))
-	dev.off()
+    index <- 1
+    for (m in MM) {
+        map_tmp <- map[map$V3 == lg & map$V4 == m, ]
+        if (glm(map_tmp$V2 ~ map_tmp$V5)$coefficients[2] < 0) {
+            map_tmp$V5 <- max(map_tmp$V5) - map_tmp$V5
+            map_tmp$V6 <- max(map_tmp$V6) - map_tmp$V6
+        }
+        if (index == 1) {
+            plot(map_tmp$V2, map_tmp$V5, xlab = "Position (Mb)", ylab = "Recombination Distance (cM)", xaxt = "n", main = paste0("LG", lg), col = alpha(cl[index], 0.3), pch = 20, cex = 1.0, ylim = c(0, ymax))
+            points(map_tmp$V2, map_tmp$V6, col = alpha(cl[index], 0.3), pch = 20, cex = 1.0)
+            arrows(map_tmp$V2, map_tmp$V5, map_tmp$V2, map_tmp$V6, length = 0.0, col = alpha(cl[index], 0.5), lwd = 1.5)
+        }
+        else {
+            points(map_tmp$V2, map_tmp$V5, col = alpha(cl[index], 0.3), pch = 20, cex = 1.0)
+            points(map_tmp$V2, map_tmp$V6, col = alpha(cl[index], 0.3), pch = 20, cex = 1.0)
+            arrows(map_tmp$V2, map_tmp$V5, map_tmp$V2, map_tmp$V6, length = 0.0, col = alpha(cl[index], 0.5), lwd = 1.5)
+        }
+        index <- index + 1
+    }
+
+    agp <- read.table(paste0(normalizePath(args[2]), "/chr.", lg, ".agp"))
+    agp <- agp[agp$V1 == paste0("LG", lg) & agp$V5 == "W", c(1:3)]
+
+    segments(agp$V2, 2 * c(1:2), agp$V3, 2 * c(1:2), col = c("red", "blue"), lwd = 2, lend = 1)
+    axis(1, seq(0, 500000000, 5000000), seq(0, 500, 5))
+    segments(agp$V2, 0, agp$V2, ymax, lwd = 0.5, col = rgb(0.5, 0.5, 0.5, 0.2))
+    dev.off()
 }
-
