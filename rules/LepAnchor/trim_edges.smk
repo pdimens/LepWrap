@@ -39,4 +39,5 @@ rule merge_trimmedintervals:
 rule plot_trimmedintervals:
   input: "16_MareyMapsTrimmed/data.marey.trimmed.gz"
   output: report("16_MareyMapsTrimmed/LepAnchor.mareymaps.pdf", category = "Trimmed Marey Maps")
+  message: "Plotting results of edge trimming"
   shell: "Rscript scripts/LASummary.r {input}"
