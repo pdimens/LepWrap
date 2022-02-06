@@ -148,9 +148,9 @@ extra_params_Map2Bed: ""
 #lepanchor_input: "noIntervals=0"  # data is intervals
 lepanchor_input: "noIntervals=1"  # data is distances
 
-# The size limit for detecting potential haplotype contigs (default: ~5000)
+# The size limit for detecting potential haplotype contigs (LepAnchor default: 2000)
 # Set this value really high (50000+) to ignore haplotype removal in between PlaceOrient iterations
-haplotype_limit: 5000
+haplotype_limit: 2000
 
 # Additional parameters you would like to use for PlaceAndOrientContigs, if any (e.g. randomOrder=1)
 extra_params_PlaceOrient: "keepEmptyIntervals=1 numRuns=10"
