@@ -33,7 +33,7 @@ You will need to modify `config.yml` to suit your needs, then you can simply run
 ```bash
 ./LepWrap <number_of_cores> <config.yml>
 ```
-where `<number_of_cores>` is an integer of the maximum number of cores/threads you want the pipeline to use and `<config.yml>` (optional!) is the name of the config file, if it's different than `config.yml`. 
+where `<number_of_cores>` is an integer of the maximum number of cores/threads you want the pipeline to use and `<config.yml>` (optional!) is the name of the config file, if it's different than `config.yml`. If no config file is found in the directory, LepWrap will generate a default one for you to edit.
 
 **Examples**
 ```bash
