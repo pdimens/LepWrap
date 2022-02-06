@@ -19,7 +19,7 @@ rule trim_newintervals:
   params:
     edge = edgelen,
     dist = trimdist
-  shell: "Rscript scripts/LATrim.r {input} {params.dist} {params.edge} 15_Trim"
+  shell: "Rscript scripts/LepWrapTrim.r {input} {params.dist} {params.edge} 15_Trim"
 
 
 rule merge_trimplots:
