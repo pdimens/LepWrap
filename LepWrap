@@ -193,7 +193,7 @@ is_int()  { case ${1#[-+]} in '' | *[!0-9]*              ) return 1;; esac ;}
 if $(is_int $1); then
   foo=1
 else
-  echo "Error: the first argument must the number of threads, as an integer."
+  echo "Error: the first argument must be the number of threads, as an integer."
   exit 1
 fi
 
