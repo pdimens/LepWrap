@@ -6,8 +6,8 @@ rule place_orient:
     prox = proximity,
     lift = "10_PlaceAndOrientContigs/liftover.la"
   output:
-    chrom = "10_PlaceAndOrientContigs/orient_1/chr.{lg_range}.la",
-    chromerr = report("10_PlaceAndOrientContigs/orient_1/logs/chr.{lg_range}.la.log", category = "Anchoring I Logs")
+    chrom = "10_PlaceAndOrientContigs/1_orient/chr.{lg_range}.la",
+    chromerr = "10_PlaceAndOrientContigs/1_orient/logs/chr.{lg_range}.la.log"
   params:
     chrom = "{lg_range}",
     extras = place_orient_extra,
@@ -21,8 +21,8 @@ rule place_orient:
 
 rule propogate1:
   input: 
-    placed = expand("10_PlaceAndOrientContigs/orient_1/chr.{lgs}.la", lgs = lg_range),
-    errors = expand("10_PlaceAndOrientContigs/orient_1/logs/chr.{lgs}.la.log", lgs = lg_range),
+    placed = expand("10_PlaceAndOrientContigs/1_orient/chr.{lgs}.la", lgs = lg_range),
+    errors = expand("10_PlaceAndOrientContigs/1_orient/logs/chr.{lgs}.la.log", lgs = lg_range),
     bedfile = "10_PlaceAndOrientContigs/map_extra.bed"
   output:
     propogated = "10_PlaceAndOrientContigs/map.propogated.bed",

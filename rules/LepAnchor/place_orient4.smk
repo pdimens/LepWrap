@@ -5,11 +5,11 @@ rule place_orient4:
         paf = paf,
         prox = proximity,
         lift = "10_PlaceAndOrientContigs/liftover.la",
-        chrom = "10_PlaceAndOrientContigs/orient_1/chr.{lg_range}.la",
-        chromlast = "10_PlaceAndOrientContigs/orient_3/chr.{lg_range}.la"
+        chrom = "10_PlaceAndOrientContigs/1_orient/chr.{lg_range}.la",
+        chromlast = "10_PlaceAndOrientContigs/3_orient/chr.{lg_range}.la"
     output:
-        chrom = "10_PlaceAndOrientContigs/orient_4/chr.{lg_range}.la",
-        err = "10_PlaceAndOrientContigs/orient_4/errors/chr.{lg_range}.errors"
+        chrom = "10_PlaceAndOrientContigs/4_orient/chr.{lg_range}.la",
+        err = "10_PlaceAndOrientContigs/4_orient/errors/chr.{lg_range}.errors"
     message: "Running 4th round of PlaceAndOrientContigs for linkage group {params.chrom}"
     params:
         chrom = "{lg_range}",
@@ -22,7 +22,7 @@ rule place_orient4:
         """
 
 rule prune_contigblocks:
-    input: "10_PlaceAndOrientContigs/orient_4/chr.{lg_range}.la"
+    input: "10_PlaceAndOrientContigs/4_orient/chr.{lg_range}.la"
     output: 
         chrom = "10_PlaceAndOrientContigs/pruned/chr.{lg_range}.pruned.la",
         err = temp("10_PlaceAndOrientContigs/pruned/err/chr.{lg_range}.pruned.err")

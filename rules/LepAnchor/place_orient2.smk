@@ -5,10 +5,10 @@ rule place_orient2:
     paf = paf,
     prox = proximity,
     lift = "10_PlaceAndOrientContigs/liftover.la",
-    chrom = "10_PlaceAndOrientContigs/orient_1/chr.{lg_range}.la"
+    chrom = "10_PlaceAndOrientContigs/1_orient/chr.{lg_range}.la"
   output:
-    chrom = "10_PlaceAndOrientContigs/orient_2/chr.{lg_range}.la",
-    chromerr = "10_PlaceAndOrientContigs/orient_2/logs/chr.{lg_range}.err"
+    chrom = "10_PlaceAndOrientContigs/2_orient/chr.{lg_range}.la",
+    chromerr = "10_PlaceAndOrientContigs/2_orient/logs/chr.{lg_range}.err"
   params:
     chrom = "{lg_range}",
     extras = place_orient_extra,
@@ -22,8 +22,7 @@ rule place_orient2:
 
 rule propogate2:
   input:
-    placed = expand("10_PlaceAndOrientContigs/orient_2/chr.{lgs}.la", lgs = lg_range),
-    #placed = expand("10_PlaceAndOrientContigs/orient_2/logs/chr.{lgs}.err", lgs = lg_range),
+    placed = expand("10_PlaceAndOrientContigs/2_orient/chr.{lgs}.la", lgs = lg_range),
     bedfile = "10_PlaceAndOrientContigs/map.propogated.bed"
   output:
     prop = expand("10_PlaceAndOrientContigs/propogate/propogated.{lgs}.la", lgs = lg_range),

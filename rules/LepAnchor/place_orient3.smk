@@ -5,11 +5,11 @@ rule place_orient3:
     paf = paf,
     prox = proximity,
     lift = "10_PlaceAndOrientContigs/liftover.la",
-    chrom = "10_PlaceAndOrientContigs/orient_1/chr.{lg_range}.la",
+    chrom = "10_PlaceAndOrientContigs/1_orient/chr.{lg_range}.la",
     propogated = "10_PlaceAndOrientContigs/propogate/propogated.{lg_range}.la"
   output:
-    chrom = "10_PlaceAndOrientContigs/orient_3/chr.{lg_range}.la",
-    errors = "10_PlaceAndOrientContigs/orient_3/errors/chr.{lg_range}.err"
+    chrom = "10_PlaceAndOrientContigs/3_orient/chr.{lg_range}.la",
+    errors = "10_PlaceAndOrientContigs/3_orient/errors/chr.{lg_range}.err"
   params:
     chrom = "{lg_range}",
     extras = place_orient_extra,
@@ -23,7 +23,7 @@ rule place_orient3:
     
 rule find_haplotypes2:
   input:
-    errors = expand("10_PlaceAndOrientContigs/orient_3/errors/chr.{lgs}.err", lgs = lg_range)
+    errors = expand("10_PlaceAndOrientContigs/3_orient/errors/chr.{lgs}.err", lgs = lg_range)
   output:
     haplos = "10_PlaceAndOrientContigs/suspected.haplotypes"
   message: "Finding full haplotypes"
@@ -39,7 +39,7 @@ rule find_haplotypes2:
 rule liftoverHaplotypes:
   input:
     chain = "9_Chain/chainfile.gz",
-    chrom = "10_PlaceAndOrientContigs/orient_1/chr.{lg_range}.la",
+    chrom = "10_PlaceAndOrientContigs/1_orient/chr.{lg_range}.la",
     haplos = "10_PlaceAndOrientContigs/suspected.haplotypes"
   output: "10_PlaceAndOrientContigs/liftover/chr.{lg_range}.liftover"
   message: "Running liftoverHaplotypes for {input.chrom}"

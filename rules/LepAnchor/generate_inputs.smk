@@ -8,7 +8,7 @@ rule extract_markers:
 rule generate_input_data:
   input:
     markers = "snps.txt",
-    data = expand("7_Intervals/ordered.{x}.intervals", x = range(1, lg + 1)) if data_type == "noIntervals=0" else expand("7_Distances/ordered.{x}.distances", x = range(1, lg + 1))
+    data = expand("7_Intervals/ordered.{x}.intervals", x = lg_range) if data_type == "noIntervals=0" else expand("7_Distances/ordered.{x}.distances", x = lg_range)
   output: 
     data = report("10_PlaceAndOrientContigs/lepanchor.input", category = "Data")
   message: "Combining {params} Lep-Map3 files into single LepAnchor input {output}"
@@ -38,10 +38,7 @@ rule find_haplotypes:
   input: "9_Chain/chainfile.gz"
   output: report("10_PlaceAndOrientContigs/suspected.haplotypes.initial", category = "Logs")
   message: "Finding non-haplotype contigs not included in map.bed"
-  shell: 
-    """
-    gunzip -fc {input} | awk -f software/LepAnchor/scripts/findFullHaplotypes.awk > {output}
-    """
+  shell: "gunzip -fc {input} | awk -f software/LepAnchor/scripts/findFullHaplotypes.awk > {output}"
 
 
 rule liftover:
@@ -68,6 +65,7 @@ rule cleanmap:
   params:
     extras = cleanmap_extra
   shell: "java -cp software/LepAnchor CleanMap map={input} {params.extras} > {output} 2> {log}"
+
 
 rule map2bed:
   input: 
