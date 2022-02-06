@@ -1,5 +1,18 @@
 #! /usr/bin/env bash
 
+# Help text
+if [[ -z "$1" ]]; then
+  echo "Perform the modules of Lep-Map3 and/or Lep-Anchor" 
+  echo "Make sure the config file (default: config.yml) is properly configured for how you want to run things"
+  echo "The second positional argument is optional if your config file is named config.yml"
+  echo ""
+  echo "[usage]   LepWrap <# of threads> <config.yml>"
+  echo "[example] LepWrap 16"
+  echo "[example] LepWrap 30 kosambi.20iterations.yml"
+  exit 1
+fi
+
+# Check for snakemake
 if which snakemake &>/dev/null; then
   foo=1
 else
@@ -11,15 +24,8 @@ else
   exit 1
 fi
 
-if [[ -z "$2" ]]; then
-    if [ ! -f config.yml ]; then
-      echo -n "Error: "
-      printf "\033[01;32m"
-      printf "config.yml"
-      printf "\033[0m"
-      echo " not found"
-      echo "The file 'config.yml' was created for you, please edit it and run LepWrap again"
-    cat <<EOF >config.yml
+function generateconfig {
+  cat <<EOF >$1
 # Configuration file for LepWrap
 #=======================================================#
 #                       Lep-Map 3                       #
@@ -163,36 +169,50 @@ extra_params_PlaceOrient: "keepEmptyIntervals=1 numRuns=10"
 
 # Set edge_length to the percent number of markers you would like to examine from either end of the linkage group
 # Value can be an integer or decimal, i.e. 15 is the same as 0.15, which both mean "15%" (10-15 is reasonable)
-LA_edge_length: 20
+LA_edge_length: 15
 
-# Set trim_cuttoff to the centiMorgan distance cutoff (5 is reasonable)
+# Set trim_cuttoff to the centiMorgan distance cutoff (5-10 is reasonable)
 LA_trim_cutoff: 5
 EOF
-  exit 1
-  fi
-    CONF=config.yml
+}
+
+export -f generateconfig
+
+# make sure the first argument is a number (number of threads)
+# function from https://stackoverflow.com/a/61835747
+is_int()  { case ${1#[-+]} in '' | *[!0-9]*              ) return 1;; esac ;}
+
+if $(is_int $1); then
+  foo=1
 else
-    if [ ! -f $2 ]; then
-      echo -n "Error: Config file "
-      printf "\033[01;32m"
-      printf "$2"
-      printf "\033[0m"
-      echo " not found"
-      exit 1
-    else
-      CONF=$2
-    fi
+  echo "Error: the first argument must the number of threads, as an integer."
+  exit 1
 fi
 
-if [[ -z "$1" ]]; then
-  echo "Perform the modules of Lep-Map3 and/or Lep-Anchor" 
-  echo "Make sure the config file (default: config.yml) is properly configured for how you want to run things"
-  echo "The second positional argument is optional if your config file is named config.yml"
-  echo ""
-  echo "[usage]   LepWrap <# of threads> <config.yml>"
-  echo "[example] LepWrap 16"
-  echo "[example] LepWrap 30 kosambi.20iterations.yml"
-  exit 1
+if [[ ! -z "$2" ]]; then
+  if [ ! -f $2 ]; then
+    echo -n "Error: Config file "
+    printf "\033[01;32m"
+    printf "$2"
+    printf "\033[0m"
+    echo " was not found, but it was created for you. Please edit it and run LepWrap again"
+    generateconfig $2
+    exit 1
+  else
+    CONF=$2
+  fi
+else 
+  if [ ! -f config.yml ]; then
+    echo -n "Error: "
+    printf "\033[01;32m"
+    printf "config.yml"
+    printf "\033[0m"
+    echo " not found"
+    echo " was not found, but it was created for you. Please edit it and run LepWrap again"
+    generateconfig config.yml
+    exit 1
+  fi
+    CONF=config.yml
 fi
 
 lepmap(){
