@@ -39,6 +39,12 @@ lgfile <- read.delim(
 ) %>%
   mutate(Mpass = T, Fpass = T)
 
+## setup output file names ##
+# split the filename by path
+filename <- unlist(strsplit(args[1], "/"))
+# pop out just the filename
+filename <- filename[length(filename)]
+
 # Modify which columns to look at based on input format
 # LM3 input has 5 columns + 2 from M|Fpass
 # LA input has 6 columns + 2 from M|Fpass
@@ -46,20 +52,15 @@ if(ncol(lgfile) == 7) {
   # LepMap3 input file
   idxcol <- c(2,3)
   keepcol <- 1:5
-  lgidx <- 2
+  lg <- unlist(strsplit(filename, "\\."))[2]
+  colshift <- 4
 } else {
   # LepAnchor input file
   idxcol <- c(5, 6)
   keepcol <- 1:6
-  lgidx <- 3
+  lg <- unlist(strsplit(filename, "\\."))[3]
+  colshift <- 2
 }
-
-## setup output file names ##
-# split the filename by path
-filename <- unlist(strsplit(args[1], "/"))
-# pop out just the filename
-filename <- filename[length(filename)]
-lg <- unlist(strsplit(filename, "\\."))[lgidx]
 
 #========= instantiate output ========#
 dir.create(args[4], showWarnings = FALSE)
@@ -104,7 +105,7 @@ for (j in idxcol){
   for(a in forward_start:2){ #first n% of total markers from the beginning
     diff <- abs(lgfile[a,j]-lgfile[a-1,j]) # difference between two points
     if( diff > dist_thresh ){ # is the difference between the two points > distance argument?
-      lgfile[(a-1):1, j+4] <- FALSE # all markers BEFORE it as FAIL
+      lgfile[(a-1):1, j + colshift] <- FALSE # all markers BEFORE it as FAIL
       break()
     }
   }
@@ -112,7 +113,7 @@ for (j in idxcol){
   for(z in reverse_start:(n_markers-1)){ #last n% total markers starting from the back edge going out
     diff <- abs(lgfile[z+1,j]-lgfile[z,j]) # difference between two points
     if( diff > dist_thresh ){ # is the difference between the two points > distance argument?
-      lgfile[(z+1):n_markers,j+4] <- FALSE # all markers AFTER it as FAIL
+      lgfile[(z+1):n_markers, j + colshift] <- FALSE # all markers AFTER it as FAIL
       break()
     }
   }
