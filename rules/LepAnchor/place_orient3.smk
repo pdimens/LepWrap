@@ -22,7 +22,7 @@ rule place_orient3:
     """
     
 rule prune_contigblocks:
-  input: "expand(10_PlaceAndOrientContigs/3_orient/chr.{lg_range}.la")
+  input: "10_PlaceAndOrientContigs/3_orient/chr.{lg_range}.la"
   output: 
     chrom = "10_PlaceAndOrientContigs/pruned/chr.{lg_range}.pruned.la",
     err = "10_PlaceAndOrientContigs/pruned/err/chr.{lg_range}.pruned.err"
