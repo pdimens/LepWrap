@@ -22,30 +22,30 @@ rule place_orient3:
     """
     
 rule prune_contigblocks:
-    input: "expand(10_PlaceAndOrientContigs/3_orient/chr.{lg_range}.la")
-    output: 
-        chrom = "10_PlaceAndOrientContigs/pruned/chr.{lg_range}.pruned.la",
-        err = "10_PlaceAndOrientContigs/pruned/err/chr.{lg_range}.pruned.err"
-    message: "Pruning contig blocks without map support and removing overlaps"
-    params:
-        chrom = lg
-    shell: "awk -f software/LepAnchor/scripts/prune.awk {input} > {output.chrom} 2> {output.err}"
+  input: "expand(10_PlaceAndOrientContigs/3_orient/chr.{lg_range}.la")
+  output: 
+    chrom = "10_PlaceAndOrientContigs/pruned/chr.{lg_range}.pruned.la",
+    err = "10_PlaceAndOrientContigs/pruned/err/chr.{lg_range}.pruned.err"
+  message: "Pruning contig blocks without map support and removing overlaps"
+  params:
+    chrom = lg
+  shell: "awk -f software/LepAnchor/scripts/prune.awk {input} > {output.chrom} 2> {output.err}"
 
 rule prune_post:
-    input:
-        bedfile = "10_PlaceAndOrientContigs/map.propogated2.bed",
-        prunedchrom = expand("10_PlaceAndOrientContigs/pruned/chr.{lgs}.pruned.la", lgs = lg_range),
-        prunederr = expand("10_PlaceAndOrientContigs/pruned/err/chr.{lgs}.pruned.err", lgs = lg_range)
-    output: 
-        overlaps = "10_PlaceAndOrientContigs/overlaps.removed.la",
-        pruned = "10_PlaceAndOrientContigs/pruned.la"
-    message: "Removing overlaps"
-    threads: 1
-    shell:
-        """
-        cat {input.prunederr} > {output.pruned}
-        awk -f software/LepAnchor/scripts/removeOverlaps.awk {input.bedfile} {input.prunedchrom} > {output.overlaps}
-        """
+  input:
+    bedfile = "10_PlaceAndOrientContigs/map.propogated2.bed",
+    prunedchrom = expand("10_PlaceAndOrientContigs/pruned/chr.{lgs}.pruned.la", lgs = lg_range),
+    prunederr = expand("10_PlaceAndOrientContigs/pruned/err/chr.{lgs}.pruned.err", lgs = lg_range)
+  output: 
+    overlaps = "10_PlaceAndOrientContigs/overlaps.removed.la",
+    pruned = "10_PlaceAndOrientContigs/pruned.la"
+  message: "Removing overlaps"
+  threads: 1
+  shell:
+    """
+    cat {input.prunederr} > {output.pruned}
+    awk -f software/LepAnchor/scripts/removeOverlaps.awk {input.bedfile} {input.prunedchrom} > {output.overlaps}
+      """
 
 #rule find_haplotypes2:
 #  input:
