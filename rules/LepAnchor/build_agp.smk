@@ -12,22 +12,20 @@ rule construct_agp:
     awk -vn={params.chrom} '($5==n)' {input} | awk -vprefix="LG" -vlg={params.chrom} -f software/LepAnchor/scripts/makeagp2.awk - > {output.scaff_agp}
     """
 
-
 rule unused:
   input:
     lengths = "10_PlaceAndOrientContigs/contigs.length",
-    haplos = "10_PlaceAndOrientContigs/suspected.haplotypes",
-    cleaned = "10_PlaceAndOrientContigs/overlaps.removed.la",
+    haplos = "10_PlaceAndOrientContigs/suspected.haplotypes.initial",
+    agp = expand("11_AGP/contigs/chr.{lgs}.agp", lgs = lg_range)
   output: 
-    txt = "11_AGP/not_used_final.txt",
+    txt = "11_AGP/not_used.txt",
     agp = "11_AGP/not_used.agp"
   message: "Finding unused contigs"
   shell:
     """
-    cut -f 1 {input.lengths} | grep -v -w -F -f <(cut -f2 {input.haplos}; cut -f1 {input.cleaned}) > {output.txt}
+    cut -f 1 {input.lengths} | grep -v -w -F -f <(cut -f 2 {input.haplos}; awk '($5!="U"){{print $6}}' {input.agp}) > {output.txt}
     grep -F -w -f {output.txt} {input.lengths} | awk '{{print $1,1,$2,1,"W",$1,1,$2,"+"}}' > {output.agp}
     """
-
 
 rule build_final_agp:
   input:
