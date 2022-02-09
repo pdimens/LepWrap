@@ -22,10 +22,9 @@ rule place_orient4:
         """
 
 rule prune_contigblocks:
-    input: "10_PlaceAndOrientContigs/4_orient/chr.{lg_range}.la"
+    input: "expand(10_PlaceAndOrientContigs/4_orient/chr.{lgs}.la", lgs = lg_range)
     output: 
         chrom = "10_PlaceAndOrientContigs/pruned/chr.{lg_range}.pruned.la",
-        err = temp("10_PlaceAndOrientContigs/pruned/err/chr.{lg_range}.pruned.err")
     message: "Pruning contig blocks without map support and removing overlaps"
     params:
         chrom = lg
