@@ -27,7 +27,11 @@ requirements:
     - pandoc
     - python >=3.9
     - r-base >=4
-    - r-tidyverse
+    - r-dplyr
+    - r-tidyr
+    - r-stringr
+    - r-ggplot2
+    - r-readr
     - sed
     - snakemake >=6.4
 
