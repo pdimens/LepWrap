@@ -16,7 +16,7 @@ rule place_orient:
   message: "Running the 1st round of PlaceAndOrientContigs for linkage group {params.chrom}"
   shell:
     """
-    gunzip -fc {input.chain} | java -cp $CONDA_PREFIX/bin/ PlaceAndOrientContigs chromosome={params.chrom} numThreads={threads} bed={input.bedfile} map={input.lift} chain=- paf={input.paf} proximity={input.prox} {params.datatype} {params.extras} > {output.chrom} 2> {output.chromerr}
+    gunzip -fc {input.chain} | java -cp $CONDA_PREFIX/bin/lepanchor PlaceAndOrientContigs chromosome={params.chrom} numThreads={threads} bed={input.bedfile} map={input.lift} chain=- paf={input.paf} proximity={input.prox} {params.datatype} {params.extras} > {output.chrom} 2> {output.chromerr}
     """
 
 rule propogate1:

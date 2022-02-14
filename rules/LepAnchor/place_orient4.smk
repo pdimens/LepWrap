@@ -18,7 +18,7 @@ rule place_orient4:
     threads: 2
     shell:
         """
-        gunzip -fc {input.chain} | java -cp $CONDA_PREFIX/bin/ PlaceAndOrientContigs chromosome={params.chrom} numThreads={threads} $(awk -f $CONDA_PREFIX/bin/pickorientation.awk {input.chrom}) bed={input.bedfile} map={input.lift} chain=- paf={input.paf} proximity={input.prox} {params.datatype} {params.extras} evaluateAnchoring={input.chromlast} improveAnchoring=1 > {output.chrom} 2> {output.err}
+        gunzip -fc {input.chain} | java -cp $CONDA_PREFIX/bin/lepanchor PlaceAndOrientContigs chromosome={params.chrom} numThreads={threads} $(awk -f $CONDA_PREFIX/bin/pickorientation.awk {input.chrom}) bed={input.bedfile} map={input.lift} chain=- paf={input.paf} proximity={input.prox} {params.datatype} {params.extras} evaluateAnchoring={input.chromlast} improveAnchoring=1 > {output.chrom} 2> {output.err}
         """
 
 rule prune_contigblocks:

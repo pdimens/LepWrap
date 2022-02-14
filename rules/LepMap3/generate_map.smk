@@ -9,7 +9,7 @@ rule separate_chromosomes:
         extra = sepchrom_extra,
     shell:
         """
-        zcat {input} | java -cp $CONDA_PREFIX/bin/ SeparateChromosomes2 lodLimit={params.lod} data=- {params.extra} {informative} numThreads={threads} > {output} 2> {log}
+        zcat {input} | java -cp $CONDA_PREFIX/bin/lepmap3 SeparateChromosomes2 lodLimit={params.lod} data=- {params.extra} {informative} numThreads={threads} > {output} 2> {log}
         """
 
 
@@ -51,7 +51,7 @@ rule join_singles:
         JS2A=$(echo {params.run_js2all} | tr '[:upper:]' '[:lower:]')
         THEMAP=$(tail -1 {input.map_choice})
         if [ $JS2A == "true" ]; then
-            zcat {input.datacall} | java -cp $CONDA_PREFIX/bin/ JoinSingles2All map=$THEMAP data=- {params.extra} {params.lod_limit} {params.lod_diff} numThreads={threads} > {output}
+            zcat {input.datacall} | java -cp $CONDA_PREFIX/bin/lepmap3 JoinSingles2All map=$THEMAP data=- {params.extra} {params.lod_limit} {params.lod_diff} numThreads={threads} > {output}
         else
             echo -e "\nSkipping JoinSingles2All and creating a symlink to $THEMAP instead"
             ln -sr $THEMAP {output}

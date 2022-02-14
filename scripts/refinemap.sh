@@ -31,7 +31,7 @@ LODMAX=$4
 SIZELIM=$5
 
 for i in $(seq $LODMIN $LODMAX); do
-    zcat 2_Filtering/data.filtered.lepmap3.gz | java -cp $CONDA_PREFIX/bin/ SeparateChromosomes2 data=- map=$TARGETMAP lg=$TARGETLG sizeLimit=$SIZELIM lodLimit=$i distortionLod=1 numThreads=4 > $1.refine/map.$i
+    zcat 2_Filtering/data.filtered.lepmap3.gz | java -cp $CONDA_PREFIX/bin/lepmap3 SeparateChromosomes2 data=- map=$TARGETMAP lg=$TARGETLG sizeLimit=$SIZELIM lodLimit=$i distortionLod=1 numThreads=4 > $1.refine/map.$i
 done
 
 # generate a summary of the results

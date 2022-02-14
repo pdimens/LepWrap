@@ -52,7 +52,7 @@ rule liftover:
   message: "Running liftoverHaplotypes for the input maps"
   shell: 
     """
-    gunzip -fc {input.chain} | java -cp $CONDA_PREFIX/bin/ LiftoverHaplotypes map={input.intervals} haplotypes={input.haplos} chain=- > {output.lift}
+    gunzip -fc {input.chain} | java -cp $CONDA_PREFIX/bin/lepanchor LiftoverHaplotypes map={input.intervals} haplotypes={input.haplos} chain=- > {output.lift}
     cat {output.lift} | sort -V -k 1,1 -k 2,2n > {output.sortedlift}
     """
 
@@ -64,7 +64,7 @@ rule cleanmap:
   message: "Running CleanMap"
   params:
     extras = cleanmap_extra
-  shell: "java -cp $CONDA_PREFIX/bin/ CleanMap map={input} {params.extras} > {output} 2> {log}"
+  shell: "java -cp $CONDA_PREFIX/bin/lepanchor CleanMap map={input} {params.extras} > {output} 2> {log}"
 
 
 rule map2bed:
@@ -76,7 +76,7 @@ rule map2bed:
   message: "Running Map2Bed"
   params:
     extras = map2bed_extra
-  shell: "java -cp $CONDA_PREFIX/bin/ Map2Bed map={input.cleanmap} contigLength={input.lengths} {params.extras} > {output} 2> {log}"
+  shell: "java -cp $CONDA_PREFIX/bin/lepanchor Map2Bed map={input.cleanmap} contigLength={input.lengths} {params.extras} > {output} 2> {log}"
 
 
 rule ungrouped:
