@@ -1,4 +1,4 @@
-#!/bin/bash
+#! usr/bin/env bash
 # for installing conda package
 mkdir -p $PREFIX/bin
 # LepWrap executable
