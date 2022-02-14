@@ -3,7 +3,6 @@
 _It's Lep-Map3 and Lep-Anchor, but with snakes 🐍🐍_
 
 [![alt text](https://img.shields.io/badge/docs-wiki-75ae6c?style=for-the-badge&logo=Read%20The%20Docs)](https://github.com/pdimens/LepWrap/wiki) 
-
 [![Cite](https://img.shields.io/badge/Cite-10.5281/zenodo.6055566-e1e1e1?style=for-the-badge)](https://zenodo.org/badge/latestdoi/260516189) 
 # LepWrap
 
