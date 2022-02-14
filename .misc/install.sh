@@ -1,3 +1,5 @@
+#! /usr/bin/env bash
+
 # install LepWrap into conda PATH
 mkdir -p $CONDA_PREFIX/bin
 # LepWrap executable
