@@ -102,8 +102,8 @@ lepanchor(){
   snakemake --cores $1 --snakefile $CONDA_PREFIX/bin/LepAnchor.smk --configfile $CONF --directory .
 }
 
-LM=$(grep "run_lepmap" config.yml | cut -d":" -f2 | xargs | tr '[:upper:]' '[:lower:]')
-LA=$(grep "run_lepanchor" config.yml | cut -d":" -f2 | xargs | tr '[:upper:]' '[:lower:]')
+LM=$(grep "run_lepmap" $CONF | cut -d":" -f2 | xargs | tr '[:upper:]' '[:lower:]')
+LA=$(grep "run_lepanchor" $CONF | cut -d":" -f2 | xargs | tr '[:upper:]' '[:lower:]')
 
 if [ $LM == "true" ]; then
   lepmap $1 $CONF
