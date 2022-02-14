@@ -20,12 +20,29 @@ if [[ -z "$1" ]]; then
   exit 1
 fi
 
+if [ -z "$CONDA_PREFIX" ]; then
+  echo -e "No active conda environment detected and one is required for the pipeline to work. If you cloned the repository rather than installing the conda package, you may install the environment using:\n"
+  printf "\033[01;32m"
+  printf "conda env create -f conda_setup.yml\n\n"
+  printf "\033[0m"
+  echo -e "Then, activate it using:\n"
+  printf "\033[01;32m"
+  printf "conda activate lepwrap\n"
+  printf "\033[0m"
+  exit 1
+fi
+
 # Check for snakemake
 if which snakemake &>/dev/null; then
   foo=1
 else
   echo -e "ERROR:\nSnakemake installation is required to run LepWrap, but not found in the current environment."
-  echo -e "If [ana|mini]conda are installed, created a pre-configred environment with:\n"
+  echo -e "It is likely LepWrap was not installed using [ana|mini]conda, which bundles all the dependencies."
+  echo -e "Please install LepWrap using conda: "
+  printf "\033[01;32m"
+  printf "conda install -c bioconda lepwrap\n\n"
+  printf "\033[0m"
+  echo -e "Alternatively, if you cloned the repository, you may install the environment using:\n"
   printf "\033[01;32m"
   printf "conda env create -f conda_setup.yml\n"
   printf "\033[0m"
@@ -84,11 +101,6 @@ lepanchor(){
   sleep 2s
   snakemake --cores $1 --snakefile $CONDA_PREFIX/bin/LepAnchor.smk --configfile $CONF --directory .
 }
-
-if [ -z "$CONDA_PREFIX" ]; then
-  echo "No active conda environment detected. The LepWrap conda environment is required for the pipeline to work."
-  exit 1
-fi
 
 LM=$(grep "run_lepmap" config.yml | cut -d":" -f2 | xargs | tr '[:upper:]' '[:lower:]')
 LA=$(grep "run_lepanchor" config.yml | cut -d":" -f2 | xargs | tr '[:upper:]' '[:lower:]')
