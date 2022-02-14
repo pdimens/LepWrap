@@ -18,7 +18,7 @@ rule place_orient3:
   threads: 2
   shell:
     """
-    gunzip -fc {input.chain} | java -cp software/LepAnchor PlaceAndOrientContigs chromosome={params.chrom} numThreads={threads} $(awk -f software/LepAnchor/scripts/pickorientation.awk {input.chrom}) bed={input.bedfile} map={input.lift} chain=- paf={input.paf} proximity={input.prox} evaluateAnchoring={input.propogated} improveAnchoring=1 {params.datatype} {params.extras} > {output.chrom} 2> {output.errors}
+    gunzip -fc {input.chain} | java -cp $CONDA_PREFIX/bin PlaceAndOrientContigs chromosome={params.chrom} numThreads={threads} $(awk -f $CONDA_PREFIX/bin/pickorientation.awk {input.chrom}) bed={input.bedfile} map={input.lift} chain=- paf={input.paf} proximity={input.prox} evaluateAnchoring={input.propogated} improveAnchoring=1 {params.datatype} {params.extras} > {output.chrom} 2> {output.errors}
     """
     
 rule prune_contigblocks:
@@ -29,7 +29,7 @@ rule prune_contigblocks:
   message: "Pruning contig blocks without map support and removing overlaps"
   params:
     chrom = lg
-  shell: "awk -f software/LepAnchor/scripts/prune.awk {input} > {output.chrom} 2> {output.err}"
+  shell: "awk -f $CONDA_PREFIX/bin/prune.awk {input} > {output.chrom} 2> {output.err}"
 
 rule prune_post:
   input:
@@ -44,8 +44,8 @@ rule prune_post:
   shell:
     """
     cat {input.prunederr} > {output.pruned}
-    awk -f software/LepAnchor/scripts/removeOverlaps.awk {input.bedfile} {input.prunedchrom} > {output.overlaps}
-      """
+    awk -f $CONDA_PREFIX/bin/removeOverlaps.awk {input.bedfile} {input.prunedchrom} > {output.overlaps}
+    """
 
 #rule find_haplotypes2:
 #  input:
@@ -72,7 +72,7 @@ rule prune_post:
 #  threads: 1
 #  shell:
 #    """
-#    gunzip -fc {input.chain} | java -cp software/LepAnchor LiftoverHaplotypes map={input.chrom} haplotypes={input.haplos} chain=- > {output}
+#    gunzip -fc {input.chain} | java -cp $CONDA_PREFIX/bin/ LiftoverHaplotypes map={input.chrom} haplotypes={input.haplos} chain=- > {output}
 #    """
 #
 #rule removehaplotypes:
@@ -83,5 +83,5 @@ rule prune_post:
 #    bedfile = "10_PlaceAndOrientContigs/map.propogated2.nohaplo.bed"
 #  message: "Removing haplotypes from the map"
 #  threads: 1
-#  shell: "awk -f software/LepAnchor/scripts/removeHaplotypes.awk {input} > {output}"
+#  shell: "awk -f $CONDA_PREFIX/bin/removeHaplotypes.awk {input} > {output}"
 #

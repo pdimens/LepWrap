@@ -1,3 +1,5 @@
+#! /usr/bin/env Rscript
+
 # This R file performs an adaptive method of filtering a linkage map
 # It works by creating a spline on the linkage map, then performing
 # a sliding window analysis on the residuals of the spline, calculating

@@ -17,7 +17,7 @@ rule place_orient2:
   message: "Running 2nd round of PlaceAndOrientContigs for linkage group {params.chrom}"
   shell:
     """
-    gunzip -fc {input.chain} | java -cp software/LepAnchor PlaceAndOrientContigs chromosome={params.chrom} numThreads={threads} $(awk -f software/LepAnchor/scripts/pickorientation.awk {input.chrom}) bed={input.bedfile} map={input.lift} chain=- paf={input.paf} proximity={input.prox} {params.datatype} {params.extras} > {output.chrom} 2> {output.chromerr}
+    gunzip -fc {input.chain} | java -cp $CONDA_PREFIX/bin/ PlaceAndOrientContigs chromosome={params.chrom} numThreads={threads} $(awk -f $CONDA_PREFIX/bin/pickorientation.awk {input.chrom}) bed={input.bedfile} map={input.lift} chain=- paf={input.paf} proximity={input.prox} {params.datatype} {params.extras} > {output.chrom} 2> {output.chromerr}
     """
 
 rule propogate2:
@@ -33,16 +33,16 @@ rule propogate2:
   message: "Second round of propogation"
   shell:
     """
-    awk -f software/LepAnchor/scripts/propagate.awk {input.placed} > {output.iter1}
-    awk -f software/LepAnchor/scripts/propagate.awk {output.iter1} > {output.iter2}
+    awk -f $CONDA_PREFIX/bin/propagate.awk {input.placed} > {output.iter1}
+    awk -f $CONDA_PREFIX/bin/propagate.awk {output.iter1} > {output.iter2}
     i=2
 
     while ! cmp -s "10_PlaceAndOrientContigs/tmp$i.la" "10_PlaceAndOrientContigs/tmp$(( $i-1 )).la" ;do
-      awk -f software/LepAnchor/scripts/propagate.awk 10_PlaceAndOrientContigs/tmp$i.la > 10_PlaceAndOrientContigs/tmp$[$i+1].la
+      awk -f $CONDA_PREFIX/bin/propagate.awk 10_PlaceAndOrientContigs/tmp$i.la > 10_PlaceAndOrientContigs/tmp$[$i+1].la
       i=$[$i+1]
     done
 
     #create prop*.la
-    awk -f software/LepAnchor/scripts/propagate2.awk 10_PlaceAndOrientContigs/tmp$i.la | awk '(/^[^#]/ && NF>=8){{++d[$1"\t"($7+0)"\t"($8+0)]; data[++line]=$0}}END{{for (i=1; i<=line; ++i) {{$0=data[i];if (d[$1"\t"($7+0)"\t"($8+0)] == 1) {{fn="10_PlaceAndOrientContigs/propogate/propogated."$5".la";print $0>fn}}}}}}'
-    awk '{{print $1"\t"($7+0)"\t"($8+0)"\t?\t"$5}}' {output.prop} | awk -f software/LepAnchor/scripts/pickbed.awk - {input.bedfile} > {output.propogated}
+    awk -f $CONDA_PREFIX/bin/propagate2.awk 10_PlaceAndOrientContigs/tmp$i.la | awk '(/^[^#]/ && NF>=8){{++d[$1"\t"($7+0)"\t"($8+0)]; data[++line]=$0}}END{{for (i=1; i<=line; ++i) {{$0=data[i];if (d[$1"\t"($7+0)"\t"($8+0)] == 1) {{fn="10_PlaceAndOrientContigs/propogate/propogated."$5".la";print $0>fn}}}}}}'
+    awk '{{print $1"\t"($7+0)"\t"($8+0)"\t?\t"$5}}' {output.prop} | awk -f $CONDA_PREFIX/bin/pickbed.awk - {input.bedfile} > {output.propogated}
     """

@@ -16,7 +16,7 @@ rule reorder_markers:
     threads: 2
     shell:
         """
-        zcat {input.datacall} | java -cp software/LepMap3 OrderMarkers2 {params.extra} map={input.filt_map} data=- numThreads={threads} evaluateOrder={input.lg_order} &> {output.runlog}
+        zcat {input.datacall} | java -cp $CONDA_PREFIX/bin/ OrderMarkers2 evaluateOrder={input.lg_order} {params.extra} map={input.filt_map} data=- numThreads={threads} &> {output.runlog}
         sed -n '/\*\*\* LG \=/,$p' {output.runlog} > {output.lg}
         grep "recombin" {output.runlog} > {log.recomb}
         awk '/#java/{{flag=1}} flag; /logL/{{flag=0}}' {output.runlog} > {log.run}
@@ -28,5 +28,5 @@ rule reorder_summary:
     message: "Recombination summary of reordering: {output}"
     shell:
         """
-        Rscript scripts/RecombinationSummary.r 6_OrderMarkers/recombination > {output}
+        RecombinationSummary.r 6_OrderMarkers/recombination > {output}
         """

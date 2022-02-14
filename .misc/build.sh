@@ -1,4 +1,5 @@
 #! usr/bin/env bash
+
 # for installing conda package
 mkdir -p $PREFIX/bin
 # LepWrap executable
@@ -12,7 +13,7 @@ cp software/LepMap3/*.class $PREFIX/bin
 cp software/LepMap3/scripts/* $PREFIX/bin
 # LepAnchor modules and scripts
 cp software/LepAnchor/*.class software/LepAnchor/lepanchor_wrapper.sh $PREFIX/bin
-cp software/LepAnchor/scripts/* $PREFIX/bin
+cp $CONDA_PREFIX/bin/* $PREFIX/bin
 cp software/LepAnchor/deps/ucsc_binaries/* $PREFIX/bin
 cp software/LepAnchor/deps/*.pl software/LepAnchor/deps/Red software/LepAnchor/deps/all_lastz.ctl software/LepAnchor/deps/scoreMatrix.q software/LepAnchor/deps/step* $PREFIX/bin
 # Snakemake rules

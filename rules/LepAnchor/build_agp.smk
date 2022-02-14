@@ -8,8 +8,8 @@ rule construct_agp:
     chrom = "{lg_range}"
   shell:
     """
-    awk -vn={params.chrom} '($5==n)' {input} | awk -vprefix="LG" -vlg={params.chrom} -f software/LepAnchor/scripts/makeagp_full2.awk - > {output.agp}
-    awk -vn={params.chrom} '($5==n)' {input} | awk -vprefix="LG" -vlg={params.chrom} -f software/LepAnchor/scripts/makeagp2.awk - > {output.scaff_agp}
+    awk -vn={params.chrom} '($5==n)' {input} | awk -vprefix="LG" -vlg={params.chrom} -f $CONDA_PREFIX/bin/makeagp_full2.awk - > {output.agp}
+    awk -vn={params.chrom} '($5==n)' {input} | awk -vprefix="LG" -vlg={params.chrom} -f $CONDA_PREFIX/bin/makeagp2.awk - > {output.scaff_agp}
     """
 
 rule unused:

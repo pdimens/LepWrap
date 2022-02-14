@@ -27,13 +27,23 @@ rule repeatmask:
     echo "- Compressing repeat-masked genome from Red"
     gzip --stdout 8_RepeatMask/*.msk > {output} && rm 8_RepeatMask/*.msk
     """
-    
+
+rule lastz_config:
+  output: 
+    ctl = "9_Chain/all_lastz.ctl",
+    scoremtx = "9_Chain/scoreMatrix.q"
+  message: "Creating LASTZ configuration inputs"
+  shell: 
+    """
+    generate_lastzctl.sh > {output.ctl}
+    generate_qscoremtx.sh > {output.scoremtx}
+    """
 
 rule chain_1:
   input: 
     geno = "8_RepeatMask/repeatmasked.fa.gz",
-    ctrl = "software/LepAnchor/deps/all_lastz.ctl",
-    scoremtx = "software/LepAnchor/deps/scoreMatrix.q"
+    ctrl = "9_Chain/all_lastz.ctl",
+    scoremtx = "9_Chain/scoreMatrix.q"
   output: 
     out1 = "9_Chain/repeatmaskedx.sizes",
     out2 = "9_Chain/repeatmasked.sizes"
@@ -41,9 +51,9 @@ rule chain_1:
   threads: 30
   shell:
     """
-    ln -srf {input} 9_Chain/
+    ln -srf {input.geno} 9_Chain/
     cd 9_Chain
-    ../software/LepAnchor/deps/step1.HM2 repeatmasked {threads}
+    step1.HM2 repeatmasked {threads}
     """
 
 
@@ -59,6 +69,6 @@ rule chain_2:
   shell:
     """   
     cd 9_Chain
-    ../software/LepAnchor/deps/step2.HM2 repeatmasked {threads} && rm -r repeatmasked.repeatmaskedx.result/raw.axt
+    step2.HM2 repeatmasked {threads} && rm -r repeatmasked.repeatmaskedx.result/raw.axt
     ln -sr ../{output.original} ../{output.slink}
     """
