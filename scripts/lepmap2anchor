@@ -6,7 +6,7 @@ cat <<EOF
 Convert Lep-Map3 interval files into a single Lep-Anchor input file.
 
 [usage]:	lepmap2anchor <marker_file>
-[example]: 	scripts/lepmap2anchor snps.txt
+[example]: 	lepmap2anchor snps.txt
 
 EOF
   exit 1
@@ -15,7 +15,7 @@ fi
 LG=$(ls 7_Intervals/*.intervals | wc -l)
 
 if [ ! -f $1 ]; then
-    echo "Error: marker file $(echo $1) not found. It may be generated using scripts/extract_markers.sh"
+    echo "Error: marker file $(echo $1) not found. It may be generated using extract_markers.sh"
     exit 1
 fi
 

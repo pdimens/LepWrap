@@ -2,7 +2,7 @@ rule extract_markers:
     input: "2_Filtering/data.filtered.lepmap3.gz"
     output: report("snps.txt", category = "Data")
     message: "Extracting marker information from Lep-Map3 data file {input}"
-    shell: "scripts/extract_markers.sh {input}"
+    shell: "extract_markers.sh {input}"
 
 
 rule generate_input_data:

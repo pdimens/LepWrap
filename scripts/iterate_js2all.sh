@@ -6,7 +6,7 @@ if [[ -z "$1" ]]; then
 cat <<EOF
 Iterate JoinSingles2All over a range of LODlimit values.
 [usage]:	iterate_js2all.sh <mapfile> <LOD start> <LOD end> <LOD difference> <informativemask OPTIONAL>
-[example]: 	scripts/iterate_js2all.sh 3_SeparateChromosomes/map.31 22 31 5 123
+[example]: 	iterate_js2all.sh 3_SeparateChromosomes/map.31 22 31 5 123
 EOF
   exit 1
 fi
@@ -39,5 +39,5 @@ done
 echo "The generated maps are named LOD.LODlim.LODdiff.js2all"
 
 # generate a summary of the results
-scripts/MapSummary.r JoinSingles2All_iter
+MapSummary.r JoinSingles2All_iter
 

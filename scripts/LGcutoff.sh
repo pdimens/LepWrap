@@ -8,7 +8,7 @@ Essentially, set an LG maximum, and markers above it will be assigned to group 0
 
 [usage]:	LGcutoff.sh <map.file> <LG max>
 # unassign all markers in LG's 25+
-[example]: 	scripts/LGcutoff.sh 3_SeparateChromosomes/map.13 24
+[example]: 	LGcutoff.sh 3_SeparateChromosomes/map.13 24
 
 EOF
   exit 1

@@ -6,7 +6,7 @@ cat <<EOF
 Extracts marker information (contig and position) from a Lep-Map3 data file.
 
 [usage]:	extract_markers.sh <data_file.gz>
-[example]: 	scripts/extract_markers.sh data.filtered.lepmap3.gz
+[example]: 	extract_markers.sh data.filtered.lepmap3.gz
 
 EOF
   exit 1
