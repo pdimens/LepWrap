@@ -19,7 +19,7 @@ rule place_orient3:
   threads: 2
   shell:
     """
-    gunzip -fc {input.chain} | java -cp software/LepAnchor PlaceAndOrientContigs chromosome={params.chrom} numThreads={threads} $(awk -f software/LepAnchor/scripts/pickorientation.awk {input.chrom}) bed={input.bedfile} map={input.lift} chain=- paf={input.paf} proximity={input.prox} evaluateAnchoring={input.propogated} improveAnchoring=1 {params.datatype} {params.extras} > {output.chrom} 2> {output.errors}
+    gunzip -fc {input.chain} | java -cp software/LepAnchor PlaceAndOrientContigs chromosome={params.chrom} numThreads={threads} $(awk -f pickorientation.awk {input.chrom}) bed={input.bedfile} map={input.lift} chain=- paf={input.paf} proximity={input.prox} evaluateAnchoring={input.propogated} improveAnchoring=1 {params.datatype} {params.extras} > {output.chrom} 2> {output.errors}
     """
     
 rule prune_contigblocks:
@@ -30,7 +30,7 @@ rule prune_contigblocks:
   message: "Pruning contig blocks without map support and removing overlaps"
   params:
     chrom = lg
-  shell: "awk -f software/LepAnchor/scripts/prune.awk {input} > {output.chrom} 2> {output.err}"
+  shell: "awk -f prune.awk {input} > {output.chrom} 2> {output.err}"
 
 rule prune_post:
   input:
@@ -45,5 +45,5 @@ rule prune_post:
   shell:
     """
     cat {input.prunederr} > {output.pruned}
-    awk -f software/LepAnchor/scripts/removeOverlaps.awk {input.bedfile} {input.prunedchrom} > {output.overlaps}
+    awk -f removeOverlaps.awk {input.bedfile} {input.prunedchrom} > {output.overlaps}
     """

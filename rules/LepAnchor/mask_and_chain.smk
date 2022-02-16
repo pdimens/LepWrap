@@ -23,7 +23,7 @@ rule repeatmask:
   threads: 30
   shell:
     """
-    software/LepAnchor/deps/Red -gnm 8_RepeatMask/inputgenome -msk 8_RepeatMask -sco 8_RepeatMask -cnd 8_RepeatMask -rpt 8_RepeatMask > {log} 2>> {log}
+    Red -gnm 8_RepeatMask/inputgenome -msk 8_RepeatMask -sco 8_RepeatMask -cnd 8_RepeatMask -rpt 8_RepeatMask > {log} 2>> {log}
     echo "- Compressing repeat-masked genome from Red"
     gzip --stdout 8_RepeatMask/*.msk > {output} && rm 8_RepeatMask/*.msk
     """
