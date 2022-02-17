@@ -19,7 +19,7 @@ rule place_orient3:
   threads: 2
   shell:
     """
-    gunzip -fc {input.chain} | java -cp software/LepAnchor PlaceAndOrientContigs chromosome={params.chrom} numThreads={threads} $(awk -f pickorientation.awk {input.chrom}) bed={input.bedfile} map={input.lift} chain=- paf={input.paf} proximity={input.prox} evaluateAnchoring={input.propogated} improveAnchoring=1 {params.datatype} {params.extras} > {output.chrom} 2> {output.errors}
+    gunzip -fc {input.chain} | java -cp $CONDA_PREFIX/bin/lepanchor PlaceAndOrientContigs chromosome={params.chrom} numThreads={threads} $(awk -f $CONDA_PREFIX/bin/pickorientation.awk {input.chrom}) bed={input.bedfile} map={input.lift} chain=- paf={input.paf} proximity={input.prox} evaluateAnchoring={input.propogated} improveAnchoring=1 {params.datatype} {params.extras} > {output.chrom} 2> {output.errors}
     """
     
 rule prune_contigblocks:
@@ -45,5 +45,5 @@ rule prune_post:
   shell:
     """
     cat {input.prunederr} > {output.pruned}
-    awk -f removeOverlaps.awk {input.bedfile} {input.prunedchrom} > {output.overlaps}
+    awk -f $CONDA_PREFIX/bin/removeOverlaps.awk {input.bedfile} {input.prunedchrom} > {output.overlaps}
     """
