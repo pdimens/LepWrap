@@ -30,7 +30,7 @@ rule prune_contigblocks:
   message: "Pruning contig blocks without map support and removing overlaps"
   params:
     chrom = lg
-  shell: "awk -f prune.awk {input} > {output.chrom} 2> {output.err}"
+  shell: "awk -f $CONDA_PREFIX/bin/prune.awk {input} > {output.chrom} 2> {output.err}"
 
 rule prune_post:
   input:
