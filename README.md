@@ -6,9 +6,7 @@ _It's Lep-Map3 and Lep-Anchor, but with snakes 🐍🐍_
 [![Cite](https://img.shields.io/badge/Cite-10.5281/zenodo.6055566-e1e1e1?style=for-the-badge)](https://zenodo.org/badge/latestdoi/260516189) 
 # LepWrap
 
-LepWrap is a reusable pipeline to use the linkage map software [Lep-Map3](https://sourceforge.net/projects/lep-map3/) and the genome assembly map-based anchoring and orienting software [Lep-Anchor](https://sourceforge.net/p/lep-anchor/wiki/Home/). It is the Snakemake-based successor to [LepMapp3r](https://github.com/pdimens/LepMapp3r). Check out [the wiki](https://github.com/pdimens/LepWrap/wiki) for detailed installation, usage, and workflow information.
-
-
+LepWrap is a reusable pipeline to use the linkage map software [Lep-Map3](https://sourceforge.net/projects/lep-map3/) and the genome assembly map-based anchoring and orienting software [Lep-Anchor](https://sourceforge.net/p/lep-anchor/wiki/Home/). Check out [the documentation/wiki](https://github.com/pdimens/LepWrap/wiki) for detailed installation, usage, and workflow information.
 
 ### How to install
 You will need a `conda` installation ([Anaconda](https://docs.anaconda.com/anaconda/install/) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html), I recommend Miniconda). Alternatively, you can download latest release or clone this repository locally.
@@ -47,7 +45,7 @@ You will need to modify `config.yml` to suit your needs, then you can simply run
 ```bash
 LepWrap <number_of_cores> <config.yml>
 ```
-where `<number_of_cores>` is an integer of the maximum number of cores/threads you want the pipeline to use and `<config.yml>` (optional!) is the name of the config file, if it's different than `config.yml`. 
+where `<number_of_cores>` is an integer of the maximum number of cores/threads you want the pipeline to use and `<config.yml>` (optional!) is the name of the config file, if it's different than `config.yml`. If no config file is found in the directory, LepWrap will generate a default one for you to edit.
 
 **Examples**
 ```bash

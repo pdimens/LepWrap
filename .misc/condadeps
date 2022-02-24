@@ -1,0 +1,12 @@
+ bzip2=1.0.8=h7f98852_4
+ font-ttf-dejavu-sans-mono=2.37=hab24e00_0
+ pygraphviz=1.7=py39h78163bd_0
+ graphviz=2.47.1=h85b4f2f_1
+ imagemagick=7.0.11_13=pl5320hb118871_0
+ openjdk=8.0.312=h0d85af4_0
+ pandoc=2.13=h7f98852_0
+ python=3.9.4=hffdb5ce_0_cpython
+ r-base=4.0.5=h9e01966_1
+ r-tidyverse=1.3.1=r40hc72bb7e_0
+ sed=4.8=he412f7d_0
+ snakemake=6.4.0=hdfd78af_0
