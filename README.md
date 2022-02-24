@@ -3,7 +3,7 @@
 _It's Lep-Map3 and Lep-Anchor, but with snakes 🐍🐍_
 
 [![alt text](https://img.shields.io/badge/docs-wiki-75ae6c?style=for-the-badge&logo=Read%20The%20Docs)](https://github.com/pdimens/LepWrap/wiki) 
-[![Cite](https://img.shields.io/badge/Cite-10.5281/zenodo.6055566-e1e1e1?style=for-the-badge)](https://zenodo.org/badge/latestdoi/260516189) 
+[![Cite](https://img.shields.io/badge/Cite-10.5281/zenodo.6055566-e1e1e1?style=for-the-badge)](https://doi.org/10.5281/zenodo.6055565) 
 # LepWrap
 
 LepWrap is a reusable pipeline to use the linkage map software [Lep-Map3](https://sourceforge.net/projects/lep-map3/) and the genome assembly map-based anchoring and orienting software [Lep-Anchor](https://sourceforge.net/p/lep-anchor/wiki/Home/). Check out [the documentation/wiki](https://github.com/pdimens/LepWrap/wiki) for detailed installation, usage, and workflow information.
