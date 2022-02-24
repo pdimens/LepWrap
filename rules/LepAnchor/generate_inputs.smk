@@ -2,13 +2,13 @@ rule extract_markers:
     input: "2_Filtering/data.filtered.lepmap3.gz"
     output: report("snps.txt", category = "Data")
     message: "Extracting marker information from Lep-Map3 data file {input}"
-    shell: "scripts/extract_markers.sh {input}"
+    shell: "extract_markers.sh {input}"
 
 
 rule generate_input_data:
   input:
     markers = "snps.txt",
-    data = expand("7_Intervals/ordered.{x}.intervals", x = range(1, lg + 1)) if data_type == "noIntervals=0" else expand("7_Distances/ordered.{x}.distances", x = range(1, lg + 1))
+    data = expand("7_Intervals/ordered.{x}.intervals", x = lg_range) if data_type == "noIntervals=0" else expand("7_Distances/ordered.{x}.distances", x = lg_range)
   output: 
     data = report("10_PlaceAndOrientContigs/lepanchor.input", category = "Data")
   message: "Combining {params} Lep-Map3 files into single LepAnchor input {output}"
@@ -31,31 +31,28 @@ rule contiglengths:
   input: geno
   output: report("10_PlaceAndOrientContigs/contigs.length", category = "Data")
   message: "Getting contig lengths"
-  shell: "gunzip -fc {input} | awk -f software/LepAnchor/scripts/contigLength.awk > {output}"
+  shell: "gunzip -fc {input} | awk -f $CONDA_PREFIX/bin/contigLength.awk > {output}"
 
 
 rule find_haplotypes:
   input: "9_Chain/chainfile.gz"
-  output: report("10_PlaceAndOrientContigs/suspected.haplotypes.before", category = "Logs")
+  output: report("10_PlaceAndOrientContigs/suspected.haplotypes.initial", category = "Logs")
   message: "Finding non-haplotype contigs not included in map.bed"
-  shell: 
-    """
-    gunzip -fc {input} | awk -f software/LepAnchor/scripts/findFullHaplotypes.awk > {output}
-    """
+  shell: "gunzip -fc {input} | awk -f $CONDA_PREFIX/bin/findFullHaplotypes.awk > {output}"
 
 
 rule liftover:
   input: 
     chain = "9_Chain/chainfile.gz",
     intervals = "10_PlaceAndOrientContigs/lepanchor.input",
-    haplos = "10_PlaceAndOrientContigs/suspected.haplotypes.before"
+    haplos = "10_PlaceAndOrientContigs/suspected.haplotypes.initial"
   output: 
     lift = report("10_PlaceAndOrientContigs/liftover.la", category = "Lifted Intervals"),
     sortedlift = report("10_PlaceAndOrientContigs/liftover.sorted.la", category = "Lifted Intervals")
   message: "Running liftoverHaplotypes for the input maps"
   shell: 
     """
-    gunzip -fc {input.chain} | java -cp software/LepAnchor LiftoverHaplotypes map={input.intervals} haplotypes={input.haplos} chain=- > {output.lift}
+    gunzip -fc {input.chain} | java -cp $CONDA_PREFIX/bin/lepanchor LiftoverHaplotypes map={input.intervals} haplotypes={input.haplos} chain=- > {output.lift}
     cat {output.lift} | sort -V -k 1,1 -k 2,2n > {output.sortedlift}
     """
 
@@ -67,7 +64,8 @@ rule cleanmap:
   message: "Running CleanMap"
   params:
     extras = cleanmap_extra
-  shell: "java -cp software/LepAnchor CleanMap map={input} {params.extras} > {output} 2> {log}"
+  shell: "java -cp $CONDA_PREFIX/bin/lepanchor CleanMap map={input} {params.extras} > {output} 2> {log}"
+
 
 rule map2bed:
   input: 
@@ -78,13 +76,13 @@ rule map2bed:
   message: "Running Map2Bed"
   params:
     extras = map2bed_extra
-  shell: "java -cp software/LepAnchor Map2Bed map={input.cleanmap} contigLength={input.lengths} {params.extras} > {output} 2> {log}"
+  shell: "java -cp $CONDA_PREFIX/bin/lepanchor Map2Bed map={input.cleanmap} contigLength={input.lengths} {params.extras} > {output} 2> {log}"
 
 
 rule ungrouped:
   input:
     lengths = "10_PlaceAndOrientContigs/contigs.length",
-    haplos = "10_PlaceAndOrientContigs/suspected.haplotypes.before",
+    haplos = "10_PlaceAndOrientContigs/suspected.haplotypes.initial",
     bedfile = "10_PlaceAndOrientContigs/map.bed"
   output:
     bedfile = "10_PlaceAndOrientContigs/map_extra.bed"

@@ -7,7 +7,7 @@
 #chr*.err are the output from Lep-Anchor error stream, e.g. java PlaceAndOrientContigs ... chromosome=X ... 2>chrX.err
 #haplotypes are put to maxChr+1
 BEGIN{
-	FS="\t"
+#	FS="\t"
 	OFS="\t"
 }
 
@@ -74,9 +74,10 @@ BEGIN{
 			bed[contig, jmax + 1] = $0
 		}
 	}
+	++numHaplotypes
 }
 END{
-	if (jmax != "")
+	if (jmax != "" || numHaplotypes == 0)
 		for (i in contigs) {
 			for (j = 1; j <= c[i]; ++j)
 				print bed[i, j]

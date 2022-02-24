@@ -1,10 +1,10 @@
 rule prep_geno:
   input: geno
-  output: "8_Repeatmask/inputgenome/lepanchorinput.fa"
+  output: "8_RepeatMask/inputgenome/lepanchorinput.fa"
   message: "Preparing genome for repeat masking"
   shell:
     """
-    mkdir -p 8_Repeatmask/inputgenome
+    mkdir -p 8_RepeatMask/inputgenome
     if (file {input} | grep -q compressed); then
       echo "- Assembly is compressed, creating decompressed copy: {output}"
       gunzip --stdout {input} > {output}
@@ -16,25 +16,34 @@ rule prep_geno:
 
 
 rule repeatmask:
-  input: "8_Repeatmask/inputgenome/lepanchorinput.fa"
-  output: "8_Repeatmask/repeatmasked.fa.gz"
-  log: "8_Repeatmask/Red.log"
+  input: "8_RepeatMask/inputgenome/lepanchorinput.fa"
+  output: "8_RepeatMask/repeatmasked.fa.gz"
+  log: "8_RepeatMask/Red.log"
   message: "Using Red to repeat-mask {input}"
   threads: 30
   shell:
     """
-    echo "- Running Red"
-    software/LepAnchor/deps/Red -gnm 8_Repeatmask/inputgenome -msk 8_Repeatmask -sco 8_Repeatmask -cnd 8_Repeatmask -rpt 8_Repeatmask > {log} 2>> {log}
+    Red -gnm 8_RepeatMask/inputgenome -msk 8_RepeatMask -sco 8_RepeatMask -cnd 8_RepeatMask -rpt 8_RepeatMask > {log} 2>> {log}
     echo "- Compressing repeat-masked genome from Red"
-    gzip --stdout 8_Repeatmask/*.msk > {output} && rm 8_Repeatmask/*.msk
+    gzip --stdout 8_RepeatMask/*.msk > {output} && rm 8_RepeatMask/*.msk
     """
-    
+
+rule lastz_config:
+  output: 
+    ctl = "9_Chain/all_lastz.ctl",
+    scoremtx = "9_Chain/scoreMatrix.q"
+  message: "Creating LASTZ configuration inputs"
+  shell: 
+    """
+    generate_lastzctl.sh > {output.ctl}
+    generate_qscoremtx.sh > {output.scoremtx}
+    """
 
 rule chain_1:
   input: 
-    geno = "8_Repeatmask/repeatmasked.fa.gz",
-    ctrl = "software/LepAnchor/deps/all_lastz.ctl",
-    scoremtx = "software/LepAnchor/deps/scoreMatrix.q"
+    geno = "8_RepeatMask/repeatmasked.fa.gz",
+    ctrl = "9_Chain/all_lastz.ctl",
+    scoremtx = "9_Chain/scoreMatrix.q"
   output: 
     out1 = "9_Chain/repeatmaskedx.sizes",
     out2 = "9_Chain/repeatmasked.sizes"
@@ -42,9 +51,9 @@ rule chain_1:
   threads: 30
   shell:
     """
-    ln -srf {input} 9_Chain/
+    ln -srf {input.geno} 9_Chain/
     cd 9_Chain
-    ../software/LepAnchor/deps/step1.HM2 repeatmasked {threads}
+    step1.HM2 repeatmasked {threads}
     """
 
 
@@ -60,6 +69,6 @@ rule chain_2:
   shell:
     """   
     cd 9_Chain
-    ../software/LepAnchor/deps/step2.HM2 repeatmasked {threads} && rm -r repeatmasked.repeatmaskedx.result/raw.axt
+    step2.HM2 repeatmasked {threads} && rm -r repeatmasked.repeatmaskedx.result/raw.axt
     ln -sr ../{output.original} ../{output.slink}
     """

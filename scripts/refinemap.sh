@@ -9,7 +9,7 @@ Attempt to refine a map from SeparateChromosomes2 by splitting out markers from 
 Uses 4 threads and distortionLod=1. Requires an input map, which linkage group to modify, LOD start:end values to iterate over, and a minimum size for new clusters.
 
 [usage]:	refinemap.sh <mapfile> <linkage group> <LOD start> <LOD end> <size limit>
-[example]: 	scripts/refinemap.sh 3_SeparateChromosomes/map.31 1 22 70 30
+[example]: 	refinemap.sh 3_SeparateChromosomes/map.31 1 22 70 30
 EOF
   exit 1
 fi
@@ -31,8 +31,8 @@ LODMAX=$4
 SIZELIM=$5
 
 for i in $(seq $LODMIN $LODMAX); do
-    zcat 2_Filtering/data.filtered.lepmap3.gz | java -cp software/LepMap3 SeparateChromosomes2 data=- map=$TARGETMAP lg=$TARGETLG sizeLimit=$SIZELIM lodLimit=$i distortionLod=1 numThreads=4 > $1.refine/map.$i
+    zcat 2_Filtering/data.filtered.lepmap3.gz | java -cp $CONDA_PREFIX/bin/lepmap3 SeparateChromosomes2 data=- map=$TARGETMAP lg=$TARGETLG sizeLimit=$SIZELIM lodLimit=$i distortionLod=1 numThreads=4 > $1.refine/map.$i
 done
 
 # generate a summary of the results
-scripts/MapSummary.r $1.refine
+MapSummary.r $1.refine

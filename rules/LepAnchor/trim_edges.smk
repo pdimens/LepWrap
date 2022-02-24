@@ -19,7 +19,7 @@ rule trim_newintervals:
   params:
     edge = edgelen,
     dist = trimdist
-  shell: "Rscript scripts/LATrim.r {input} {params.dist} {params.edge} 15_Trim"
+  shell: "LepWrapTrim.r {input} {params.dist} {params.edge} 15_Trim"
 
 
 rule merge_trimplots:
@@ -39,4 +39,5 @@ rule merge_trimmedintervals:
 rule plot_trimmedintervals:
   input: "16_MareyMapsTrimmed/data.marey.trimmed.gz"
   output: report("16_MareyMapsTrimmed/LepAnchor.mareymaps.pdf", category = "Trimmed Marey Maps")
-  shell: "Rscript scripts/LASummary.r {input}"
+  message: "Plotting results of edge trimming"
+  shell: "LASummary.r {input}"

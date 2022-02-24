@@ -1,6 +1,5 @@
 rule construct_agp:
-  input:
-    cleaned = "10_PlaceAndOrientContigs/overlaps_rm.la"
+  input: "10_PlaceAndOrientContigs/overlaps.removed.la"
   output:
     agp = report("11_AGP/contigs/chr.{lg_range}.agp", category = "Contig AGP Files"),
     scaff_agp = report("11_AGP/scaffolds/chr.{lg_range}.scaffolds.agp", category = "Scaffold AGP Files")
@@ -9,26 +8,24 @@ rule construct_agp:
     chrom = "{lg_range}"
   shell:
     """
-    awk -vn={params.chrom} '($5==n)' {input.cleaned} | awk -vprefix="LG" -vlg={params.chrom} -f software/LepAnchor/scripts/makeagp_full2.awk - > {output.agp}
-    awk -vn={params.chrom} '($5==n)' {input.cleaned} | awk -vprefix="LG" -vlg={params.chrom} -f software/LepAnchor/scripts/makeagp2.awk - > {output.scaff_agp}
+    awk -vn={params.chrom} '($5==n)' {input} | awk -vprefix="LG" -vlg={params.chrom} -f $CONDA_PREFIX/bin/makeagp_full2.awk - > {output.agp}
+    awk -vn={params.chrom} '($5==n)' {input} | awk -vprefix="LG" -vlg={params.chrom} -f $CONDA_PREFIX/bin/makeagp2.awk - > {output.scaff_agp}
     """
-
 
 rule unused:
   input:
     lengths = "10_PlaceAndOrientContigs/contigs.length",
-    haplos = "10_PlaceAndOrientContigs/suspected.haplotypes.before",
-    agp = expand("11_AGP/contigs/chr.{lgs}.agp", lgs = lg_range),
+    haplos = "10_PlaceAndOrientContigs/suspected.haplotypes.initial",
+    agp = expand("11_AGP/contigs/chr.{lgs}.agp", lgs = lg_range)
   output: 
-    txt = "11_AGP/not_used_final.txt",
+    txt = "11_AGP/not_used.txt",
     agp = "11_AGP/not_used.agp"
   message: "Finding unused contigs"
   shell:
     """
-    cut -f 1 {input.lengths} | grep -v -w -F -f <(cut -f 2 {input.haplos};awk '($5!="U"){{print $6}}' {input.agp}) > {output.txt}
+    cut -f 1 {input.lengths} | grep -v -w -F -f <(cut -f 2 {input.haplos}; awk '($5!="U"){{print $6}}' {input.agp}) > {output.txt}
     grep -F -w -f {output.txt} {input.lengths} | awk '{{print $1,1,$2,1,"W",$1,1,$2,"+"}}' > {output.agp}
     """
-
 
 rule build_final_agp:
   input:
