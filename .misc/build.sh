@@ -5,8 +5,8 @@ mkdir -p $PREFIX/bin
 mkdir -p $PREFIX/bin/lepmap3
 mkdir -p $PREFIX/bin/lepanchor
 # LepWrap executable
+chmod +x LepWrap
 cp LepWrap $PREFIX/bin/
-chmod +x $PREFIX/bin/LepWrap
 # associated scripts
 chmod +x scripts/*
 cp scripts/* $PREFIX/bin/
