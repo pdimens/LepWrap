@@ -59,7 +59,7 @@ LepWrap does things a certain way, employing the most common/reasonable way of u
 ## Citation
 If using LepWrap in a publication, cite **Pasi Rastas** for their work on Lep-Map3/Lep-Anchor and cite this repository using the Zenodo citation. You are also encouraged to cite LepWrap if you just use the edge-trimming part of it. If you like LepWrap, please Star the repository and/or give me (Pavel) a shout out on Twitter [@pvdimens](https://twitter.com/PVDimens) [![alt text](http://i.imgur.com/wWzX9uB.png)](https://twitter.com/PVDimens)  =)
 
-> Pavel V. Dimens. (2022). pdimens/LepWrap: link with zenodo (3.6.2). Zenodo. https://doi.org/10.5281/zenodo.6055566
+> Pavel V. Dimens. (2022). pdimens/LepWrap: link with zenodo (4.0). Zenodo. https://doi.org/10.5281/zenodo.6055565
 
 > Pasi Rastas, Lep-MAP3: robust linkage mapping even for low-coverage whole genome sequencing data, Bioinformatics, Volume 33, Issue 23, 01 December 2017, Pages 3726–3732,https://doi.org/10.1093/bioinformatics/btx494
 
