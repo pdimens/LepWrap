@@ -6,7 +6,7 @@ rule parent_call:
     message: "Creating Lep-Map3 data file from {input.vcf} and {input.pedigree}"
     params:
         extra = parentcall_extra
-    shell: "java -cp $CONDA_PREFIX/bin/lepmap3lepmap3lepmap3 ParentCall2 data={input.pedigree} vcfFile={input.vcf} {params} | gzip > {output}"
+    shell: "java -cp $CONDA_PREFIX/bin/lepmap3 ParentCall2 data={input.pedigree} vcfFile={input.vcf} {params} | gzip > {output}"
 
 rule filtering:
     input: "1_ParentCall/data.lepmap3.gz"
