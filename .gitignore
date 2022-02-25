@@ -21,7 +21,7 @@
 /JoinSingles2All_iter
 /RefineMap
 /pedigree.txt
-LOD.master
+LOD.MAP
 snps.txt
 /*.paf
 /*.vcf

@@ -1,7 +1,7 @@
 rule order_markers:
     input:
         datacall = "2_Filtering/data.filtered.lepmap3.gz",
-        filt_map = "LOD.master"
+        filt_map = "3_SeparateChromosomes/LOD.MAP"
     output: 
         lg = "4_OrderMarkers/ordered.{lg_range}",
         runlog = temp("4_OrderMarkers/logs/ordered.{lg_range}.running")

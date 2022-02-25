@@ -38,7 +38,7 @@ rule join_singles:
     input:
         datacall = "2_Filtering/data.filtered.lepmap3.gz",
         map_choice = "3_SeparateChromosomes/chosen.LOD"
-    output: "LOD.master"
+    output: "3_SeparateChromosomes/LOD.MAP"
     threads: 40
     message: "Joining singles to linkage groups"
     params:

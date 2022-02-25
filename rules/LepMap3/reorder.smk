@@ -1,7 +1,7 @@
 rule reorder_markers:
     input:
         datacall = "2_Filtering/data.filtered.lepmap3.gz",
-        filt_map = "LOD.master",
+        filt_map = "3_SeparateChromosomes/LOD.MAP",
         lg_order = "5_Trim/ordered.{lg_range}.trimmed"
     output: 
         lg = "6_OrderMarkers/ordered.{lg_range}",
