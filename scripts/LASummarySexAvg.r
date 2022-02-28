@@ -1,6 +1,9 @@
 #! /usr/bin/env Rscript
 
-suppressMessages(library(tidyverse, warn.conflicts = FALSE, quietly = TRUE))
+library(dplyr)
+library(tidyr)
+library(readr)
+library(ggplot2)
 
 args <- commandArgs(trailingOnly = TRUE)
 # args[1] = mareydata file

@@ -1,6 +1,8 @@
 #! /usr/bin/env Rscript
 
-suppressMessages(library(tidyverse, quietly = TRUE, warn.conflicts = FALSE))
+library(dplyr)
+library(tidyr)
+library(ggplot2)
 
 args <- commandArgs(trailingOnly = TRUE)
 

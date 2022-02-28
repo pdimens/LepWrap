@@ -14,11 +14,13 @@
 # sliding window and at least once for the other. End-markers that only get
 # tested 2x (lack of overlaps) incur double-penalties.
 
-library(tidyverse)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
 library(splines)
 
 # will require un-gzipped mareydata
-marey <- read_delim("data.marey.trimmed", delim = "\t", col_names = FALSE) %>%
+marey <- read.delim("data.marey.trimmed", sep = "\t", col_names = FALSE) %>%
   select(X3, X2, X5, X6) %>%
   rename(LG = X3, MB = X2, MALE = X5, FEMALE = X6) %>%
   rowwise() %>%

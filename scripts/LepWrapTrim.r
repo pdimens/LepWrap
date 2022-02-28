@@ -1,7 +1,8 @@
 #! /usr/bin/env Rscript
 
-suppressMessages(if (!require("tidyverse")) install.packages("tidyverse"))
-suppressMessages(library("tidyverse"))
+library(dplyr)
+library(tidyr)
+library(ggplot2)
 
 args <- commandArgs(trailingOnly = TRUE)
 # args[1] is the OrderMarkers2/LepAnchor output file

@@ -1,8 +1,10 @@
 #! /usr/bin/env Rscript
 
 # This script will parse all the recombination logs of LepWrap
-suppressMessages(library(tidyverse))
-suppressMessages(library("stringr"))
+library(dplyr)
+library(tidyr)
+library(stringr)
+
 ## setup outfile
 # format trailing arguments for script
 args <- commandArgs(trailingOnly = TRUE)

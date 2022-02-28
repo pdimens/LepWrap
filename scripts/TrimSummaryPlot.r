@@ -1,6 +1,9 @@
 #! /usr/bin/env Rscript
 
-suppressMessages(library(tidyverse, quietly = TRUE))
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(readr)
 
 args <- commandArgs(trailingOnly = TRUE)
 # args[1] is the summary file
