@@ -4,6 +4,7 @@
 library(dplyr)
 library(tidyr)
 library(stringr)
+library(purrr)
 
 ## setup outfile
 # format trailing arguments for script
