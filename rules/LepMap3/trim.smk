@@ -21,7 +21,6 @@ rule trim_summary:
         detailed = "5_Trim/trim.details",
         summary = "5_Trim/trim.summary",
         summarypdf = "5_Trim/trim.summary.pdf",
-        summarysvg = "5_Trim/trim.summary.svg",
         mergeplots = "5_Trim/plots/all.trimplots.pdf"
     message: "Summarizing trimming results"
     params:
