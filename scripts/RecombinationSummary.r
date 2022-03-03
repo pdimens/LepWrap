@@ -1,10 +1,10 @@
 #! /usr/bin/env Rscript
 
 # This script will parse all the recombination logs of LepWrap
-library(dplyr)
-library(tidyr)
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(tidyr))
 library(stringr)
-library(purrr)
+suppressPackageStartupMessages(library(purrr))
 
 ## setup outfile
 # format trailing arguments for script

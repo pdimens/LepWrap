@@ -1,7 +1,7 @@
 #! /usr/bin/env Rscript
 
-suppressMessages(library(dplyr))
-suppressPackageStartupMessages((library(tidyr))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(tidyr))
 library(ggplot2)
 library(readr)
 
@@ -29,4 +29,3 @@ tbl %>%
     scale_y_continuous(limits =   c(-0.05, max(tbl$n_removed)+10))
 
 ggsave(paste0(args[1], ".pdf"), height = 4, width = 7, units = "in")
-#ggsave(paste0(args[1], ".svg"), height = 4, width = 7, units = "in")

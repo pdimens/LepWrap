@@ -1,7 +1,7 @@
 #! /usr/bin/env Rscript
 
-library(dplyr)
-library(tidyr)
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(tidyr))
 library(ggplot2)
 
 args <- commandArgs(trailingOnly = TRUE)
