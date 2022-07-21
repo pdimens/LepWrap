@@ -9,37 +9,19 @@ _It's Lep-Map3 and Lep-Anchor, but with snakes 🐍🐍_
 LepWrap is a reusable pipeline to use the linkage map software [Lep-Map3](https://sourceforge.net/projects/lep-map3/) and the genome assembly map-based anchoring and orienting software [Lep-Anchor](https://sourceforge.net/p/lep-anchor/wiki/Home/). Check out [the documentation/wiki](https://github.com/pdimens/LepWrap/wiki) for detailed installation, usage, and workflow information.
 
 ### How to install
-You will need a `conda` installation ([Anaconda](https://docs.anaconda.com/anaconda/install/) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html), I recommend Miniconda). Alternatively, you can download latest release or clone this repository locally.
+You will need a `conda` installation ([Anaconda](https://docs.anaconda.com/anaconda/install/) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html), I recommend Miniconda). Alternatively, you can download latest release or clone this repository locally (see wiki)
 
-#### 1. The Easy Way™️ 
 Create an environment called `lepwrap` and install `LepWrap` into it in a single command.
 ```bash
 conda create -n lepwrap -c bioconda lepwrap
 ```
 Activate the environment with `conda activate lepwrap`
 
-#### 2. The Other Way
-##### 2.1 Cloning LepWrap
-Download a zip of this repository using the "Code" button on the top-right and unzip it on your machine or:
+This can also be done in an environment of your choosing
 ```bash
-git clone https://github.com/pdimens/LepWrap.git
+conda activate some_env
+conda install -c bioconda lepwrap
 ```
-
-##### 2.2 Installing everything
-Assuming you have `anaconda` or `miniconda` installed:
-```bash
-cd LepWrap
-conda env create -f conda_setup.yml
-```
-This will create an environment called `lepwrap` that can be activated with:
-```bash
-conda activate lepwrap
-```
-Then, install all the software dependencies into the environment's path with 
-```bash
-.misc/install.sh
-```
-
 ### How to run
 You will need to modify `config.yml` to suit your needs, then you can simply run the pipeline with the wrapper:
 ```bash
