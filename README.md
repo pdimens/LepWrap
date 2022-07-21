@@ -35,7 +35,7 @@ LepWrap 15                    # assumes config.yml
 LepWrap 32 nojoinsingles.yml  # specific config file
 ```
 ### Something to keep in mind
-LepWrap does things a certain way, employing the most common/reasonable way of using Lep-Map3 (and LepAnchor more or less). Current versions are **a lot** more flexible that the predecessors, but might still lack something you need. Your study is unique, and I encourage you to clone/fork this repository and adapt LepWrap to it! All of the code in LepWrap is written in human-readable bash or aggressively annotated R, so give it a shot and adapt it to your workflow. PR's always welcome!
+LepWrap does things a certain way, employing the most common/reasonable way of using Lep-Map3 (and LepAnchor, _more or less_). The current version is **a lot** more flexible that its predecessors, but might still lack something you need. Your study is unique, and I encourage you to clone/fork this repository and adapt LepWrap to it! All of the code in LepWrap is written in human-readable bash or aggressively annotated R, so give it a shot and adapt it to your workflow. PR's welcome!
 
 
 ## Citation
