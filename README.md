@@ -39,7 +39,7 @@ LepWrap does things a certain way, employing the most common/reasonable way of u
 
 
 ## Citation
-If using LepWrap in a publication, cite **Pasi Rastas** for their work on Lep-Map3/Lep-Anchor and cite this repository using the Zenodo citation. You are also encouraged to cite LepWrap if you just use the edge-trimming part of it. If you like LepWrap, please Star the repository and/or give me (Pavel) a shout out on Twitter [@pvdimens](https://twitter.com/PVDimens) [![alt text](http://i.imgur.com/wWzX9uB.png)](https://twitter.com/PVDimens)  =)
+If using LepWrap in a publication, cite **Pasi Rastas** for their work on Lep-Map3/Lep-Anchor and cite this repository using the Zenodo citation. You are also encouraged to cite LepWrap if you just use the edge-trimming part of it. If you like LepWrap, please Star the repository and/or give me (Pavel) a shout out on social media [mastodon](https://ecoevo.social/@pvdimens) [bluesky](https://bsky.app/profile/pvdimens.bsky.social)  =)
 
 > Pavel V. Dimens. (2022). pdimens/LepWrap: link with zenodo (4.0). Zenodo. https://doi.org/10.5281/zenodo.6055565
 
