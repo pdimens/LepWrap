@@ -2,21 +2,21 @@ from os import path
 import glob
 
 # PlaceAndOrientContigs #
-data_type = config["lepanchor_input"]
-geno = config["assembly"]
-paf = config["PAF_file"]
-proximity = config["proximity_file"]
-haplo_limit = config["haplotype_limit"]
-place_orient_extra = config["extra_params_PlaceOrient"]
-# Map2Bed #
-map2bed_extra = config["extra_params_Map2Bed"]
+lg = config["LepAnchor"]["lg_count"]
+geno = config["LepAnchor"]["assembly"]
+paf = config["LepAnchor"]["PAF_file"]
+data_type = config["LepAnchor"]["PlaceAndOrientContigs"]["lepanchor_input"]
+proximity = config["LepAnchor"]["proximity_file"]
+haplo_limit = config["LepAnchor"]["PlaceAndOrientContigs"]["haplotype_limit"]
+place_orient_extra = config["LepAnchor"]["PlaceAndOrientContigs"]["extra_params"]
 # CleanMap #
-cleanmap_extra = config["extra_params_CleanMap"]
+cleanmap_extra = config["LepAnchor"]["CleanMap"]["extra_params"]
+# Map2Bed #
+map2bed_extra = config["LepAnchor"]["Map2Bed"]["extra_params"]
 # Edge Trimming #
-edgelen = config["LA_edge_length"]
-trimdist = config["LA_trim_cutoff"]
+edgelen = config["LepAnchor"]["EdgeTrimming"]["edge_length"]
+trimdist = config["LepAnchor"]["EdgeTrimming"]["cutoff"]
 # Other #
-lg = config["lg_count"]
 lg_range = list(range(1,lg+1))
 
 include: "generate_inputs.smk"

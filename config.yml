@@ -1,147 +1,111 @@
 # Configuration file for LepWrap
-#=======================================================#
-#                       Lep-Map 3                       #
-#=======================================================#
-# Change this to false if you want to skip Lep-Map3
-run_lepmap: true
 
-  #----- ParentCall2 ------#
-# The filtered VCF file with your genotype likelihoods:
-vcf: mydata.vcf
-
-# Instructions to create pedigree file: https://sourceforge.net/p/lep-map3/wiki/software/LepMap3 Home/#parentcall2
-# the pedigree file associated with your data
-pedigree: pedigree.txt
-
-# Additional parameters for ParentCall2 (e.g. halfSibs=1), if any
-extra_params_ParentCall: "removeNonInformative=1"
-
-
-  #----- Filtering2 -----#
-# Data tolerance value-- set this to 0 if you want to skip the Filtering2 module
-data_tol: 0
-
-# Additional parameters for Filtering2 (e.g. convert2Biallelic=1), if any
-extra_params_Filtering: ""
-
-
-  #----- SeperateChromosomes2 -----#
-# LepWrap will iteratively perform SeperateChromosomes2 for each
-# LOD score in the range of lod_min to lod_max
-
-# The minimum LOD for SeperateChromosomes2
-lod_min: 10
-
-# The maximum LOD for SeperateChromosomes2
-lod_max: 50
-
-# Use only markers with informative father (1), mother(2), both parents(3) or neither parent(0)
-informative: "informativeMask=3"
-
-# Additional parameters for SeparateChromosomes2 (e.g. distrotionLOD=1), if any
-extra_params_SeparateChromosomes: "sizeLimit=5 distortionLod=1"
-
-
-  #----- JoinSingles2ALL -----#
-# Set this to false if you want to skip joining singles (0) to linkage groups
-run_joinsingles2all: false
-
-# These are the parameters for JoinSingles2ALL, and are highly data-dependent
-# Start with lower values for lod_limit and increase as necessary
-lod_limit: "lodLimit=2"
-
-# Start with lower values for lod_limit and increase as necessary
-lod_difference: "lodDifference=2"
-
-# Additional parameters for JoinSingles2All (e.g. iterate=1), if any
-extra_params_JoinSingles: "iterate=1 distortionLod=1"
+LepMap3:
+  # Change this to false if you want to skip Lep-Map3
+  run_lepmap: true
+  #The filtered VCF file with your genotype likelihoods:
+  vcf: mydata.vcf
+  # Instructions to create pedigree file: https://sourceforge.net/p/lep-map3/wiki/software/LepMap3 Home/#parentcall2
+  # the pedigree file associated with your data
+  pedigree: pedigree.txt
+  ParentCall2:
+    # Additional parameters for ParentCall2 (e.g. halfSibs=1), if any
+    extra_params: "removeNonInformative=1"
+  
+  Filtering2:
+    # Data tolerance value-- set this to 0 if you want to skip the Filtering2 module
+    data_tol: 0
+    # Additional parameters for Filtering2 (e.g. convert2Biallelic=1), if any
+    extra_params: ""
+  
+  SeperateChromosomes2:
+    # LepWrap will iteratively perform SeperateChromosomes2 for each
+    # LOD score in the range of lod_min to lod_max
+    # The minimum LOD for SeperateChromosomes2
+    lod_min: 10
+    # The maximum LOD for SeperateChromosomes2
+    lod_max: 50
+    # Use only markers with informative father (1), mother(2), both parents(3) or neither parent(0)
+    informative: "informativeMask=3"
+    # Additional parameters for SeparateChromosomes2 (e.g. distrotionLOD=1), if any
+    extra_params: "sizeLimit=5 distortionLod=1"
+  
+  JoinSingles2ALL:
+    # Set this to false if you want to skip joining singles (0) to linkage groups
+    run: false
+    # These are the parameters for JoinSingles2ALL, and are highly data-dependent
+    # Start with lower values for lod_limit and increase as necessary
+    lod_limit: "lodLimit=2"
+    # Start with lower values for lod_limit and increase as necessary
+    lod_difference: "lodDifference=2"
+    # Additional parameters for JoinSingles2All (e.g. iterate=1), if any
+    extra_params: "iterate=1 distortionLod=1"
  
+  OrderMarkers2:
+    # Set exp_lg to your expected number of chromosomes for iterative ordering
+    exp_lg: 24
+    # Additional parameters for OrderMarkers2 (e.g. hyperPhaser=1), if any
+    # I recommend setting numMergeIterations to ~100 (Lep-Map3 default is 6)
+    extra_params: "useKosambi=1 phasingIterations=2 numMergeIterations=100"
 
-  #----- OrderMarkers2 -----#
-# Set exp_lg to your expected number of chromosomes for iterative ordering
-exp_lg: 24
+  EdgeTrimming:
+    # Edge trimming will examine the first and last X% of markers in a linkage group
+    # and remove clusters that are N% centimorgans (of the total cM span) away from 
+    # the next marker. You can "skip" trimming by setting trim_cutoff really high (e.g. 80-100).
+    # Set edge_length to the percent number of markers you would like to examine from either end of the linkage group
+    # Value can be an integer or decimal, i.e. 15 is the same as 0.15, which both mean "15%" (10-20 is reasonable)
+    edge_length: 20
+    # Set the trim cuttoff to the centiMorgan distance cutoff (5-10 is reasonable)
+    cutoff: 100 
 
-# Additional parameters for OrderMarkers2 (e.g. hyperPhaser=1), if any
-# I recommend setting numMergeIterations to ~100 (Lep-Map3 default is 6)
-extra_params_OrderMarkers: "useKosambi=1 phasingIterations=2 numMergeIterations=100"
+  ReOrderMarkers2:
+    # The second round of OrderMarkers will use the same basic parameters as the first round (but not the extra params)
+    # If there are additional parameters you would like to use, add them here:
+    extra_params: "improveOrder=1 useKosambi=1 numMergeIterations=75"
 
-
-  #----- Edge Trimming -----#
-# Edge trimming will examine the first and last X% of markers in a linkage group
-# and remove clusters that are N% centimorgans (of the total cM span) away from 
-# the next marker. You can "skip" trimming by setting trim_cutoff really high (e.g. 80-100).
-
-# Set edge_length to the percent number of markers you would like to examine from either end of the linkage group
-# Value can be an integer or decimal, i.e. 15 is the same as 0.15, which both mean "15%" (10-20 is reasonable)
-edge_length: 20
-
-# Set trim_cuttoff to the centiMorgan distance cutoff (5-10 is reasonable)
-trim_cutoff: 100 
-
-
-  #----- Re-OrderMarkers2 -----#
-# The second round of OrderMarkers will use the same basic parameters as the first round (but not the extra params)
-# If there are additional parameters you would like to use, add them here:
-extra_params_reOrderMarkers: "improveOrder=1 useKosambi=1 numMergeIterations=75"
-
-  #----- Calculate Distances -----#
-# If you used useKosambi=1 or useMorgan=1 for Ordering/reOrdering, add that same
-# parameter to distance_method, otherwise leave it as a blank string
-distance_method: "useKosambi=1"
+  CalculateDistances:
+    # If you used useKosambi=1 or useMorgan=1 for Ordering/reOrdering, add that same
+    # parameter to distance_method, otherwise leave it as a blank string
+    distance_method: "useKosambi=1"
 
 
-#=======================================================#
-#                       Lep-Anchor                      #
-#=======================================================#
-  #---- global settings ----#
-# Change this to false if you want to skip Lep-Anchor
-run_lepanchor: true
+LepAnchor:
+  # Change this to false if you want to skip Lep-Anchor
+  run_lepanchor: true
+  # The path to the genome assembly you are trying to anchor 
+  assembly: assembly.fasta
+  # The number of linkage groups you have
+  lg_count: 24
+  # If you have a PAF file of long reads mapped to your genome, add it here, otherwise leave the text as "/dev/null"
+  PAF_file: /dev/null
+  # If you have a proximity file add it here, otherwise leave the text as "/dev/null".
+  # This isn't yet implemented in Lep-Anchor.
+  proximity_file: /dev/null
 
-# The path to the genome assembly you are trying to anchor 
-assembly: assembly.fasta
+  CleanMap:
+    # Additional parameters for CleanMap (e.g. chimericDistance=500), if any
+    extra_params: ""
 
-# The number of linkage groups you have
-lg_count: 24
+  Map2Bed:
+    # Additional parameters for Map2Bed (e.g. markerSupport=4), if any
+    extra_params: ""
 
-# If you have a PAF file of long reads mapped to your genome, add it here, otherwise leave the text as "/dev/null"
-PAF_file: /dev/null
+  PlaceAndOrientContigs:
+    # Choose which of the input types you want to generate by leaving it uncommented. Intervals are the default, but either works.
+    #lepanchor_input: "noIntervals=0"  # data is intervals
+    lepanchor_input: "noIntervals=1"  # data is distances
+    # The size limit for detecting potential haplotype contigs (LepAnchor default: 2000)
+    # Set this value really high (50000+) to ignore haplotype removal in between PlaceOrient iterations
+    haplotype_limit: 2000
+    # Additional parameters you would like to use for PlaceAndOrientContigs, if any (e.g. randomOrder=1)
+    extra_params: "keepEmptyIntervals=1 numRuns=10"
 
-# If you have a proximity file add it here, otherwise leave the text as "/dev/null".
-# This isn't yet implemented in Lep-Anchor.
-proximity_file: /dev/null
-
-
-  #----- CleanMap -----#
-# Additional parameters for CleanMap (e.g. chimericDistance=500), if any
-extra_params_CleanMap: ""
-
-
-  #----- Map2Bed -----#
-# Additional parameters for Map2Bed (e.g. markerSupport=4), if any
-extra_params_Map2Bed: ""
-
-
-  #----- PlaceAndOrientContigs -----#
-# Choose which of the input types you want to generate by leaving it uncommented. Intervals are the default, but either works.
-#lepanchor_input: "noIntervals=0"  # data is intervals
-lepanchor_input: "noIntervals=1"  # data is distances
-
-# The size limit for detecting potential haplotype contigs (LepAnchor default: 2000)
-# Set this value really high (50000+) to ignore haplotype removal in between PlaceOrient iterations
-haplotype_limit: 2000
-
-# Additional parameters you would like to use for PlaceAndOrientContigs, if any (e.g. randomOrder=1)
-extra_params_PlaceOrient: "keepEmptyIntervals=1 numRuns=10"
-
-
-  #----- Edge Trimming -----#
-# Edge trimming will examine the first and last X% of markers in a linkage group
-# and remove clusters that are N% centimorgans (of the total cM span) away from 
-# the next marker. You can "skip" trimming by setting  LA_trim_cutoff really high (e.g. 80-100) 
-
-# Set edge_length to the percent number of markers you would like to examine from either end of the linkage group
-# Value can be an integer or decimal, i.e. 15 is the same as 0.15, which both mean "15%" (10-15 is reasonable)
-LA_edge_length: 20
-
-# Set trim_cuttoff to the centiMorgan distance cutoff (5 is reasonable)
-LA_trim_cutoff: 5
+  EdgeTrimming:
+    # Edge trimming will examine the first and last X% of markers in a linkage group
+    # and remove clusters that are N% centimorgans (of the total cM span) away from 
+    # the next marker. You can "skip" trimming by setting  LA_trim_cutoff really high (e.g. 80-100) 
+    # Set edge_length to the percent number of markers you would like to examine from either end of the linkage group
+    # Value can be an integer or decimal, i.e. 15 is the same as 0.15, which both mean "15%" (10-15 is reasonable)
+    edge_length: 20
+    # Set the trim cuttoff to the centiMorgan distance cutoff (5 is reasonable)
+    cutoff: 5
