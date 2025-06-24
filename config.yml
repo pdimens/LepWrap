@@ -7,11 +7,11 @@ run_lepmap: true
 
   #----- ParentCall2 ------#
 # The filtered VCF file with your genotype likelihoods:
-vcf: "mydata.vcf"
+vcf: mydata.vcf
 
 # Instructions to create pedigree file: https://sourceforge.net/p/lep-map3/wiki/software/LepMap3 Home/#parentcall2
 # the pedigree file associated with your data
-pedigree: "pedigree.txt"
+pedigree: pedigree.txt
 
 # Additional parameters for ParentCall2 (e.g. halfSibs=1), if any
 extra_params_ParentCall: "removeNonInformative=1"
@@ -98,17 +98,17 @@ distance_method: "useKosambi=1"
 run_lepanchor: true
 
 # The path to the genome assembly you are trying to anchor 
-assembly: "assembly.fasta"
+assembly: assembly.fasta
 
 # The number of linkage groups you have
 lg_count: 24
 
 # If you have a PAF file of long reads mapped to your genome, add it here, otherwise leave the text as "/dev/null"
-PAF_file: "/dev/null"
+PAF_file: /dev/null
 
 # If you have a proximity file add it here, otherwise leave the text as "/dev/null".
 # This isn't yet implemented in Lep-Anchor.
-proximity_file: "/dev/null"
+proximity_file: /dev/null
 
 
   #----- CleanMap -----#
